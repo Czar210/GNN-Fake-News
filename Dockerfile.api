@@ -1,0 +1,44 @@
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Dependências de sistema necessárias para compilação de pacotes C
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gcc g++ \
+    && rm -rf /var/lib/apt/lists/*
+
+# ── Torch CPU (muito menor que a versão CUDA, ~1.2GB vs ~2.5GB) ──────────────
+RUN pip install --no-cache-dir \
+    torch==2.5.1 \
+    --index-url https://download.pytorch.org/whl/cpu
+
+# ── PyTorch Geometric ─────────────────────────────────────────────────────────
+RUN pip install --no-cache-dir torch-geometric==2.6.1
+
+# ── Demais dependências da API ────────────────────────────────────────────────
+COPY requirements.api.txt .
+RUN pip install --no-cache-dir -r requirements.api.txt
+
+# ── Pré-download do modelo BERT (evita cold-start lento no primeiro uso) ──────
+RUN python -c "\
+from sentence_transformers import SentenceTransformer; \
+SentenceTransformer('paraphrase-multilingual-mpnet-base-v2')"
+
+# ── Código da aplicação ───────────────────────────────────────────────────────
+# API
+COPY Interface/frontend/api/ ./Interface/frontend/api/
+
+# Módulos do projeto (coleta e embeddings)
+COPY Training/01_BlueSky_Pipe/src/ ./Training/01_BlueSky_Pipe/src/
+
+# Modelos treinados (.pth)
+COPY Execution/weights/pesos_gcn.pth          ./Execution/weights/pesos_gcn.pth
+COPY Execution/weights/pesos_bs_ctrl.pth      ./Execution/weights/pesos_bs_ctrl.pth
+COPY Execution/weights/pesos_bs_cetico.pth    ./Execution/weights/pesos_bs_cetico.pth
+COPY Execution/weights/pesos_bs_ex_cetico.pth ./Execution/weights/pesos_bs_ex_cetico.pth
+
+WORKDIR /app/Interface/frontend/api
+
+EXPOSE 8000
+
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]

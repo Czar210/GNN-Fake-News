@@ -1,0 +1,28 @@
+# Dependências mínimas para o container da API
+# torch e torch-geometric são instalados separadamente no Dockerfile (CPU-only)
+
+fastapi
+uvicorn[standard]
+sqlalchemy
+pydantic
+python-dotenv
+
+# Bluesky / AT Protocol
+atproto==0.0.63
+
+# NLP
+sentence-transformers==5.1.2
+transformers==4.57.1
+tokenizers==0.22.1
+huggingface-hub==0.36.0
+safetensors==0.6.2
+
+# Data
+pandas==2.3.3
+numpy==2.3.4
+pyarrow==22.0.0
+
+# Utils
+tqdm==4.67.1
+requests==2.32.5
+python-dateutil==2.9.0.post0

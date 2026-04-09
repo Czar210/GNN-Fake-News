@@ -1,0 +1,19 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+:root {
+  --bsky-blue: #0085ff;
+  --bg-dark: #050b14;
+}
+
+body {
+  background: radial-gradient(circle at center, #0a192f 0%, var(--bg-dark) 100%);
+  color: #e2e8f0;
+  font-family: 'Inter', sans-serif;
+}
+
+.glass {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}

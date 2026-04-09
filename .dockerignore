@@ -1,0 +1,47 @@
+# Dataset massivo (está no Hugging Face, não vai na imagem)
+14669616.zip
+dados_bluesky/
+
+# Ambiente virtual local
+.venv/
+venv/
+env/
+
+# Node
+Interface/frontend/web/node_modules/
+Interface/frontend/web/.next/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Treinamento e dados (não necessários pra API)
+Training/03_Mega_Research/
+Training/02_UPFD_Benchmark/
+Material/
+Photos/
+Tests/
+Flow/
+Execution/results/
+Execution/scripts/
+
+# Dados coletados (regeneráveis)
+Training/01_BlueSky_Pipe/data/
+
+# Arquivos de trabalho
+*.db
+*.log
+
+# Git
+.git/
+.gitignore
+
+# Credenciais (passadas via env vars no compose)
+.env
+
+# Outros
+.cursorignore
+.cursorindexingignore
+implementation_plan.md
+guia_desenvolvimento.md

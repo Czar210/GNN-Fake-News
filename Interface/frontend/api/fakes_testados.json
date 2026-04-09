@@ -1,0 +1,24 @@
+[
+    {
+        "url": "https://bsky.app/profile/freeblowjob.deichator.ar/post/3mhm433r7bs2u",
+        "texto": "Sangue não significa NADA. pai é quem caça briga com a cantora internacional chappel roan por você",
+        "score_veredicto": 0.7486,
+        "modelos": {
+            "UPFD_Baseline": 0.4408,
+            "Bluesky_Controlado": 0.0227,
+            "Bluesky_Cetico": 1.0,
+            "Bluesky_Exa_Cetico": 1.0
+        }
+    },
+    {
+        "url": "https://bsky.app/profile/orathiago.com/post/3mhp2tg76xc2c",
+        "texto": "a mãe da criança agredida por chappel roan no instagram",
+        "score_veredicto": 0.8481,
+        "modelos": {
+            "UPFD_Baseline": 0.4576,
+            "Bluesky_Controlado": 0.5641,
+            "Bluesky_Cetico": 0.9652,
+            "Bluesky_Exa_Cetico": 1.0
+        }
+    }
+]
