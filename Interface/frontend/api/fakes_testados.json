@@ -20,5 +20,82 @@
             "Bluesky_Cetico": 0.9652,
             "Bluesky_Exa_Cetico": 1.0
         }
+    },
+    {
+        "url": "https://bsky.app/profile/stevenbeschloss.bsky.social/post/3mjeux776ds2f",
+        "texto": "Scraper inativo (credenciais BSKY ausentes). Modo Simulação.",
+        "score_veredicto": 0.9473,
+        "modelos": {
+            "UPFD_Baseline": 0.4743,
+            "Bluesky_Controlado": 0.9997,
+            "Bluesky_Cetico": 0.9998,
+            "Bluesky_Exa_Cetico": 0.9999
+        }
+    },
+    {
+        "url": "https://bsky.app/profile/freeblowjob.deichator.ar/post/3mhm433r7bs2u",
+        "texto": "Scraper inativo (credenciais BSKY ausentes). Modo Simulação.",
+        "score_veredicto": 0.9473,
+        "modelos": {
+            "UPFD_Baseline": 0.4743,
+            "Bluesky_Controlado": 0.9997,
+            "Bluesky_Cetico": 0.9998,
+            "Bluesky_Exa_Cetico": 0.9999
+        }
+    },
+    {
+        "url": "https://bsky.app/profile/bsky.app/post/3mizb7z3cg22p",
+        "texto": "Scraper inativo (credenciais BSKY ausentes). Modo Simulação.",
+        "score_veredicto": 0.9473,
+        "modelos": {
+            "UPFD_Baseline": 0.4743,
+            "Bluesky_Controlado": 0.9997,
+            "Bluesky_Cetico": 0.9998,
+            "Bluesky_Exa_Cetico": 0.9999
+        }
+    },
+    {
+        "url": "https://bsky.app/profile/bsky.app/post/3mizb7z3cg22p",
+        "texto": "Scraper inativo (credenciais BSKY ausentes). Modo Simulação.",
+        "score_veredicto": 0.9467,
+        "modelos": {
+            "UPFD_Baseline": 0.4793,
+            "Bluesky_Controlado": 0.9985,
+            "Bluesky_Cetico": 0.9984,
+            "Bluesky_Exa_Cetico": 0.9988
+        }
+    },
+    {
+        "url": "https://bsky.app/profile/bsky.app/post/3mizb7z3cg22p",
+        "texto": "Scraper inativo (credenciais BSKY ausentes). Modo Simulação.",
+        "score_veredicto": 0.9467,
+        "modelos": {
+            "UPFD_Baseline": 0.4793,
+            "Bluesky_Controlado": 0.9985,
+            "Bluesky_Cetico": 0.9984,
+            "Bluesky_Exa_Cetico": 0.9988
+        }
+    },
+    {
+        "url": "https://bsky.app/profile/bsky.app/post/3mizb7z3cg22p",
+        "texto": "Scraper inativo (credenciais BSKY ausentes). Modo Simulação.",
+        "score_veredicto": 0.9467,
+        "modelos": {
+            "UPFD_Baseline": 0.4793,
+            "Bluesky_Controlado": 0.9985,
+            "Bluesky_Cetico": 0.9984,
+            "Bluesky_Exa_Cetico": 0.9988
+        }
+    },
+    {
+        "url": "https://bsky.app/profile/bsky.app/post/3mizb7z3cg22p",
+        "texto": "Scraper inativo (credenciais BSKY ausentes). Modo Simulação.",
+        "score_veredicto": 0.9467,
+        "modelos": {
+            "UPFD_Baseline": 0.4793,
+            "Bluesky_Controlado": 0.9985,
+            "Bluesky_Cetico": 0.9984,
+            "Bluesky_Exa_Cetico": 0.9988
+        }
     }
 ]

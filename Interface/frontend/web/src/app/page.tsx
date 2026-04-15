@@ -1,9 +1,15 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import dynamic from "next/dynamic";
 import { Search, ShieldAlert, ShieldCheck, Activity, BarChart3, Clock, Globe } from "lucide-react";
 
-// ─── Visualização do Grafo de Propagação ──────────────────────────────────────
+const ForceGraph2D = dynamic(() => import("react-force-graph-2d"), { ssr: false });
+
+// ─── Visualização interativa do Grafo de Propagação ───────────────────────────
 function GraphViz({ explanation, isFake }: { explanation: any; isFake: boolean }) {
+  const fgRef = useRef<any>(null);
+  const [hoverNode, setHoverNode] = useState<any>(null);
+
   if (!explanation || !explanation.edges || explanation.edges.length === 0) {
     return (
       <p className="text-center text-gray-500 text-sm py-6">
@@ -12,74 +18,91 @@ function GraphViz({ explanation, isFake }: { explanation: any; isFake: boolean }
     );
   }
 
-  const W = 520, H = 300;
-  const cx = W / 2, cy = H / 2;
-  const RADIUS = 115;
-
-  // Limita a 12 filhos para não poluir o SVG
-  const edges: Array<{ from: number; to: number; importance: number }> =
-    explanation.edges.slice(0, 12);
-  const numChildren = edges.length;
-
-  const childPos = edges.map((_, i) => {
-    const angle = (2 * Math.PI * i) / numChildren - Math.PI / 2;
-    return { x: cx + RADIUS * Math.cos(angle), y: cy + RADIUS * Math.sin(angle) };
-  });
-
   const edgeColor = (imp: number) =>
     imp > 0.66 ? (isFake ? "#ef4444" : "#10b981")
     : imp > 0.33 ? "#f59e0b"
     : "#374151";
 
+  const graphData = useMemo(() => {
+    const nodeSet = new Set<number>();
+    const edges: Array<{ from: number; to: number; importance: number }> = explanation.edges;
+    edges.forEach((e) => { nodeSet.add(e.from); nodeSet.add(e.to); });
+
+    const nodes = Array.from(nodeSet).map((id) => ({
+      id,
+      isRoot: id === 0,
+      label: id === 0 ? "POST" : `${id}`,
+    }));
+
+    const links = edges.map((e) => ({
+      source: e.from,
+      target: e.to,
+      importance: e.importance,
+      color: edgeColor(e.importance),
+      width: 1 + e.importance * 5,
+    }));
+
+    return { nodes, links };
+  }, [explanation, isFake]);
+
+  const paintNode = useCallback((node: any, ctx: CanvasRenderingContext2D, globalScale: number) => {
+    const r = node.isRoot ? 10 : 6;
+    const isHovered = hoverNode === node;
+
+    // Glow effect on hover
+    if (isHovered) {
+      ctx.beginPath();
+      ctx.arc(node.x, node.y, r + 4, 0, 2 * Math.PI);
+      ctx.fillStyle = isFake ? "rgba(239,68,68,0.25)" : "rgba(16,185,129,0.25)";
+      ctx.fill();
+    }
+
+    // Node circle
+    ctx.beginPath();
+    ctx.arc(node.x, node.y, r, 0, 2 * Math.PI);
+    ctx.fillStyle = node.isRoot ? "#1e3a5f" : "#1f2937";
+    ctx.fill();
+    ctx.strokeStyle = node.isRoot ? "#3b82f6" : (isFake ? "#ef4444" : "#10b981");
+    ctx.lineWidth = node.isRoot ? 2.5 : 1.5;
+    ctx.stroke();
+
+    // Label
+    const fontSize = node.isRoot ? 12 / globalScale : 9 / globalScale;
+    ctx.font = `${node.isRoot ? "bold " : ""}${fontSize}px monospace`;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillStyle = node.isRoot ? "#93c5fd" : "#e5e7eb";
+    ctx.fillText(node.label, node.x, node.y);
+  }, [hoverNode, isFake]);
+
   return (
-    <svg
-      viewBox={`0 0 ${W} ${H}`}
-      className="w-full max-w-lg mx-auto"
-      aria-label="Grafo de propagação"
-    >
-      {/* Arestas */}
-      {edges.map((e, i) => {
-        const imp = e.importance;
-        const { x, y } = childPos[i];
-        return (
-          <line
-            key={i}
-            x1={cx} y1={cy}
-            x2={x}  y2={y}
-            stroke={edgeColor(imp)}
-            strokeWidth={1 + imp * 5}
-            strokeOpacity={0.35 + imp * 0.65}
-          />
-        );
-      })}
-
-      {/* Nós filhos (interações) */}
-      {edges.map((e, i) => {
-        const imp = e.importance;
-        const { x, y } = childPos[i];
-        const highlight = imp > 0.5;
-        return (
-          <g key={i}>
-            <circle
-              cx={x} cy={y} r={15}
-              fill={highlight ? (isFake ? "#7f1d1d" : "#064e3b") : "#1f2937"}
-              stroke={edgeColor(imp)}
-              strokeWidth={2}
-            />
-            <text x={x} y={y + 1} textAnchor="middle" dominantBaseline="middle"
-              fill="white" fontSize={8} fontFamily="monospace">
-              {e.to}
-            </text>
-            <title>{`Nó ${e.to} — influência: ${(imp * 100).toFixed(0)}%`}</title>
-          </g>
-        );
-      })}
-
-      {/* Nó raiz */}
-      <circle cx={cx} cy={cy} r={24} fill="#1e3a5f" stroke="#3b82f6" strokeWidth={2.5} />
-      <text x={cx} y={cy - 4} textAnchor="middle" fill="white" fontSize={9} fontWeight="bold">POST</text>
-      <text x={cx} y={cy + 8} textAnchor="middle" fill="#93c5fd" fontSize={7}>raiz</text>
-    </svg>
+    <div className="w-full flex justify-center rounded-xl overflow-hidden bg-black/30 border border-white/5">
+      <ForceGraph2D
+        ref={fgRef}
+        graphData={graphData}
+        width={520}
+        height={340}
+        backgroundColor="transparent"
+        nodeCanvasObject={paintNode}
+        nodePointerAreaPaint={(node: any, color: string, ctx: CanvasRenderingContext2D) => {
+          ctx.beginPath();
+          ctx.arc(node.x, node.y, node.isRoot ? 12 : 8, 0, 2 * Math.PI);
+          ctx.fillStyle = color;
+          ctx.fill();
+        }}
+        onNodeHover={setHoverNode}
+        linkColor={(link: any) => link.color}
+        linkWidth={(link: any) => link.width}
+        linkDirectionalParticles={(link: any) => link.importance > 0.5 ? 2 : 0}
+        linkDirectionalParticleWidth={2}
+        linkDirectionalParticleSpeed={0.005}
+        cooldownTicks={60}
+        onEngineStop={() => fgRef.current?.zoomToFit(300, 30)}
+        enableZoomInteraction={true}
+        enablePanInteraction={true}
+        nodeLabel={(node: any) => node.isRoot ? "Nó raiz (post original)" : `Nó ${node.id} — interação`}
+      />
+    </div>
   );
 }
 
@@ -141,7 +164,7 @@ function GraphLegend({ isFake }: { isFake: boolean }) {
   );
 }
 
-const API_URL = "http://localhost:8000";
+const API_URL = "http://localhost:8001";
 
 export default function Home() {
   const [url, setUrl] = useState("");

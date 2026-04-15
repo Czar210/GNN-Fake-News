@@ -178,6 +178,28 @@ class RequestURL(BaseModel):
 
 # ─── Lógica de inferência (roda em background thread) ────────────────────────
 
+def _count_thread_nodes(thread_node) -> tuple[int, list]:
+    """
+    Percorre a árvore de replies recursivamente e retorna:
+      - total de nós filhos (excluindo a raiz)
+      - lista de arestas (parent_idx, child_idx) para o grafo
+    """
+    edges = []
+    counter = [0]  # mutable counter para closure
+
+    def _walk(node, parent_idx: int):
+        if not hasattr(node, "replies") or not node.replies:
+            return
+        for reply in node.replies:
+            counter[0] += 1
+            child_idx = counter[0]
+            edges.append((parent_idx, child_idx))
+            _walk(reply, child_idx)
+
+    _walk(thread_node, 0)
+    return counter[0], edges
+
+
 def _run_inference(url: str, task_id: str) -> None:
     """
     Executa toda a pipeline pesada (scrape → BERT → GNN) e salva
@@ -188,7 +210,8 @@ def _run_inference(url: str, task_id: str) -> None:
     db = SessionLocal()
     try:
         post_text = "Texto não extraído."
-        interacoes = 5
+        interacoes = 0
+        tree_edges = []
 
         # Scrape via AT Protocol
         if bsky_client:
@@ -209,8 +232,7 @@ def _run_inference(url: str, task_id: str) -> None:
                 thread = bsky_client.app.bsky.feed.get_post_thread({"uri": uri, "depth": 10})
                 post_text = thread.thread.post.record.text
 
-                if hasattr(thread.thread, "replies") and thread.thread.replies:
-                    interacoes = len(thread.thread.replies)
+                interacoes, tree_edges = _count_thread_nodes(thread.thread)
             except Exception as e:
                 post_text = f"Simulação local — erro na extração: {str(e)[:50]}"
         else:
@@ -229,7 +251,13 @@ def _run_inference(url: str, task_id: str) -> None:
         num_nodos = 1 + interacoes
         x        = torch.stack([x_raiz] * num_nodos)
 
-        if interacoes > 0:
+        if tree_edges:
+            # Usa a árvore real de propagação extraída da thread
+            src = [e[0] for e in tree_edges]
+            dst = [e[1] for e in tree_edges]
+            edge_index = torch.tensor([src, dst], dtype=torch.long)
+        elif interacoes > 0:
+            # Fallback: estrela simples (raiz → filhos)
             edge_index = torch.tensor([[0] * interacoes, list(range(1, num_nodos))], dtype=torch.long)
         else:
             edge_index = torch.tensor([[], []], dtype=torch.long)
