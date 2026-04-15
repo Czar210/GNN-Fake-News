@@ -1,0 +1,25 @@
+==========================================================
+  RELATORIO COMPARATIVO - GCN vs GAT
+==========================================================
+  Dataset:  Bluesky (HuggingFace: Zaras210/bluesky-fake-news-dataset)
+  Épocas:   30  |  Batch: 64
+
+  Métrica               GCN      GAT        Δ
+  --------------------------------------------
+  Accuracy           0.9951   0.9942 -0.0009
+  Precision          0.7042   0.0000 -0.7042
+  Recall             0.2577   0.0000 -0.2577
+  F1                 0.3774   0.0000 -0.3774
+
+  Parâmetros         57,666  218,562
+  Tempo/época         9.98s   13.10s
+
+  → Vencedor em F1: GCN (margem: 0.3774)
+
+==========================================================
+  CONCLUSÃO PARA A MONOGRAFIA
+==========================================================
+  GCN superou o GAT (margem: 0.3774).
+  Possível causa: grafos pequenos/rasos não se beneficiam
+  tanto do mecanismo de atenção.
+==========================================================

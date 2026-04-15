@@ -23,10 +23,6 @@ def carregar_dataset_upfd():
     """
     print(f"Baixando e carregando o dataset UPFD (PolitiFact) para: {DATA_PATH}")
     try:
-        # =====================================================================
-        # <<< AQUI ESTÁ A CORREÇÃO >>>
-        # Mudei "PolitiFact" para "politifact" (tudo minúsculo)
-        # =====================================================================
         dataset = UPFD(root=DATA_PATH, name="politifact", feature="bert")
         
         print("\n--- Dataset UPFD Carregado com Sucesso ---")

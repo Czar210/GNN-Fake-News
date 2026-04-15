@@ -182,3 +182,6 @@ Material/politifact/raw/new_bert_feature.npz
 
 # Credenciais
 .env
+
+# Weights
+*.pt
