@@ -1,0 +1,36 @@
+========================================================================
+  RELATORIO DE INFERENCIA CRUZADA -- Bluesky <-> UPFD (fakenewsnet)
+========================================================================
+
+  NOTA: Bluesky usa label 1=Fake; UPFD usa label 0=Fake.
+  F1 calculado sobre a classe Fake em ambos os casos.
+
+  Cenario                               GCN      GAT     SAGE
+  ------------------------------------------------------------
+  BS -> BS   (in-domain, Bluesky)    0.4128   0.0000   0.2489
+  UPFD -> UPFD (in-domain, fakenewsnet)   0.8456   0.8591   0.8553
+
+  BS -> UPFD (cross, treino Bluesky)   0.6518   0.6549   0.6578
+  UPFD -> BS (cross, treino fakenewsnet)   0.0067   0.0065   0.0066
+
+========================================================================
+  ANALISE DE TRANSFERENCIA
+========================================================================
+
+  [BS -> UPFD] Modelo treinado no Bluesky, testado no UPFD:
+    GCN in-domain UPFD: 0.8456 vs cross BS->UPFD: 0.6518
+    Queda GCN: 0.1938
+    Causa esperada: grafos Bluesky tinham 0 arestas -- o modelo
+    aprendeu apenas features BERT (classificador de texto), nao
+    propagacao. Ao encontrar grafos ricos no UPFD, a agregacao GNN
+    e imprevisivel (nao foi treinada com vizinhos).
+
+  [UPFD -> BS] Modelo treinado no UPFD, testado no Bluesky:
+    GCN in-domain BS: 0.4128 vs cross UPFD->BS: 0.0067
+    Queda GCN: 0.4061
+    Causa esperada: modelo UPFD aprendeu propagacao em arvores ricas.
+    No Bluesky (1 no, 0 arestas), reduz a classificador linear BERT.
+    A queda reflete diferenca de dominio (Twitter vs Bluesky) mais
+    do que a falta de estrutura de grafo.
+
+========================================================================

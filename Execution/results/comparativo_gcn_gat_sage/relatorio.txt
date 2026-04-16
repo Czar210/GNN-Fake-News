@@ -1,0 +1,30 @@
+=================================================================
+  RELATÓRIO COMPARATIVO — GCN vs GAT vs GraphSAGE
+=================================================================
+  Dataset:  Bluesky (HuggingFace: Zaras210/bluesky-fake-news-dataset)
+  Épocas:   30  |  Batch: 64
+
+  Metrica               GCN      GAT     SAGE  D(SAGE-GCN)
+  --------------------------------------------------------
+  Accuracy           0.9951   0.9942   0.9948    -0.0003
+  Precision          0.6667   0.0000   0.7436 +    0.0769
+  Recall             0.2990   0.0000   0.1495    -0.1495
+  F1                 0.4128   0.0000   0.2489    -0.1639
+
+  Parâmetros         57,666  218,562  115,010
+  Tempo/época         0.00s    0.00s    0.00s
+
+  -> Ranking em F1: GCN > SAGE > GAT
+
+=================================================================
+  CONCLUSÃO PARA A MONOGRAFIA
+=================================================================
+  GCN mantém a melhor F1 entre os três modelos.
+  Grafos pequenos/rasos (estrela, ≤50 nós) favorecem
+  agregação simples normalizada por grau (GCN).
+  GraphSAGE e GAT adicionam complexidade sem ganho claro.
+
+  Nota: GAT (F1=0.0000 no experimento anterior) falhou por colapso
+  de atenção em grafos homogêneos/rasos. GraphSAGE evita esse
+  problema por usar matrizes W_l e W_r fixas (sem softmax).
+=================================================================

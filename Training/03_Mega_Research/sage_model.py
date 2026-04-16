@@ -1,52 +1,62 @@
 """
-gat_model.py
-------------
-Define o GATClassifier — arquitetura Graph Attention Network — como
-drop-in replacement do GCNClassifier existente.
+sage_model.py
+-------------
+Define o SAGEClassifier — arquitetura GraphSAGE — como
+drop-in replacement do GCNClassifier e GATClassifier existentes.
 
-Interface idêntica ao GCN:
-  model = GATClassifier(num_node_features=768, num_classes=2)
+Interface idêntica ao GCN e GAT:
+  model = SAGEClassifier(num_node_features=768, num_classes=2)
   out, h = model(x, edge_index, batch)
 
-Diferenças chave vs GCNClassifier:
+Diferenças chave vs GCNClassifier e GATClassifier:
   ┌─────────────────┬──────────────────────────────┬────────────────────────────┐
-  │ Aspecto         │ GCNClassifier                │ GATClassifier              │
+  │ Aspecto         │ GCNClassifier                │ SAGEClassifier             │
   ├─────────────────┼──────────────────────────────┼────────────────────────────┤
-  │ Agregação       │ Soma normalizada por grau    │ Atenção aprendida (softmax)│
-  │ Multi-head      │ Não                          │ 4 heads (camadas 1 e 2)    │
-  │ Ativação        │ ReLU                         │ ELU (padrão GAT)           │
-  │ Dropout interno │ Só antes do classificador    │ Entre cada camada GAT      │
-  │ Parâmetros      │ ~3x(in→hid) + (hid→2)       │ 4x mais por camada         │
+  │ Agregação       │ Soma normalizada por grau    │ Média (W_l·h + W_r·h_N)   │
+  │ Matrizes/camada │ 1 (in→hid)                  │ 2 (W_l e W_r separadas)    │
+  │ Indutivo        │ Não (transdutivo)            │ Sim (generaliza p/ nós novos)│
+  │ Multi-head      │ Não                          │ Não                        │
+  │ Ativação        │ ReLU                         │ ReLU (idem ao GCN)         │
+  │ Dropout interno │ Só antes do classificador    │ Só antes do classificador  │
+  │ Parâmetros      │ ~57,666                      │ ~115,010                   │
   └─────────────────┴──────────────────────────────┴────────────────────────────┘
+
+Agregadores disponíveis via parâmetro `aggr`:
+  'mean'  — média dos vizinhos (padrão, equivale ao SAGE original de Hamilton et al. 2017)
+  'max'   — max-pooling dos embeddings de vizinhos
+  'lstm'  — LSTM sobre a sequência de vizinhos (requer grafo com ordem estável)
 
 Pipeline forward:
   x [N, 768]
-    → GATConv(768 → 64, heads=4, concat=False)  → ELU → Dropout
-    → GATConv(64  → 64, heads=4, concat=False)  → ELU → Dropout
-    → GATConv(64  → 64, heads=1)
+    → SAGEConv(768 → 64, aggr='mean')  → ReLU
+    → SAGEConv(64  → 64, aggr='mean')  → ReLU
+    → SAGEConv(64  → 64, aggr='mean')
     → global_mean_pool → [B, 64]
     → Dropout(0.5)
     → Linear(64 → 2)
     → (logits [B, 2], embedding [B, 64])
+
+Referência:
+  Hamilton et al., "Inductive Representation Learning on Large Graphs", NeurIPS 2017.
+  https://arxiv.org/abs/1706.02216
 """
 
 import torch
 import torch.nn.functional as F
 from torch.nn import Linear
-from torch_geometric.nn import GATConv, global_mean_pool
+from torch_geometric.nn import SAGEConv, global_mean_pool
 
 
-class GATClassifier(torch.nn.Module):
+class SAGEClassifier(torch.nn.Module):
     """
-    Graph Attention Network para classificação binária de grafos.
+    GraphSAGE para classificação binária de grafos de propagação.
 
     Args:
         num_node_features: Dimensão dos features de entrada por nó (768 para BERT).
         num_classes:       Número de classes (2: Real / Fake).
         hidden_channels:   Dimensão do espaço latente interno (padrão: 64).
-        heads:             Número de cabeças de atenção nas camadas 1 e 2 (padrão: 4).
-        dropout_attn:      Dropout aplicado internamente na atenção (padrão: 0.3).
-        dropout_out:       Dropout antes do classificador final (padrão: 0.5).
+        aggr:              Agregador de vizinhança — 'mean' | 'max' | 'lstm' (padrão: 'mean').
+        dropout:           Dropout antes do classificador final (padrão: 0.5).
     """
 
     def __init__(
@@ -54,42 +64,35 @@ class GATClassifier(torch.nn.Module):
         num_node_features: int,
         num_classes: int,
         hidden_channels: int = 64,
-        heads: int = 4,
-        dropout_attn: float = 0.3,
-        dropout_out: float = 0.5,
+        aggr: str = "mean",
+        dropout: float = 0.5,
         seed: int = 12345,
     ):
         super().__init__()
         torch.manual_seed(seed)
 
-        self.dropout_attn = dropout_attn
-        self.dropout_out  = dropout_out
+        self.dropout = dropout
 
-        # Camada 1: 768 → 64 (média de 4 heads → concat=False mantém dim=64)
-        self.conv1 = GATConv(
+        # Camada 1: 768 → 64
+        # SAGEConv aprende duas matrizes: W_l (self-loop) e W_r (vizinhos)
+        self.conv1 = SAGEConv(
             in_channels=num_node_features,
             out_channels=hidden_channels,
-            heads=heads,
-            concat=False,           # output dim = hidden_channels (não heads*hidden)
-            dropout=dropout_attn,
+            aggr=aggr,
         )
 
-        # Camada 2: 64 → 64 (mesma lógica)
-        self.conv2 = GATConv(
+        # Camada 2: 64 → 64
+        self.conv2 = SAGEConv(
             in_channels=hidden_channels,
             out_channels=hidden_channels,
-            heads=heads,
-            concat=False,
-            dropout=dropout_attn,
+            aggr=aggr,
         )
 
-        # Camada 3: 64 → 64 (1 head — camada de consolidação)
-        self.conv3 = GATConv(
+        # Camada 3: 64 → 64 (consolidação)
+        self.conv3 = SAGEConv(
             in_channels=hidden_channels,
             out_channels=hidden_channels,
-            heads=1,
-            concat=True,            # com 1 head e concat=True → dim mantém 64
-            dropout=dropout_attn,
+            aggr=aggr,
         )
 
         # Classificador final
@@ -113,13 +116,11 @@ class GATClassifier(torch.nn.Module):
         """
         # ── Camada 1 ──────────────────────────────────────────────────────
         x = self.conv1(x, edge_index)
-        x = F.elu(x)
-        x = F.dropout(x, p=self.dropout_attn, training=self.training)
+        x = x.relu()
 
         # ── Camada 2 ──────────────────────────────────────────────────────
         x = self.conv2(x, edge_index)
-        x = F.elu(x)
-        x = F.dropout(x, p=self.dropout_attn, training=self.training)
+        x = x.relu()
 
         # ── Camada 3 (consolidação) ────────────────────────────────────────
         x = self.conv3(x, edge_index)
@@ -128,7 +129,7 @@ class GATClassifier(torch.nn.Module):
         h = global_mean_pool(x, batch)
 
         # ── Classificação ─────────────────────────────────────────────────
-        x = F.dropout(h, p=self.dropout_out, training=self.training)
+        x = F.dropout(h, p=self.dropout, training=self.training)
         out = self.lin(x)
 
         return out, h
@@ -141,12 +142,12 @@ class GATClassifier(torch.nn.Module):
 # ─── Teste rápido de sanidade ─────────────────────────────────────────────────
 
 if __name__ == "__main__":
-    print("Testando GATClassifier com grafo dummy...")
+    print("Testando SAGEClassifier com grafo dummy...")
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Device: {device}")
 
-    model = GATClassifier(num_node_features=768, num_classes=2).to(device)
+    model = SAGEClassifier(num_node_features=768, num_classes=2).to(device)
     print(f"Parâmetros treináveis: {model.count_parameters():,}")
     print(model)
 
@@ -163,4 +164,10 @@ if __name__ == "__main__":
     print(f"h.shape:   {h.shape}    (esperado: [1, 64])")
     print(f"out: {out}")
     print(f"prob_fake: {torch.softmax(out, dim=1)[0, 1].item():.4f}")
-    print("\n[OK] GATClassifier funcionando corretamente!")
+    print("\n[OK] SAGEClassifier funcionando corretamente!")
+
+    # ── Comparação de parâmetros com GCN e GAT ────────────────────────────
+    print("\n-- Comparacao de complexidade --")
+    print(f"  GCN  (referencia):  ~57,666 parametros")
+    print(f"  SAGE (este modelo): {model.count_parameters():,} parametros")
+    print(f"  GAT  (referencia):  ~218,562 parametros")

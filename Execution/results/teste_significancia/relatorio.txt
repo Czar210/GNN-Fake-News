@@ -1,0 +1,48 @@
+========================================================================
+  TESTES DE SIGNIFICANCIA -- GCN vs GAT vs GraphSAGE
+  Dataset: FakeNewsNet (politifact) | label 0=Fake
+  Runs: 10 | t-test pareado (scipy.stats.ttest_rel)
+========================================================================
+
+  METRICAS POR ARQUITETURA (media +/- std)
+
+  Metrica                         GCN                    GAT                   SAGE
+  ----------------------------------------------------------------------
+  F1                0.8691 +/- 0.0126      0.8649 +/- 0.0162      0.8557 +/- 0.0184
+  ACCURACY          0.8704 +/- 0.0128      0.8665 +/- 0.0144      0.8592 +/- 0.0139
+  PRECISION         0.8554 +/- 0.0195      0.8515 +/- 0.0171      0.8526 +/- 0.0176
+  RECALL            0.8838 +/- 0.0193      0.8797 +/- 0.0333      0.8608 +/- 0.0456
+
+========================================================================
+  T-TEST PAREADO -- F1 (pos_label=0, Fake)
+  Hipotese nula: as medias de F1 sao iguais
+  Nivel de significancia: * p<0.05  ** p<0.01  *** p<0.001  ns = nao significativo
+
+  Par                    Media A   Media B    t-stat    p-valor   Sig
+  -----------------------------------------------------------------
+  GCN vs GAT              0.8691    0.8649    0.5009   0.628429    ns
+  GCN vs SAGE             0.8691    0.8557    1.4926   0.169753    ns
+  GAT vs SAGE             0.8649    0.8557    1.5417   0.157536    ns
+
+========================================================================
+  T-TEST PAREADO -- ACCURACY
+
+  Par                    Media A   Media B    t-stat    p-valor   Sig
+  -----------------------------------------------------------------
+  GCN vs GAT              0.8704    0.8665    0.4983   0.630204    ns
+  GCN vs SAGE             0.8704    0.8592    1.4582   0.178791    ns
+  GAT vs SAGE             0.8665    0.8592    1.4587   0.178649    ns
+
+========================================================================
+  INTERPRETACAO
+========================================================================
+
+  Resultados estatisticamente significativos (p < 0.05) indicam que
+  a diferenca de desempenho nao e fruto de variacao aleatoria.
+
+  Grafos FakeNewsNet possuem estrutura real de propagacao (media ~88 nos),
+  o que permite as arquiteturas explorar a topologia do grafo.
+  Diferentemente do Bluesky (grafos vazios, 1 no), aqui a comparacao
+  reflete genuinamente as capacidades arquiteturais.
+
+========================================================================
