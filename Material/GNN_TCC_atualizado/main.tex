@@ -1,0 +1,60 @@
+\documentclass[12pt,oneside,a4paper]{abntex2}
+
+% --- Pacotes Básicos ---
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[brazil]{babel}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{listings}
+\usepackage{booktabs}
+\usepackage{hyperref}
+
+\titulo{Detecção de Fake News com GNNs (Graph Neural Networks) em redes sociais}
+\autor{André Messina Livingston \\ César Augusto Sibila \\ Enzo Kikuji Takida}
+\local{Brasil}
+\data{2026}
+
+\begin{document}
+
+\imprimircapa
+\imprimirfolhaderosto
+
+
+\begin{resumo}
+A proliferação de desinformação em redes sociais representa um dos maiores desafios epistemológicos da era digital. As abordagens tradicionais baseadas em Processamento de Linguagem Natural (NLP) mostram-se insuficientes frente ao avanço de Inteligências Artificiais generativas capazes de produzir conteúdo falso com gramática impecável, e perdem precisão ao transitar entre idiomas e registros informais das redes sociais. Este trabalho propõe uma mudança de paradigma: ao invés de analisar apenas \textit{o que é dito}, o sistema avalia \textit{como a informação se propaga}, modelando a rede social como um grafo e aplicando Redes Convolucionais de Grafos (GCN) sobre a topologia de disseminação.
+
+O estudo utilizou a plataforma Bluesky como ambiente de experimentação, coletando e estruturando um \textit{dataset} de 168.463 postagens distribuídas em 11 categorias temáticas via \textit{AT Protocol}. Para cada publicação, gerou-se um vetor semântico de 768 dimensões com o modelo \texttt{paraphrase-multilingual-mpnet-base-v2} e construiu-se um grafo de propagação representando as interações dos usuários. O núcleo do sistema é um \textit{framework} de \textit{ensemble} com quatro modelos GCN de ceticismo progressivo, cujos pesos foram calibrados empiricamente (UPFD 10\%, Controlado 20\%, Cético 30\%, Exageradamente Cético 40\%).
+
+Os experimentos revelaram que o modelo treinado em dados históricos do Twitter (UPFD) falha em generalizar para o Bluesky, validando a hipótese do \textit{Cold Start}. O \textit{framework} de \textit{ensemble} demonstrou que a taxa de erro cai progressivamente com o volume de engajamento, atingindo 0\% de erros para postagens com mais de 50 interações. O sistema completo foi implementado como uma aplicação \textit{web} de ponta a ponta, com \textit{backend} assíncrono em FastAPI e interface em Next.js, disponibilizando a análise em tempo real para qualquer postagem pública do Bluesky.
+
+\textbf{Palavras-chave}: Fake News. Graph Neural Networks. Bluesky. Cold Start. Ensemble. AT Protocol.
+\end{resumo}
+
+\begin{resumo}[Abstract]
+\begin{otherlanguage*}{english}
+The proliferation of disinformation on social media represents one of the greatest epistemological challenges of the digital age. Traditional Natural Language Processing (NLP) approaches prove insufficient against generative AI systems capable of producing false content with impeccable grammar, and lose accuracy when transitioning between languages and the informal registers of social networks. This work proposes a paradigm shift: rather than analyzing only \textit{what is said}, the system evaluates \textit{how information propagates}, modeling the social network as a graph and applying Graph Convolutional Networks (GCN) to the dissemination topology.
+
+The study used the Bluesky platform as an experimental environment, collecting and structuring a dataset of 168,463 posts distributed across 11 thematic categories via AT Protocol. For each publication, a 768-dimensional semantic vector was generated using the \texttt{paraphrase-multilingual-mpnet-base-v2} model, and a propagation graph was constructed representing user interactions. The core of the system is an ensemble framework with four GCN models of progressive skepticism, with empirically calibrated weights (UPFD 10\%, Controlled 20\%, Skeptical 30\%, Extremely Skeptical 40\%).
+
+Experiments revealed that the model trained on historical Twitter data (UPFD) fails to generalize to Bluesky, validating the Cold Start hypothesis. The ensemble framework demonstrated that the error rate drops progressively with engagement volume, reaching 0\% error for posts with more than 50 interactions. The complete system was implemented as an end-to-end web application, with an asynchronous FastAPI backend and a Next.js interface, providing real-time analysis for any public Bluesky post.
+
+\textbf{Keywords}: Fake News. Graph Neural Networks. Bluesky. Cold Start. Ensemble. AT Protocol.
+\end{otherlanguage*}
+\end{resumo}
+
+
+\tableofcontents
+
+
+\include{capitulos/introducao}
+\include{capitulos/fundamentacao}
+\include{capitulos/metodologia}
+\include{capitulos/resultados}
+\include{capitulos/conclusao}
+
+\bibliography{Referencias}
+\bibliographystyle{abntex2-alf}
+
+\end{document}

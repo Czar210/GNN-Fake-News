@@ -1,0 +1,22 @@
+\chapter{Conclusão}
+
+Este trabalho teve como objetivo investigar a aplicação de Redes Neurais de Grafos (GNNs) na detecção de desinformação em redes sociais, utilizando como cenário de estudo a plataforma emergente Bluesky. Ao longo da pesquisa, foi possível construir um \textit{pipeline} completo de engenharia de dados, desde a extração via \textit{AT Protocol} até a inferência em tempo real servida por uma interface \textit{web}.
+
+\section{Considerações Finais}
+
+A transição metodológica do Twitter para o Bluesky, motivada por restrições de acesso a APIs comerciais, revelou-se um ponto de inflexão positivo para a pesquisa. O Bluesky funcionou como um microcosmo ideal para testar a hipótese do \textit{Cold Start} (Partida Fria). Os resultados obtidos, embora classificados inicialmente como intermediários em ambientes de rede aberta, trouxeram evidências fundamentais sobre a dependência entre a densidade topológica e a precisão algorítmica.
+
+A principal contribuição deste TCC é a identificação do limiar de eficácia das GNNs. Demonstrou-se que, enquanto modelos baseados apenas em NLP falham pela mutabilidade da linguagem, os modelos de grafos alcançam a excelência (0\% de erro nos testes realizados) assim que a notícia atinge um volume crítico de engajamento (acima de 50 interações). Portanto, conclui-se que a geometria da rede é, de fato, uma assinatura de veracidade superior ao texto, mas que exige um amadurecimento mínimo da árvore de propagação para ser plenamente capturada.
+
+\section{Limitações da Pesquisa}
+
+A principal limitação enfrentada pelo grupo foi o ``abismo de generalização'' causado pela disparidade entre os \textit{datasets} de treinamento consolidados (Twitter/UPFD) e a realidade fluida do Bluesky. Além disso, a rotulagem manual de dados em uma rede descentralizada e em crescimento exponencial apresenta desafios de escala que podem ter influenciado a sensibilidade do modelo em casos de baixo engajamento.
+
+\section{Trabalhos Futuros}
+
+Como continuidade a este estudo, sugerem-se as seguintes frentes de pesquisa:
+\begin{itemize}
+    \item \textbf{Modelos Híbridos Dinâmicos:} Implementar uma camada de decisão que utilize NLP profundo para postagens com baixo engajamento e migre automaticamente para GNNs conforme a rede se expande.
+    \item \textbf{Graph Attention Networks (GAT):} Evoluir a arquitetura de GCN para GAT, permitindo que o modelo atribua pesos diferenciados a perfis verificados ou \textit{hubs} históricos de desinformação.
+    \item \textbf{Análise Temporal:} Incorporar a evolução temporal do grafo para detectar anomalias de velocidade de propagação em segundos, combatendo a desinformação antes de seu primeiro pico de viralização.
+\end{itemize}

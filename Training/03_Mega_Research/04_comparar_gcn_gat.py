@@ -23,14 +23,11 @@ import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 import numpy as np
 import torch
-import torch.nn.functional as F
 from sklearn.metrics import (
     accuracy_score, confusion_matrix, f1_score,
     precision_score, recall_score,
 )
 from torch_geometric.loader import DataLoader
-from torch_geometric.nn import GCNConv, global_mean_pool
-from torch.nn import Linear
 
 # ─── Caminhos ─────────────────────────────────────────────────────────────────
 
@@ -41,29 +38,7 @@ OUT_DIR     = RAIZ / "Execution" / "results" / "comparativo_gcn_gat"
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from gat_model import GATClassifier
-
-# ─── GCNClassifier (cópia local — sem depender dos outros scripts) ────────────
-
-class GCNClassifier(torch.nn.Module):
-    """Arquitetura GCN padrão do projeto (3 camadas GCNConv)."""
-    def __init__(self, num_node_features: int, num_classes: int, hidden_channels: int = 64):
-        super().__init__()
-        torch.manual_seed(12345)
-        self.conv1 = GCNConv(num_node_features, hidden_channels)
-        self.conv2 = GCNConv(hidden_channels, hidden_channels)
-        self.conv3 = GCNConv(hidden_channels, hidden_channels)
-        self.lin   = Linear(hidden_channels, num_classes)
-
-    def forward(self, x, edge_index, batch):
-        x = self.conv1(x, edge_index).relu()
-        x = self.conv2(x, edge_index).relu()
-        x = self.conv3(x, edge_index)
-        h = global_mean_pool(x, batch)
-        x = F.dropout(h, p=0.5, training=self.training)
-        return self.lin(x), h
-
-    def count_parameters(self) -> int:
-        return sum(p.numel() for p in self.parameters() if p.requires_grad)
+from gcn_model import GCNClassifier
 
 
 # ─── Carregamento de dados ────────────────────────────────────────────────────
