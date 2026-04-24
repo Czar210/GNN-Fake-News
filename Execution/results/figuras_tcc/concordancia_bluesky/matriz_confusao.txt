@@ -1,0 +1,15 @@
+Concordancia TEXTUAL vs TOPOLOGICO em Bluesky (sem ground truth)
+============================================================
+
+N amostrado: 3728
+Agreement rate: 0.5035 (50.3%)
+Cohen's kappa: 0.1048
+
+Matriz de confusao (rows=textual, cols=topologico):
+                 topo=fake(0)  topo=real(1)
+  text=fake(0)        535         1662
+  text=real(1)        189         1342
+
+Distribuicao marginal:
+  textual:    fake=2197  real=1531
+  topologico: fake=724  real=3004

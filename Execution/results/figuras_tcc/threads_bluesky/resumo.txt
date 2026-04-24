@@ -1,0 +1,11 @@
+Visualizacao de threads Bluesky -- 6 amostras de tamanhos variados
+======================================================================
+RF estrutural treinado em GossipCop com features [num_nodes, grau_root]
+Score interpretacao: prob fake (>0.5 = predito fake)
+
+  thread_00  size=    5  ts=202309251941  score=0.000 -> real
+  thread_01  size=   15  ts=202311050940  score=0.311 -> real
+  thread_02  size=   40  ts=202310291721  score=0.994 -> FAKE
+  thread_03  size=   80  ts=202401241626  score=0.984 -> FAKE
+  thread_04  size=  150  ts=202308191707  score=0.740 -> FAKE
+  thread_05  size=  400  ts=202311010236  score=0.875 -> FAKE

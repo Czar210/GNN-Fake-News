@@ -1,0 +1,17 @@
+% Comparacao com baselines do UPFD original (Dou et al., SIGIR 2021, Tabela 4). Nota: nossos resultados sao F1-macro sobre k-fold com feature 'content' (310d); valores publicados sao accuracy com feature 'bert' (768d). Comparacao indicativa, nao bit-exact.
+\begin{table}[h]\centering
+\caption{Comparacao com baselines do UPFD original (Dou et al., SIGIR 2021, Tabela 4). Nota: nossos resultados sao F1-macro sobre k-fold com feature 'content' (310d); valores publicados sao accuracy com feature 'bert' (768d). Comparacao indicativa, nao bit-exact.}
+\label{tab:upfd_vs_publicado}
+\begin{tabular}{lrrr}
+\toprule
+Dataset & Modelo & F1-macro (nosso) & Acc (Dou et al.) \\
+\midrule
+politifact & GCN & 0.782$\pm$0.055 & 0.846 \\
+politifact & GAT & 0.694$\pm$0.186 & 0.846 \\
+politifact & SAGE & 0.817$\pm$0.010 & 0.846 \\
+gossipcop & GCN & 0.941$\pm$0.006 & 0.972 \\
+gossipcop & GAT & 0.939$\pm$0.005 & 0.971 \\
+gossipcop & SAGE & 0.945$\pm$0.004 & 0.971 \\
+\bottomrule
+\end{tabular}
+\end{table}

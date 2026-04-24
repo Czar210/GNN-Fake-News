@@ -57,6 +57,18 @@ pip install -r requirements.txt
 
 *(Nota: Para rodar tanto a API do backend quanto a interface visual, recomenda-se verificar e inicializar os runtimes na pasta `frontend/`).*
 
+### Reprodutibilidade — caveats honestos
+
+Os experimentos usam `random_state=42` em todo lugar (`StratifiedKFold`, RF/LogReg do scikit-learn, `torch.manual_seed`/`np.random.seed`/`random.seed` nos loops dos GNNs). Os resultados reportados em cada `relatorio.txt` **são reprodutíveis no mesmo ambiente** (mesmo OS, mesma versão exata de torch/PyG/scikit-learn — daí o `requirements.txt` pinado).
+
+**O que NÃO é garantido:**
+
+- **Bit-exact entre máquinas.** Diferenças de CUDA toolkit, cuDNN, ou apenas CPU vs GPU mudam a aritmética de ponto flutuante. As métricas variam tipicamente na 3ª casa decimal.
+- **Determinismo dentro do PyTorch.** Algumas operações de scatter/gather usadas pelo PyG não têm kernel determinístico em GPU (ver [PyTorch reproducibility docs](https://pytorch.org/docs/stable/notes/randomness.html)). Não usamos `torch.use_deterministic_algorithms(True)` porque ele lançaria erro em várias operações do PyG.
+- **Bluesky inferência.** O dataset Bluesky (~6 GB) tem ordem de leitura dependente do sistema de arquivos; os scripts amostram com seed fixa após carregar tudo, então a amostra final é determinística desde que todos os arquivos estejam presentes.
+
+**Por que isso é OK academicamente:** todos os achados centrais foram validados com **10 seeds independentes** (`13_benchmark_upfd_oficial.py`, `14_topologia_sem_texto.py`) e **k-fold pareado com `scipy.stats.ttest_rel`** (`09_teste_significancia.py`). A variabilidade de seed (std ≈ 0.002–0.05 dependendo do modelo) está reportada lado a lado com a média; conclusões qualitativas não mudam entre runs.
+
 ---
 
 ## 📦 Como obter os dados

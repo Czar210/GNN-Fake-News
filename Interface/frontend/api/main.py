@@ -2,21 +2,20 @@ import os
 import sys
 import uuid
 import json
+import pickle
 import re
 
-# PRIMEIRO: importar torch e torch_geometric da venv
+import numpy as np
 import torch
-import torch.nn.functional as F
-from torch.nn import Linear
 from torch_geometric.data import Data
-from torch_geometric.nn import GCNConv, global_mean_pool
 from torch_geometric.explain import Explainer, GNNExplainer
 
-# DEPOIS: adicionar os caminhos do projeto
+# Caminhos do projeto
 api_dir = os.path.dirname(os.path.abspath(__file__))
 raiz = os.path.dirname(os.path.dirname(os.path.dirname(api_dir)))  # GNN Fake News/
 sys.path.append(api_dir)
 sys.path.append(os.path.join(raiz, "Training", "01_BlueSky_Pipe", "src"))
+sys.path.append(os.path.join(raiz, "Training", "03_Mega_Research"))
 
 from fastapi import FastAPI, Depends, HTTPException, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
@@ -28,8 +27,10 @@ import pandas as pd
 from database import get_db, AnaliseHistory
 from collection import collect
 from features import text_embedder
+from sage_model import SAGEClassifier  # da pasta Training/03_Mega_Research
 
-app = FastAPI(title="Truth GNN Analytics - Backend", description="Motor de detecções em Real-time")
+app = FastAPI(title="Truth GNN Analytics - Backend",
+              description="Detecção de fake news com classificador dual (textual + topológico)")
 
 app.add_middleware(
     CORSMiddleware,
@@ -39,11 +40,48 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ─── Modelo GCN ───────────────────────────────────────────────────────────────
+# ─── Carregamento dos modelos canônicos persistidos ──────────────────────────
+# Os 3 modelos abaixo foram treinados pelo script
+# Training/03_Mega_Research/17_persistir_modelos_finais.py
+WEIGHTS_DIR = os.path.join(raiz, "Execution", "weights")
 
-# Wrapper sem o return duplo (out, h) — necessário para o GNNExplainer
-class _GCNWrapper(torch.nn.Module):
-    def __init__(self, model: "GCNClassifier"):
+# 1. LogReg-BERT (textual): treinado em FakeNewsNet, F1m sanidade ≈ 0.95
+_lr_textual = None
+try:
+    with open(os.path.join(WEIGHTS_DIR, "logreg_bert_fnn.pkl"), "rb") as f:
+        _lr_textual = pickle.load(f)["model"]
+    print(f"[OK] LogReg-BERT textual carregado")
+except Exception as e:
+    print(f"[WARN] LogReg textual não carregado: {e}")
+
+# 2. RandomForest estrutural (topológico leve): treinado em GossipCop,
+#    features = [num_nodes, grau_root]; F1m ≈ 0.75
+_rf_topologico = None
+try:
+    with open(os.path.join(WEIGHTS_DIR, "rf_struct_gossipcop.pkl"), "rb") as f:
+        _rf_topologico = pickle.load(f)["model"]
+    print(f"[OK] RF estrutural topológico carregado")
+except Exception as e:
+    print(f"[WARN] RF topológico não carregado: {e}")
+
+# 3. SAGE estrutural (topológico GNN, usado para GNNExplainer):
+#    features = [is_root, grau_norm]; F1m ≈ 0.81
+_sage_topologico = None
+try:
+    state = torch.load(os.path.join(WEIGHTS_DIR, "sage_struct_gossipcop.pth"),
+                       map_location="cpu", weights_only=False)
+    _sage_topologico = SAGEClassifier(state["input_dim"], 2)
+    _sage_topologico.load_state_dict(state["state_dict"])
+    _sage_topologico.eval()
+    print(f"[OK] SAGE estrutural carregado")
+except Exception as e:
+    print(f"[WARN] SAGE estrutural não carregado: {e}")
+
+
+# ─── GNNExplainer (sobre o SAGE estrutural) ──────────────────────────────────
+# Wrapper sem return duplo — GNNExplainer espera só logits
+class _SAGEWrapper(torch.nn.Module):
+    def __init__(self, model):
         super().__init__()
         self.model = model
 
@@ -54,55 +92,11 @@ class _GCNWrapper(torch.nn.Module):
         return out
 
 
-class GCNClassifier(torch.nn.Module):
-    def __init__(self, num_node_features: int, num_classes: int, hidden_channels: int = 64):
-        super(GCNClassifier, self).__init__()
-        torch.manual_seed(12345)
-        self.conv1 = GCNConv(num_node_features, hidden_channels)
-        self.conv2 = GCNConv(hidden_channels, hidden_channels)
-        self.conv3 = GCNConv(hidden_channels, hidden_channels)
-        self.lin = Linear(hidden_channels, num_classes)
-
-    def forward(self, x, edge_index, batch):
-        x = self.conv1(x, edge_index).relu()
-        x = self.conv2(x, edge_index).relu()
-        x = self.conv3(x, edge_index)
-        h = global_mean_pool(x, batch)
-        x = F.dropout(h, p=0.5, training=self.training)
-        out = self.lin(x)
-        return out, h
-
-# ─── Carregamento dos modelos ─────────────────────────────────────────────────
-
-model_upfd      = GCNClassifier(768, 2)
-model_bs_ctrl   = GCNClassifier(768, 2)
-model_bs_cetico = GCNClassifier(768, 2)
-model_bs_ex_cetico = GCNClassifier(768, 2)
-
-def load_models():
-    specs = [
-        (model_upfd,         "pesos_gcn.pth"),
-        (model_bs_ctrl,      "pesos_bs_ctrl.pth"),
-        (model_bs_cetico,    "pesos_bs_cetico.pth"),
-        (model_bs_ex_cetico, "pesos_bs_ex_cetico.pth"),
-    ]
-    for model, fname in specs:
-        path = os.path.join(raiz, "Execution", "weights", fname)
-        if os.path.exists(path):
-            model.load_state_dict(torch.load(path, map_location="cpu"))
-        model.eval()
-
-load_models()
-
-# ─── GNNExplainer (usa o modelo mais cético como referência — peso 0.40) ─────
-
-_explainer: Explainer | None = None
-
-def _init_explainer():
-    global _explainer
+_explainer = None
+if _sage_topologico is not None:
     try:
         _explainer = Explainer(
-            model=_GCNWrapper(model_bs_ex_cetico),
+            model=_SAGEWrapper(_sage_topologico),
             algorithm=GNNExplainer(epochs=100),
             explanation_type="model",
             node_mask_type=None,
@@ -113,10 +107,9 @@ def _init_explainer():
                 return_type="raw",
             ),
         )
+        print(f"[OK] GNNExplainer inicializado")
     except Exception as e:
         print(f"[WARN] GNNExplainer não inicializado: {e}")
-
-_init_explainer()
 
 # ─── Word-level attribution (leave-one-out sobre embedding BERT) ──────────────
 
@@ -165,11 +158,50 @@ try:
 except Exception:
     bsky_client = None
 
-# ─── Constantes do ensemble ───────────────────────────────────────────────────
+# ─── Combinacao dos scores (regra do experimento 20) ─────────────────────────
+# F1 quando os 2 modelos concordam = 0.97 (alta confianca).
+# F1 quando discordam: textual = 0.91 vs topologico = 0.08 -> texto vence.
+# Por isso quando discordam damos peso 0.8 ao textual.
+PESO_TEXTUAL_QUANDO_DISCORDA = 0.8
 
-WEIGHTS = [0.10, 0.20, 0.30, 0.40]
-MODELS  = [model_upfd, model_bs_ctrl, model_bs_cetico, model_bs_ex_cetico]
-NAMES   = ["UPFD_Baseline", "Bluesky_Controlado", "Bluesky_Cetico", "Bluesky_Exa_Cetico"]
+
+def _features_topologicas_de_grafo(num_nodes: int, num_edges: int):
+    """Para o RF estrutural: [num_nodes, grau_root]."""
+    grau_root = num_edges  # em estrela, grau da raiz = numero de filhos
+    return np.array([[num_nodes, grau_root]], dtype=np.float64)
+
+
+def _features_estruturais_para_sage(num_nodes: int, edge_index: torch.Tensor) -> torch.Tensor:
+    """Para o SAGE: [is_root, grau_norm] por no."""
+    is_root = torch.zeros(num_nodes, dtype=torch.float)
+    is_root[0] = 1.0
+    deg = torch.zeros(num_nodes, dtype=torch.float)
+    if edge_index.numel() > 0:
+        idx, counts = torch.unique(edge_index[0], return_counts=True)
+        deg[idx] = counts.float()
+    deg_norm = deg / max(deg.max().item(), 1.0)
+    return torch.stack([is_root, deg_norm], dim=1)
+
+
+def _combinar_scores(score_textual: float, score_topo: float) -> tuple:
+    """
+    Retorna (score_combinado, pred_combinado, concordam, peso_aplicado).
+
+    Convenção: score = prob de FAKE (classe 0). pred = 0 (fake) se score>=0.5.
+    """
+    pred_t = score_textual >= 0.5
+    pred_k = score_topo >= 0.5
+    concordam = pred_t == pred_k
+    if concordam:
+        # media aritmetica simples
+        score = 0.5 * score_textual + 0.5 * score_topo
+        peso  = 0.5
+    else:
+        # textual vence (peso 0.8)
+        score = PESO_TEXTUAL_QUANDO_DISCORDA * score_textual + (1 - PESO_TEXTUAL_QUANDO_DISCORDA) * score_topo
+        peso  = PESO_TEXTUAL_QUANDO_DISCORDA
+    pred = score >= 0.5
+    return float(score), bool(pred), bool(concordam), float(peso)
 
 # ─── Schemas ──────────────────────────────────────────────────────────────────
 
@@ -238,63 +270,82 @@ def _run_inference(url: str, task_id: str) -> None:
         else:
             post_text = "Scraper inativo (credenciais BSKY ausentes). Modo Simulação."
 
-        # BERT embedding
+        # BERT embedding do texto do post (raiz)
         df_temp = pd.DataFrame([{"texto": post_text}])
         df_temp = text_embedder.gerar_embeddings_de_texto(df_temp)
         emb = df_temp["embedding"].iloc[0]
+        emb_np = np.asarray(emb, dtype=np.float64)
 
-        # Word importance (calcula antes de converter para tensor)
+        # Word importance (leave-one-out)
         word_importance = _compute_word_importance(post_text, emb)
 
-        # Construção do grafo
-        x_raiz   = torch.tensor(emb, dtype=torch.float)
+        # Constrói o grafo estrutural (mesma estratégia dos scripts 14/19)
         num_nodos = 1 + interacoes
-        x        = torch.stack([x_raiz] * num_nodos)
-
         if tree_edges:
-            # Usa a árvore real de propagação extraída da thread
             src = [e[0] for e in tree_edges]
             dst = [e[1] for e in tree_edges]
             edge_index = torch.tensor([src, dst], dtype=torch.long)
         elif interacoes > 0:
-            # Fallback: estrela simples (raiz → filhos)
             edge_index = torch.tensor([[0] * interacoes, list(range(1, num_nodos))], dtype=torch.long)
         else:
             edge_index = torch.tensor([[], []], dtype=torch.long)
 
-        data = Data(x=x, edge_index=edge_index, batch=torch.zeros(num_nodos, dtype=torch.long))
+        # ── 1. Modelo TEXTUAL (LogReg-BERT sobre emb da raiz) ──────────────
+        score_textual = 0.5
+        if _lr_textual is not None and emb_np.shape[0] == _lr_textual.coef_.shape[1]:
+            try:
+                proba = _lr_textual.predict_proba(emb_np.reshape(1, -1))[0]
+                idx_fake = list(_lr_textual.classes_).index(0)
+                score_textual = float(proba[idx_fake])
+            except Exception as ex:
+                print(f"[WARN] textual inference falhou: {ex}")
 
-        # Inferência ensemble
-        probs = []
-        with torch.no_grad():
-            for m in MODELS:
-                out, _ = m(data.x, data.edge_index, data.batch)
-                prob = torch.softmax(out, dim=1)[:, 1].item()
-                probs.append(prob)
+        # ── 2. Modelo TOPOLÓGICO leve (RF [num_nodes, grau_root]) ──────────
+        score_topo_rf = 0.5
+        if _rf_topologico is not None:
+            try:
+                X_topo = _features_topologicas_de_grafo(num_nodos, interacoes)
+                proba = _rf_topologico.predict_proba(X_topo)[0]
+                idx_fake = list(_rf_topologico.classes_).index(0)
+                score_topo_rf = float(proba[idx_fake])
+            except Exception as ex:
+                print(f"[WARN] RF topologico falhou: {ex}")
 
-        ensemble_score = sum(w * p for w, p in zip(WEIGHTS, probs))
-        is_fake        = bool(ensemble_score >= 0.5)
+        # ── 3. Modelo TOPOLÓGICO GNN (SAGE estrutural) — usado para GNNExplainer
+        score_topo_sage = 0.5
+        data_sage = None
+        if _sage_topologico is not None and num_nodos >= 1:
+            try:
+                x_sage = _features_estruturais_para_sage(num_nodos, edge_index)
+                batch  = torch.zeros(num_nodos, dtype=torch.long)
+                data_sage = Data(x=x_sage, edge_index=edge_index, batch=batch)
+                with torch.no_grad():
+                    out, _ = _sage_topologico(data_sage.x, data_sage.edge_index, data_sage.batch)
+                    prob = torch.softmax(out, dim=1)[0, 0].item()  # classe 0 = fake
+                score_topo_sage = float(prob)
+            except Exception as ex:
+                print(f"[WARN] SAGE topologico falhou: {ex}")
 
-        # ── GNNExplainer ──────────────────────────────────────────────────────
+        # ── Combinação dual: textual vs topologico (regra do exp 20) ───────
+        score_combinado, pred_combinado, concordam, peso_aplicado = _combinar_scores(
+            score_textual, score_topo_rf)
+        is_fake = pred_combinado
+
+        # ── GNNExplainer (sobre SAGE com features estruturais) ─────────────
         graph_explanation = None
-        if _explainer is not None and data.edge_index.size(1) > 0:
+        if _explainer is not None and data_sage is not None and data_sage.edge_index.size(1) > 0:
             try:
                 explanation = _explainer(
-                    x=data.x,
-                    edge_index=data.edge_index,
-                    batch=data.batch,
+                    x=data_sage.x,
+                    edge_index=data_sage.edge_index,
+                    batch=data_sage.batch,
                 )
                 raw_mask = explanation.edge_mask.detach().tolist()
-
-                # Normaliza para [0, 1] para melhor visualização
                 mn, mx = min(raw_mask), max(raw_mask)
-                if mx > mn:
-                    norm_mask = [(v - mn) / (mx - mn) for v in raw_mask]
-                else:
-                    norm_mask = [0.5] * len(raw_mask)
+                norm_mask = [(v - mn) / (mx - mn) for v in raw_mask] if mx > mn else [0.5] * len(raw_mask)
 
-                src_nodes = data.edge_index[0].tolist()
-                dst_nodes = data.edge_index[1].tolist()
+                src_nodes = data_sage.edge_index[0].tolist()
+                dst_nodes = data_sage.edge_index[1].tolist()
                 edges = [
                     {"from": int(s), "to": int(d), "importance": round(float(imp), 4)}
                     for s, d, imp in zip(src_nodes, dst_nodes, norm_mask)
@@ -311,18 +362,27 @@ def _run_inference(url: str, task_id: str) -> None:
                     "error": str(ex)[:120],
                     "word_importance": word_importance,
                 })
+        elif word_importance:
+            graph_explanation = json.dumps({
+                "num_nodes": num_nodos,
+                "edges": [],
+                "word_importance": word_importance,
+            })
 
-        # Persiste no banco
+        # ── Persistência (reuso dos campos legados do schema) ──────────────
         registro = db.query(AnaliseHistory).filter(AnaliseHistory.task_id == task_id).first()
         if registro:
             registro.status         = "done"
             registro.texto_resumo   = post_text[:200]
             registro.tamanho_grafo  = num_nodos
-            registro.pred_upfd      = "Fake" if probs[0] >= 0.5 else "Real"
-            registro.cert_upfd      = float(probs[0])
-            registro.pred_bsky        = "Fake" if is_fake else "Real"
-            registro.cert_bsky        = float(ensemble_score)
-            registro.heuristica_final = float(ensemble_score)
+            # pred_upfd/cert_upfd -> Modelo TEXTUAL
+            registro.pred_upfd      = "Fake" if score_textual >= 0.5 else "Real"
+            registro.cert_upfd      = float(score_textual)
+            # pred_bsky/cert_bsky -> Modelo TOPOLÓGICO (RF)
+            registro.pred_bsky      = "Fake" if score_topo_rf >= 0.5 else "Real"
+            registro.cert_bsky      = float(score_topo_rf)
+            # heuristica_final -> Score COMBINADO
+            registro.heuristica_final = float(score_combinado)
             registro.graph_explanation = graph_explanation
             db.commit()
 
@@ -338,10 +398,16 @@ def _run_inference(url: str, task_id: str) -> None:
                         pass
 
             fakes_data.append({
-                "url":            url,
-                "texto":          post_text,
-                "score_veredicto": round(ensemble_score, 4),
-                "modelos":        {n: round(p, 4) for n, p in zip(NAMES, probs)},
+                "url":             url,
+                "texto":           post_text,
+                "score_combinado": round(score_combinado, 4),
+                "concordam":       concordam,
+                "peso_textual":    peso_aplicado,
+                "modelos":         {
+                    "textual_logreg_bert":  round(score_textual, 4),
+                    "topologico_rf":        round(score_topo_rf, 4),
+                    "topologico_sage":      round(score_topo_sage, 4),
+                },
             })
             with open(fakes_file, "w", encoding="utf-8") as f:
                 json.dump(fakes_data, f, indent=4, ensure_ascii=False)
@@ -388,8 +454,16 @@ async def get_result(task_id: str, db: Session = Depends(get_db)):
     if registro.status != "done":
         return {"status": registro.status, "task_id": task_id}
 
-    cert   = registro.cert_bsky or 0.0
-    is_fake = (registro.heuristica_final or 0) >= 0.5
+    score_textual = float(registro.cert_upfd or 0.0)
+    score_topo    = float(registro.cert_bsky or 0.0)
+    score_combinado = float(registro.heuristica_final or 0.0)
+    is_fake = score_combinado >= 0.5
+
+    # Calcula concordancia + peso aplicado ja
+    pred_t = score_textual >= 0.5
+    pred_k = score_topo >= 0.5
+    concordam = pred_t == pred_k
+    peso_textual = 0.5 if concordam else PESO_TEXTUAL_QUANDO_DISCORDA
 
     exp = None
     if registro.graph_explanation:
@@ -399,15 +473,24 @@ async def get_result(task_id: str, db: Session = Depends(get_db)):
             pass
 
     return {
-        "status":         "done",
-        "task_id":        task_id,
-        "url":            registro.url_bsky,
-        "texto":          registro.texto_resumo,
-        "is_fake":        is_fake,
-        "ensemble_score": cert,
+        "status":           "done",
+        "task_id":          task_id,
+        "url":              registro.url_bsky,
+        "texto":            registro.texto_resumo,
+        "is_fake":          is_fake,
+        "ensemble_score":   score_combinado,
+        "score_combinado":  score_combinado,
+        "concordam":        concordam,
+        "peso_textual_aplicado": peso_textual,
         "model_breakdown": [
-            {"model": registro.pred_upfd or "—",  "prob_fake": registro.cert_upfd or 0,  "weight": 0.10},
-            {"model": registro.pred_bsky or "—",  "prob_fake": cert,                      "weight": 0.90},
+            {"model": "Textual (LogReg-BERT, treinado em FakeNewsNet)",
+             "prob_fake": score_textual,
+             "pred": "Fake" if pred_t else "Real",
+             "peso": peso_textual},
+            {"model": "Topologico (RF estrutural, treinado em GossipCop)",
+             "prob_fake": score_topo,
+             "pred": "Fake" if pred_k else "Real",
+             "peso": 1 - peso_textual},
         ],
         "nodes":             registro.tamanho_grafo or 1,
         "graph_explanation": exp,
