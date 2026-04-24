@@ -1,0 +1,24 @@
+========================================================================
+  Topologia SEM texto -- Resumo (media +/- std)
+========================================================================
+
+  dataset              variant        modelo             F1m          F1fake             Acc
+  --------------------------------------------------------------------------------------------
+  upfd_gossipcop       A_isroot       GAT    0.465+/-0.120   0.632+/-0.050   0.554+/-0.061
+  upfd_gossipcop       A_isroot       GCN    0.612+/-0.071   0.637+/-0.017   0.628+/-0.047
+  upfd_gossipcop       A_isroot       SAGE   0.757+/-0.005   0.782+/-0.003   0.760+/-0.004
+  upfd_gossipcop       B_estrutural   GAT    0.483+/-0.107   0.637+/-0.044   0.558+/-0.053
+  upfd_gossipcop       B_estrutural   GCN    0.644+/-0.019   0.618+/-0.026   0.650+/-0.022
+  upfd_gossipcop       B_estrutural   SAGE   0.810+/-0.002   0.819+/-0.002   0.810+/-0.002
+  upfd_gossipcop       C_posicional   GAT    0.585+/-0.115   0.600+/-0.120   0.619+/-0.071
+  upfd_gossipcop       C_posicional   GCN    0.650+/-0.008   0.638+/-0.010   0.651+/-0.010
+  upfd_gossipcop       C_posicional   SAGE   0.808+/-0.004   0.818+/-0.002   0.809+/-0.003
+  upfd_politifact      A_isroot       GAT    0.370+/-0.079   0.498+/-0.255   0.502+/-0.024
+  upfd_politifact      A_isroot       GCN    0.368+/-0.072   0.568+/-0.185   0.496+/-0.011
+  upfd_politifact      A_isroot       SAGE   0.328+/-0.000   0.657+/-0.000   0.489+/-0.000
+  upfd_politifact      B_estrutural   GAT    0.380+/-0.080   0.566+/-0.194   0.500+/-0.019
+  upfd_politifact      B_estrutural   GCN    0.362+/-0.055   0.600+/-0.149   0.495+/-0.011
+  upfd_politifact      B_estrutural   SAGE   0.331+/-0.009   0.656+/-0.001   0.489+/-0.001
+  upfd_politifact      C_posicional   GAT    0.361+/-0.066   0.519+/-0.232   0.503+/-0.026
+  upfd_politifact      C_posicional   GCN    0.362+/-0.058   0.549+/-0.185   0.492+/-0.026
+  upfd_politifact      C_posicional   SAGE   0.339+/-0.032   0.646+/-0.032   0.486+/-0.010

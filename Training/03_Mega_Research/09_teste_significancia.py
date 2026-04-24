@@ -3,24 +3,29 @@
 --------------------------
 Testes de significancia estatistica entre GCN, GAT e GraphSAGE.
 
-Metodologia:
-  - Treina cada arquitetura K vezes (default K=10) com seeds distintas
-  - Coleta F1, Accuracy, Precision, Recall por execucao
+Metodologia (Fase 2B.1, Erro 4):
+  - Itera sobre os K=10 folds estratificados pre-gerados em
+    data/folds_fnn.pt (ver gerar_folds.py).
+  - Para cada fold, treina cada arquitetura no train_idx (com 10% reservado
+    como val para early stopping) e avalia no test_idx.
+  - Coleta F1, Accuracy, Precision, Recall por fold.
   - Executa t-test pareado (scipy.stats.ttest_rel) entre todos os pares
-    de modelos, pois cada run usa a mesma particao treino/teste
-  - Reporta: media +/- desvio, t-estatistica, p-valor, nivel de sig.
+    de modelos -- agora a paridade do teste e sobre fold (variancia de
+    generalizacao), nao sobre seed (variancia de inicializacao).
 
 Dataset padrao: FakeNewsNet (grafos reais, balanceado ~50/50).
-  -> Usa os .pt pre-construidos por 00_construir_grafos_fakenewsnet.py.
+  -> Usa os .pt pre-construidos por 00_construir_grafos_fakenewsnet.py
+     e os folds compartilhados gerados por gerar_folds.py.
 
 Saidas em Execution/results/teste_significancia/:
   relatorio.txt       -- tabela completa de metricas e p-valores
-  boxplot_f1.png      -- distribuicao F1 por arquitetura (K runs)
+  boxplot_f1.png      -- distribuicao F1 por arquitetura (K folds)
   violino_f1.png      -- violin plot + pontos individuais
 
 Uso:
+  python gerar_folds.py             # uma vez, gera folds_fnn.pt
   python 09_teste_significancia.py
-  python 09_teste_significancia.py --runs 10 --epochs 50
+  python 09_teste_significancia.py --epochs 50
   python 09_teste_significancia.py --cpu
 """
 
@@ -42,12 +47,13 @@ from torch_geometric.loader import DataLoader
 
 RAIZ     = Path(__file__).resolve().parent.parent.parent
 DATA_DIR = Path(__file__).resolve().parent / "data"
-OUT_DIR  = RAIZ / "Execution" / "results" / "teste_significancia"
+OUT_DIR  = RAIZ / "Execution" / "results" / "fase4_benchmarks" / "teste_significancia"
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from gcn_model  import GCNClassifier
 from gat_model  import GATClassifier
 from sage_model import SAGEClassifier
+from gerar_folds import iterar_folds, carregar_grafos
 
 BATCH_SIZE = 32
 PATIENCE   = 10
@@ -66,23 +72,57 @@ def criar_modelo(nome: str, num_features: int, seed: int,
 
 # ─── Dados ────────────────────────────────────────────────────────────────────
 
-def carregar_fakenewsnet() -> tuple:
-    """Retorna (train_list, val_list, test_list, num_features)."""
-    splits = {}
-    for split in ("train", "val", "test"):
-        p = DATA_DIR / f"fakenewsnet_{split}.pt"
-        if not p.exists():
-            print(f"[ERRO] {p} nao encontrado.")
-            print("       Execute: python 00_construir_grafos_fakenewsnet.py")
-            sys.exit(1)
-        splits[split] = torch.load(p, weights_only=False)
+def carregar_dataset_completo(data_suffix: str = None) -> tuple:
+    """
+    Retorna (grafos, num_features). Para uso com k-fold a partir de folds_fnn.pt.
+    Se data_suffix for None, usa raiz data/ (legacy bugado). Caso contrario,
+    carrega de data/fakenewsnet_<suffix>/.
+    """
+    folds_path = DATA_DIR / "folds_fnn.pt"
+    if not folds_path.exists():
+        print(f"[ERRO] {folds_path} nao encontrado.")
+        print("       Execute: python gerar_folds.py")
+        sys.exit(1)
 
-    num_feats = splits["train"][0].x.shape[1]
-    total = sum(len(v) for v in splits.values())
-    fakes = sum(sum(1 for g in v if g.y.item() == 0) for v in splits.values())
-    print(f"  FakeNewsNet: {total} grafos | fake={fakes} ({100*fakes/total:.1f}%) | "
-          f"features={num_feats}")
-    return splits["train"], splits["val"], splits["test"], num_feats
+    if data_suffix:
+        sub = DATA_DIR / f"fakenewsnet_{data_suffix}"
+        if not sub.exists():
+            print(f"[ERRO] {sub} nao encontrado.")
+            print(f"       Execute: python 00_construir_grafos_fakenewsnet.py "
+                  f"--feature-variant <variant> --output-suffix {data_suffix}")
+            sys.exit(1)
+        grafos = []
+        import torch as _torch
+        for split in ("train", "val", "test"):
+            grafos += _torch.load(sub / f"fakenewsnet_{split}.pt", weights_only=False)
+        print(f"  Dataset: data/fakenewsnet_{data_suffix}/")
+    else:
+        grafos = carregar_grafos()
+        print(f"  Dataset: data/ (raiz, legacy)")
+
+    num_feats = grafos[0].x.shape[1]
+    fakes = sum(1 for g in grafos if g.y.item() == 0)
+    print(f"  FakeNewsNet: {len(grafos)} grafos | fake={fakes} "
+          f"({100*fakes/len(grafos):.1f}%) | features={num_feats}")
+    return grafos, num_feats
+
+
+def split_train_val(train_idx: list, grafos: list, val_frac: float = 0.10,
+                    seed: int = 0) -> tuple:
+    """
+    A partir do train_idx do fold, separa val_frac (estratificado por classe)
+    para early stopping. Retorna (train_subset, val_subset).
+    """
+    import random
+    rng = random.Random(seed)
+    fakes = [i for i in train_idx if grafos[i].y.item() == 0]
+    reals = [i for i in train_idx if grafos[i].y.item() == 1]
+    rng.shuffle(fakes); rng.shuffle(reals)
+    n_val_fk = max(1, int(len(fakes) * val_frac))
+    n_val_re = max(1, int(len(reals) * val_frac))
+    val_idx   = fakes[:n_val_fk] + reals[:n_val_re]
+    train_sub = fakes[n_val_fk:] + reals[n_val_re:]
+    return [grafos[i] for i in train_sub], [grafos[i] for i in val_idx]
 
 
 # ─── Treinamento ──────────────────────────────────────────────────────────────
@@ -120,8 +160,8 @@ def treinar_uma_vez(model, train_data, val_data, device, epochs, lr) -> torch.nn
                 val_y_pred.extend(preds)
                 val_y_true.extend(labels if isinstance(labels, list) else [labels])
 
-        # Criterio de selecao: F1 (consistente com a metrica de avaliacao final)
-        val_f1 = f1_score(val_y_true, val_y_pred, pos_label=0, zero_division=0)
+        # Criterio de selecao: F1-macro (alinha com avaliacao final)
+        val_f1 = f1_score(val_y_true, val_y_pred, average="macro", zero_division=0)
         scheduler.step(val_f1)
 
         if val_f1 > best_val:
@@ -201,7 +241,7 @@ def plot_boxplot(resultados: dict, metrica: str, out_dir: Path) -> None:
     ax.set_xticks(range(1, len(arqs) + 1))
     ax.set_xticklabels(arqs, fontsize=12)
     ax.set_ylabel(metrica.upper(), fontsize=12)
-    ax.set_title(f"Distribuicao de {metrica.upper()} -- {len(vals[0])} runs\n"
+    ax.set_title(f"Distribuicao de {metrica.upper()} -- {len(vals[0])} folds\n"
                  f"(FakeNewsNet, label 0=Fake)", fontsize=12)
     ax.grid(axis="y", alpha=0.3, linestyle="--")
 
@@ -232,7 +272,7 @@ def plot_violino(resultados: dict, metrica: str, out_dir: Path) -> None:
     ax.set_xticklabels(arqs, fontsize=12)
     ax.set_ylabel(metrica.upper(), fontsize=12)
     ax.set_title(f"Violin Plot -- {metrica.upper()} por Arquitetura\n"
-                 f"({len(vals[0])} runs, FakeNewsNet)", fontsize=12)
+                 f"({len(vals[0])} folds, FakeNewsNet)", fontsize=12)
     ax.grid(axis="y", alpha=0.3, linestyle="--")
 
     plt.tight_layout()
@@ -244,7 +284,7 @@ def plot_violino(resultados: dict, metrica: str, out_dir: Path) -> None:
 
 # ─── Relatorio ────────────────────────────────────────────────────────────────
 
-def salvar_relatorio(resultados: dict, pares_ttest: dict, runs: int,
+def salvar_relatorio(resultados: dict, pares_ttest: dict, n_folds: int,
                      out_dir: Path) -> None:
     arqs = list(resultados.keys())
     metricas = ["f1", "accuracy", "precision", "recall"]
@@ -253,7 +293,7 @@ def salvar_relatorio(resultados: dict, pares_ttest: dict, runs: int,
         "=" * 72,
         "  TESTES DE SIGNIFICANCIA -- GCN vs GAT vs GraphSAGE",
         "  Dataset: FakeNewsNet (politifact) | label 0=Fake",
-        f"  Runs: {runs} | t-test pareado (scipy.stats.ttest_rel)",
+        f"  Folds: {n_folds} (StratifiedKFold seed=42) | t-test pareado (ttest_rel)",
         "=" * 72,
         "",
         "  METRICAS POR ARQUITETURA (media +/- std)",
@@ -334,56 +374,63 @@ def salvar_relatorio(resultados: dict, pares_ttest: dict, runs: int,
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Testes de significancia entre GCN, GAT e GraphSAGE.")
-    parser.add_argument("--runs",   type=int, default=10,
-                        help="Numero de execucoes por arquitetura (default: 10)")
-    parser.add_argument("--epochs", type=int, default=50)
-    parser.add_argument("--lr",     type=float, default=0.001)
-    parser.add_argument("--cpu",    action="store_true")
+        description="Testes de significancia entre GCN, GAT e GraphSAGE (k-fold pareado).")
+    parser.add_argument("--epochs",      type=int, default=50)
+    parser.add_argument("--lr",          type=float, default=0.001)
+    parser.add_argument("--cpu",         action="store_true")
+    parser.add_argument("--data-suffix", type=str, default=None,
+                        choices=["posfull", "posmin", "posgrau", "bugado_original"],
+                        help="Sufixo do dataset em data/fakenewsnet_<suffix>/. "
+                             "Default: legacy bugado em data/ (raiz).")
     args = parser.parse_args()
 
     device = torch.device("cpu" if args.cpu else
                           ("cuda" if torch.cuda.is_available() else "cpu"))
-    OUT_DIR.mkdir(parents=True, exist_ok=True)
+    out_dir = (OUT_DIR.parent / f"teste_significancia_{args.data_suffix}") if args.data_suffix else OUT_DIR
+    out_dir.mkdir(parents=True, exist_ok=True)
 
     print("=" * 72)
-    print("  TESTES DE SIGNIFICANCIA -- GCN vs GAT vs GraphSAGE")
+    print("  TESTES DE SIGNIFICANCIA -- GCN vs GAT vs GraphSAGE (K-FOLD PAREADO)")
     print("=" * 72)
-    print(f"  Device: {device} | Runs: {args.runs} | Epochs max: {args.epochs}")
+    print(f"  Device: {device} | Epochs max: {args.epochs}")
     print()
 
-    # ── Carregar dados ────────────────────────────────────────────────────
-    print("[1/3] Carregando FakeNewsNet...")
-    train_data, val_data, test_data, num_feats = carregar_fakenewsnet()
+    # ── Carregar dados + folds ────────────────────────────────────────────
+    print("[1/3] Carregando FakeNewsNet e folds compartilhados...")
+    grafos, num_feats = carregar_dataset_completo(args.data_suffix)
+    folds = list(iterar_folds())
+    print(f"  Folds: {len(folds)} (compartilhados via folds_fnn.pt)")
     print()
 
-    # ── Executar K runs por arquitetura ───────────────────────────────────
-    print(f"[2/3] Treinando {args.runs} runs x 3 arquiteturas "
-          f"({args.runs * 3} treinos total)...")
+    # ── Treinar 1 modelo por arquitetura por fold ─────────────────────────
+    print(f"[2/3] Treinando {len(folds)} folds x 3 arquiteturas "
+          f"({len(folds) * 3} treinos total)...")
 
     arqs = ["GCN", "GAT", "SAGE"]
-    # resultados[arq][metrica] = lista de K valores
+    # resultados[arq][metrica] = lista de K valores (1 por fold)
     resultados: dict = {a: {"f1": [], "accuracy": [], "precision": [], "recall": []}
                         for a in arqs}
-    base_seed = 42
 
-    for run in range(1, args.runs + 1):
-        seed = base_seed + run * 7   # seeds bem espalhadas
-        torch.manual_seed(seed)
-        np.random.seed(seed)
+    for fold_idx, train_idx, test_idx in folds:
+        torch.manual_seed(fold_idx)
+        np.random.seed(fold_idx)
+
+        train_sub, val_sub = split_train_val(train_idx, grafos, val_frac=0.10,
+                                              seed=fold_idx)
+        test_sub = [grafos[i] for i in test_idx]
 
         for arq in arqs:
             t0    = time.time()
-            model = criar_modelo(arq, num_feats, seed, device)
-            model = treinar_uma_vez(model, train_data, val_data,
+            model = criar_modelo(arq, num_feats, seed=fold_idx, device=device)
+            model = treinar_uma_vez(model, train_sub, val_sub,
                                     device, args.epochs, args.lr)
-            res   = avaliar(model, test_data, device, pos_label_fake=0)
+            res   = avaliar(model, test_sub, device, pos_label_fake=0)
             elapsed = time.time() - t0
 
             for m in ("f1", "accuracy", "precision", "recall"):
                 resultados[arq][m].append(res[m])
 
-            print(f"  Run {run:02d}/{args.runs} | {arq:<5} | "
+            print(f"  Fold {fold_idx:02d}/{len(folds)-1} | {arq:<5} | "
                   f"F1={res['f1']:.4f} | Acc={res['accuracy']:.4f} | "
                   f"{elapsed:.1f}s")
 
@@ -399,15 +446,46 @@ def main():
         print(f"  F1 {a} vs {b}: t={t:.4f}, p={p:.6f} {sig}")
 
     # ── Plots ─────────────────────────────────────────────────────────────
-    print(f"\n[Plots] Salvando em {OUT_DIR}...")
-    plot_boxplot(resultados, "f1", OUT_DIR)
-    plot_violino(resultados, "f1", OUT_DIR)
-    plot_boxplot(resultados, "accuracy", OUT_DIR)
+    print(f"\n[Plots] Salvando em {out_dir}...")
+    plot_boxplot(resultados, "f1", out_dir)
+    plot_violino(resultados, "f1", out_dir)
+    plot_boxplot(resultados, "accuracy", out_dir)
 
-    salvar_relatorio(resultados, pares_ttest, args.runs, OUT_DIR)
+    salvar_relatorio(resultados, pares_ttest, len(folds), out_dir)
+
+    # Tabela LaTeX p-valores
+    tex_path = out_dir / "tabela_significancia.tex"
+    with open(tex_path, "w", encoding="utf-8") as f:
+        f.write("% Tabela de significancia (ttest_rel pareado por fold) -- GERADO AUTOMATICAMENTE\n")
+        f.write("\\begin{tabular}{lrrrrl}\n")
+        f.write("\\toprule\n")
+        f.write("Par & $\\bar{F1}_A$ & $\\bar{F1}_B$ & $t$ & $p$ & sig \\\\\n")
+        f.write("\\midrule\n")
+        for (a, b), (t, p, sig) in pares_ttest.items():
+            ma = float(np.mean(resultados[a]['f1']))
+            mb = float(np.mean(resultados[b]['f1']))
+            f.write(f"{a} vs {b} & {ma:.4f} & {mb:.4f} & {t:.3f} & {p:.4f} & {sig} \\\\\n")
+        f.write("\\bottomrule\n\\end{tabular}\n")
+    print(f"  [OK] {tex_path.name}")
+
+    # CSV por fold
+    csv_path = out_dir / "por_fold.csv"
+    with open(csv_path, "w", newline="", encoding="utf-8") as f:
+        import csv as _csv
+        w = _csv.writer(f)
+        w.writerow(["modelo", "fold", "f1_macro", "f1_fake", "accuracy", "precision", "recall"])
+        for arq in resultados:
+            for fold_idx in range(len(resultados[arq]["f1"])):
+                w.writerow([arq, fold_idx,
+                            resultados[arq]["f1"][fold_idx],
+                            resultados[arq]["f1"][fold_idx],  # ja eh fake-only neste 09
+                            resultados[arq]["accuracy"][fold_idx],
+                            resultados[arq]["precision"][fold_idx],
+                            resultados[arq]["recall"][fold_idx]])
+    print(f"  [OK] {csv_path.name}")
 
     print(f"\n[OK] Testes de significancia concluidos!")
-    print(f"     Resultados em: {OUT_DIR}")
+    print(f"     Resultados em: {out_dir}")
 
 
 if __name__ == "__main__":

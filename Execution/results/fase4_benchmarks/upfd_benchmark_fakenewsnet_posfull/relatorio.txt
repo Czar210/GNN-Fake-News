@@ -1,0 +1,39 @@
+======================================================================
+  RELATORIO COMPARATIVO -- GCN vs GAT vs GraphSAGE (FAKENEWSNET)
+======================================================================
+  Dataset:    UPFD fakenewsnet | Feature: BERT (768-dim)
+  Epocas max: 30  |  Batch: 32
+  Nota: label 0 = Fake, label 1 = Real (convencao UPFD)
+
+  Metrica               GCN      GAT     SAGE  D(SAGE-GCN)
+  ----------------------------------------------------------
+  Accuracy           0.8618   0.8882   0.8553    -0.0065
+  Precision          0.8442   0.8800   0.8611 +    0.0169
+  Recall             0.8784   0.8919   0.8378    -0.0406
+  F1                 0.8609   0.8859   0.8493    -0.0116
+
+  Parametros         57,858  219,330  115,394
+  Tempo/epoca         0.16s    0.66s    0.39s
+
+  -> Ranking em F1: GAT > GCN > SAGE
+
+======================================================================
+  CONCLUSAO
+======================================================================
+  Modelo com maior F1 nesta execução (sem teste de significância): GAT
+  Amplitude das diferencas de F1 entre modelos: 0.0366
+
+  ATENCAO: este relatorio descreve UMA execucao com seed fixo.
+  Diferencas pequenas (< ~0.02) podem ser variancia de inicializacao.
+  Execute 09_teste_significancia.py para testes com multiplas runs.
+  AVISO: se os grafos forem construidos com features nodais identicos
+  (todos os nos com o mesmo embedding do artigo), as diferencas entre
+  arquiteturas refletem apenas a transformacao linear sobre BERT,
+  nao capacidades distintas de agregacao de grafo.
+
+  Comparacao com Bluesky (grafos vazios):
+    GCN  Bluesky F1=0.4128 | UPFD F1=0.8609
+    GAT  Bluesky F1=0.0000 | UPFD F1=0.8859
+    SAGE Bluesky F1=0.2489 | UPFD F1=0.8493
+  (Bluesky: todos os grafos tinham 1 no e 0 arestas -- ver analise_benchmarks_gnn.md)
+======================================================================

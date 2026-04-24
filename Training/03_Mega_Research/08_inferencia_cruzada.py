@@ -49,7 +49,7 @@ from torch_geometric.loader import DataLoader
 RAIZ        = Path(__file__).resolve().parent.parent.parent
 DATA_DIR    = Path(__file__).resolve().parent / "data"
 WEIGHTS_DIR = RAIZ / "Execution" / "weights"
-OUT_DIR     = RAIZ / "Execution" / "results" / "inferencia_cruzada"
+OUT_DIR     = RAIZ / "Execution" / "results" / "fase4_benchmarks" / "inferencia_cruzada"
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from gcn_model  import GCNClassifier

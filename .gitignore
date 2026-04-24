@@ -153,11 +153,58 @@ node_modules/
 # Databases
 *.db
 
-# Dataset massivo (extraído localmente, disponível no Hugging Face)
-14669616.zip
-dados_bluesky/
+# ─────────────────────────────────────────────────────────────────────────
+# DATASETS (todos baixados/gerados localmente -- ver README "Como obter os dados")
+# ─────────────────────────────────────────────────────────────────────────
 
-# Arquivos de trabalho do LaTeX (gerados pelo Overleaf/compilação)
+# Bluesky (~6 GB) -- ver README "dados_bluesky/" para fonte
+dados_bluesky/
+14669616.zip
+
+# UPFD oficial -- ~2 GB (gossipcop) + ~315 MB (politifact)
+# Baixado via PyG download_google_url ou manualmente do Drive (links no README)
+Material/gossipcop/
+Material/politifact/raw/
+Material/politifact/processed/
+
+# Mapeamentos UPFD legacy (pickles auxiliares)
+Material/upfd_raw/*.pkl
+
+# LIAR dataset (TSVs brutos pesados; mantém scripts e README)
+Material/LIAR/src/*.tsv
+Material/LIAR/src/*.html
+
+# Visualizacoes HTML interativas (geradas; pesadas; ~3 MB cada conjunto)
+Photos/*.html
+
+# Versao compilada do TCC (fonte fica no Overleaf)
+GNN_TCC_atualizado.zip
+Material/GNN_TCC_atualizado/
+
+# Embeddings BERT cacheados e grafos pre-construidos do FakeNewsNet
+# Regenerados por 00_construir_grafos_fakenewsnet.py + gerar_folds.py
+Training/03_Mega_Research/data/
+
+# CSVs e parquets do pipeline antigo do Bluesky (legacy/desalinhado, ver README)
+Training/01_BlueSky_Pipe/data/
+
+# Pesos de modelos treinados (regenerados por 17_persistir_modelos_finais.py)
+Execution/weights/*.pth
+Execution/weights/*.pkl
+
+# Resultados experimentais (regerados pelos scripts da fase 2-4)
+# Mantemos apenas .tex (tabelas LaTeX) e relatorio.txt versionados
+Execution/results/**/*.png
+Execution/results/**/*.html
+Execution/results/**/*.csv
+Execution/results/legacy/
+
+# Arquivos de output dos backgrounds task do Claude
+.claude/scheduled_tasks.lock
+
+# ─────────────────────────────────────────────────────────────────────────
+# ARQUIVOS GERADOS POR FERRAMENTAS DE COMPILACAO LaTeX
+# ─────────────────────────────────────────────────────────────────────────
 Material/GNN_TCC_extraido/
 *.aux
 *.out
@@ -170,18 +217,16 @@ Material/GNN_TCC_extraido/
 *.fdb_latexmk
 *.synctex.gz
 
-# Modelos PyTorch treinados (grandes, não versionados)
-Execution/weights/*.pth
-Training/01_BlueSky_Pipe/data/raw/posts_coletados.csv
-Training/01_BlueSky_Pipe/data/raw/reposts_coletados.csv
-Training/01_BlueSky_Pipe/data/processed/
-
-# Material com dados processados do PolitiFact
-Material/politifact/processed/bert/*.pt
-Material/politifact/raw/new_bert_feature.npz
+# Pesos PyTorch e pickles em qualquer pasta (genericos)
+*.pt
+*.pth
+*.pkl
 
 # Credenciais
 .env
 
-# Weights
-*.pt
+# Output de pipelines pesados
+*.npz
+*.npy
+*.csv.gz
+*.tar.gz

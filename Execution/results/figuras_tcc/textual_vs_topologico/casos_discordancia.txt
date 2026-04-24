@@ -1,0 +1,19 @@
+Top 15 casos onde textual e topologico mais divergem
+(maior |score_text - score_topo|)
+============================================================
+
+idx=3554  label=1  s_text=0.004  s_topo=0.990  delta=0.986  text_pred=1 topo_pred=0  text_ok=True  topo_ok=False
+idx= 251  label=0  s_text=0.980  s_topo=0.000  delta=0.980  text_pred=0 topo_pred=1  text_ok=True  topo_ok=False
+idx=2171  label=0  s_text=0.974  s_topo=0.000  delta=0.974  text_pred=0 topo_pred=1  text_ok=True  topo_ok=False
+idx=2506  label=0  s_text=0.974  s_topo=0.000  delta=0.974  text_pred=0 topo_pred=1  text_ok=True  topo_ok=False
+idx=2811  label=1  s_text=0.024  s_topo=0.998  delta=0.973  text_pred=1 topo_pred=0  text_ok=True  topo_ok=False
+idx=2016  label=0  s_text=0.954  s_topo=0.000  delta=0.954  text_pred=0 topo_pred=1  text_ok=True  topo_ok=False
+idx=1601  label=0  s_text=0.947  s_topo=0.000  delta=0.947  text_pred=0 topo_pred=1  text_ok=True  topo_ok=False
+idx=2488  label=1  s_text=0.054  s_topo=1.000  delta=0.946  text_pred=1 topo_pred=0  text_ok=True  topo_ok=False
+idx=  10  label=1  s_text=0.053  s_topo=0.990  delta=0.937  text_pred=1 topo_pred=0  text_ok=True  topo_ok=False
+idx=3732  label=1  s_text=0.063  s_topo=1.000  delta=0.937  text_pred=1 topo_pred=0  text_ok=True  topo_ok=False
+idx=3767  label=1  s_text=0.068  s_topo=1.000  delta=0.932  text_pred=1 topo_pred=0  text_ok=True  topo_ok=False
+idx=2421  label=0  s_text=0.926  s_topo=0.000  delta=0.926  text_pred=0 topo_pred=1  text_ok=True  topo_ok=False
+idx=1965  label=0  s_text=0.925  s_topo=0.000  delta=0.925  text_pred=0 topo_pred=1  text_ok=True  topo_ok=False
+idx=2228  label=1  s_text=0.073  s_topo=0.998  delta=0.925  text_pred=1 topo_pred=0  text_ok=True  topo_ok=False
+idx=1704  label=0  s_text=0.925  s_topo=0.000  delta=0.925  text_pred=0 topo_pred=1  text_ok=True  topo_ok=False

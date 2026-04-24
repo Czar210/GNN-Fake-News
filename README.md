@@ -56,3 +56,146 @@ pip install -r requirements.txt
 ```
 
 *(Nota: Para rodar tanto a API do backend quanto a interface visual, recomenda-se verificar e inicializar os runtimes na pasta `frontend/`).*
+
+---
+
+## 📦 Como obter os dados
+
+Nenhum dataset é versionado no repositório (todos juntos somam ~10 GB). Os scripts esperam a estrutura abaixo. Cada bloco descreve onde baixar e onde colocar.
+
+### 1. FakeNewsNet PolitiFact (CSV pequeno, baixado automaticamente)
+
+**Tamanho:** ~3 MB (CSVs) + ~150 MB (após gerar `.pt` com BERT)
+
+**Origem:** [github.com/KaiDMML/FakeNewsNet](https://github.com/KaiDMML/FakeNewsNet) — `dataset/politifact_fake.csv` e `dataset/politifact_real.csv`.
+
+**Como obter:** o script faz tudo. Apenas rode:
+
+```bash
+cd Training/03_Mega_Research
+python 00_construir_grafos_fakenewsnet.py --feature-variant full --output-suffix posfull --cpu
+python gerar_folds.py
+```
+
+Isso baixa os CSVs do GitHub, gera embeddings BERT dos títulos (cache em `data/_bert_titulos_cache.pt`), constrói os grafos com features posicionais (`is_root`, `grau_norm`, `pos`) e os salva em `Training/03_Mega_Research/data/fakenewsnet_posfull/`.
+
+Para reproduzir as variantes do experimento de ablation (`pos-min`, `pos-grau`):
+
+```bash
+python 00_construir_grafos_fakenewsnet.py --feature-variant pos-min  --output-suffix posmin  --cpu
+python 00_construir_grafos_fakenewsnet.py --feature-variant pos-grau --output-suffix posgrau --cpu
+```
+
+### 2. UPFD oficial (PolitiFact + GossipCop) — Google Drive
+
+**Tamanho:** PolitiFact ~200 MB + GossipCop ~1.4 GB (extraídos)
+
+**Origem:** dataset oficial do paper *"User Preference-aware Fake News Detection"* (Dou et al., SIGIR 2021), distribuído via Google Drive. Os IDs ficam hardcoded no fonte do PyG e mudam entre versões — sempre conferir contra a documentação atual.
+
+**Fonte autoritativa:** [pytorch_geometric.datasets.UPFD source](https://pytorch-geometric.readthedocs.io/en/latest/_modules/torch_geometric/datasets/upfd.html) (busque `file_ids` no código).
+
+**IDs válidos (confirmados em 2026):**
+
+| Dataset | Drive ID | Link de visualização |
+|---|---|---|
+| `politifact` | `1toou2GO0agoY_OS54LaCWEECQfe93nuq` | [drive.google.com/file/d/1toou…](https://drive.google.com/file/d/1toou2GO0agoY_OS54LaCWEECQfe93nuq/view) |
+| `gossipcop` | `1DkMAzC7XUUciAxsSujRJt3sq1MqaVI3g` | [drive.google.com/file/d/1DkMA…](https://drive.google.com/file/d/1DkMAzC7XUUciAxsSujRJt3sq1MqaVI3g/view) |
+
+**Como obter (download automatizado via PyG):**
+
+```bash
+python -c "
+from torch_geometric.data import download_google_url, extract_zip
+import os
+ids = {
+    'politifact': '1toou2GO0agoY_OS54LaCWEECQfe93nuq',
+    'gossipcop':  '1DkMAzC7XUUciAxsSujRJt3sq1MqaVI3g',
+}
+for nome, gid in ids.items():
+    raw_dir = f'Material/{nome}/raw'
+    os.makedirs(raw_dir, exist_ok=True)
+    p = download_google_url(gid, raw_dir, 'data.zip')
+    extract_zip(p, raw_dir); os.remove(p)
+"
+```
+
+Cada zip contém: `node_graph_id.npy`, `graph_labels.npy`, `A.txt`, `train_idx.npy`, `val_idx.npy`, `test_idx.npy`, e os `.npz` para cada feature (`profile`, `spacy`, `bert`, `content`).
+
+Estrutura final esperada:
+```
+Material/
+├── politifact/raw/   (~200 MB, 7 arquivos)
+└── gossipcop/raw/    (~1.4 GB, 7 arquivos)
+```
+
+Após primeira leitura via `torch_geometric.datasets.UPFD`, o PyG materializa em `Material/<dataset>/processed/<feature>/{train,val,test}.pt`.
+
+> ⚠️ **GossipCop com `feature='bert'` precisa de ~1.8 GB de RAM** para densificar a matriz esparsa. Em CPU/Windows pode estourar OOM. Use `feature='content'` (310d) que é mais leve e dá resultados equivalentes para os experimentos topológicos.
+
+### 3. Bluesky — dataset social acadêmico (~6 GB)
+
+**Tamanho:** ~6 GB extraído (15 GB+ se contar arquivos brutos do dataset original de 31 GB).
+
+**Conteúdo:** posts, reposts, replies, quotes, followers — coletados de 11 feeds temáticos do Bluesky (Blacksky, News, Science, Political Science, etc.). Total de ~168 mil posts, ~63 milhões de reposts, ~87 milhões de replies.
+
+**⚠ Sem labels fake/real.** Esse dataset é usado **apenas no capítulo de aplicação/demonstração** do TCC, nunca para validação supervisionada.
+
+**Origem:** dataset acadêmico do Bluesky (paper de pesquisa social — buscar por "Bluesky social network dataset feeds 2024" no Hugging Face/Zenodo/OSF). O zip original tem ~31 GB; nós usamos um subconjunto de ~6 GB.
+
+Estrutura esperada:
+```
+dados_bluesky/
+├── feed_posts/                  # 11 .jsonl (um por feed)
+├── feed_posts_likes/            # likes por feed (csv.gz)
+├── feed_bookmarks.csv
+├── followers.csv.gz             # rede de seguidores (~491 MB)
+├── interactions.csv.gz          # interações (~1 GB)
+├── graphs.tar.gz                # 891 MB; contém reposts/replies/quotes/threads
+├── graphs_extracted/graphs/     # após extração: ~3.7 GB
+└── scripts/                     # scripts originais do paper (data_collection,
+                                 #   cleaning&processing, experiments)
+```
+
+**Como usar nos scripts:** após colocar a pasta `dados_bluesky/` na raiz do repositório, os scripts `18_analise_bluesky_crossfeed.py`, `19_aplicar_modelo_bluesky.py` e `22_concordancia_bluesky.py` funcionam direto.
+
+### 4. Pipeline legacy (Bluesky CSVs antigos — não recomendado)
+
+A pasta `Training/01_BlueSky_Pipe/data/raw/` continha CSVs antigos (`posts_coletados.csv`, `reposts_coletados.csv`) coletados via `atproto`. Estes CSVs são **desalinhados** (apenas ~35 IDs em comum entre posts e reposts) e **inadequados para treino**. Foram preservados apenas para referência histórica do pipeline; o caminho atual usa o `dados_bluesky/` de pesquisa acadêmica descrito acima.
+
+---
+
+## 🧪 Reproduzindo o experimento completo
+
+Sequência mínima para regenerar todos os resultados do TCC após baixar os dados:
+
+```bash
+cd Training/03_Mega_Research
+
+# Fase 2 — baselines + folds compartilhados
+python 00_construir_grafos_fakenewsnet.py --feature-variant full --output-suffix posfull --cpu
+python gerar_folds.py
+python 10_baseline_textual.py
+python 11_diagnostico_confound.py
+
+# Fase 3 — ablation positional encodings
+python 00_construir_grafos_fakenewsnet.py --feature-variant pos-min  --output-suffix posmin  --cpu
+python 00_construir_grafos_fakenewsnet.py --feature-variant pos-grau --output-suffix posgrau --cpu
+python 12_ablation_intra_encoding.py --cpu
+python 15_analise_estrutural.py
+
+# Fase 4 — benchmarks finais
+python 09_teste_significancia.py --cpu --data-suffix posfull   # tabela LaTeX
+python 13_benchmark_upfd_oficial.py --cpu --seeds 5             # cross-dataset UPFD
+python 14_topologia_sem_texto.py --cpu --seeds 10               # sem texto
+python 16_gnn_explainer_upfd.py --cpu                           # explanations
+
+# Persistencia + comparacoes finais
+python 17_persistir_modelos_finais.py
+python 18_analise_bluesky_crossfeed.py
+python 19_aplicar_modelo_bluesky.py
+python 20_textual_vs_topologico.py
+python 21_bloco_vs_mini.py
+python 22_concordancia_bluesky.py
+```
+
+Tempo total estimado em CPU sem GPU: ~3-4 horas (a maior parte é BERT embeddando textos; reusa cache em runs subsequentes).

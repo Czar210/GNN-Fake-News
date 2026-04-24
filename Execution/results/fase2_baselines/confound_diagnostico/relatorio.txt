@@ -1,0 +1,8 @@
+==============================================================
+  Diagnostico de Confound -- Resumo
+==============================================================
+  Variante A (so num_nodes): F1_macro = 0.5231 +/- 0.0536
+  Variante B (BERT+num_nodes): F1_macro = 0.8472 +/- 0.0390
+
+  Gate de Decisao: F1(A) > 0.65 ?
+  -> NAO (0.5231 <= 0.65). Confound presente mas fraco; nao gera dataset balanceado.

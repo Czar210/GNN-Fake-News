@@ -68,7 +68,7 @@ def carregar_dados(device: torch.device) -> tuple:
 
 def treinar(model, train_loader, val_loader, device, epochs, lr) -> tuple:
     """
-    Retorna (model_treinado, historico_loss, historico_val_acc, tempo_por_epoca).
+    Retorna (model_treinado, historico_loss, historico_val_f1, tempo_por_epoca).
     """
     optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=5e-4)
     criterion = torch.nn.CrossEntropyLoss()
@@ -97,31 +97,32 @@ def treinar(model, train_loader, val_loader, device, epochs, lr) -> tuple:
         ep_time = time.time() - t0
         tempos.append(ep_time)
 
-        # Validação
+        # Validação (F1-macro)
         model.eval()
-        correct, total = 0, 0
+        val_y_true, val_y_pred = [], []
         with torch.no_grad():
             for data in val_loader:
                 data  = data.to(device)
                 out, _ = model(data.x, data.edge_index, data.batch)
-                preds  = out.argmax(dim=1)
-                correct += int((preds == data.y.squeeze()).sum())
-                total   += data.num_graphs
+                preds  = out.argmax(dim=1).cpu().tolist()
+                labels = data.y.squeeze().cpu().tolist()
+                val_y_pred.extend(preds)
+                val_y_true.extend(labels if isinstance(labels, list) else [labels])
 
-        val_acc = correct / total if total > 0 else 0.0
+        val_f1 = f1_score(val_y_true, val_y_pred, average="macro", zero_division=0) if val_y_true else 0.0
         avg_loss = total_loss / sum(d.num_graphs for d in train_loader)
-        scheduler.step(val_acc)
+        scheduler.step(val_f1)
 
         hist_loss.append(avg_loss)
-        hist_val.append(val_acc)
+        hist_val.append(val_f1)
 
-        if val_acc > best_val:
-            best_val   = val_acc
+        if val_f1 > best_val:
+            best_val   = val_f1
             best_state = {k: v.clone() for k, v in model.state_dict().items()}
 
         if epoch % 5 == 0 or epoch == 1:
             print(f"    Epoch {epoch:03d} | Loss: {avg_loss:.4f} | "
-                  f"Val: {val_acc:.4f} | {ep_time:.2f}s/ep")
+                  f"Val F1: {val_f1:.4f} | {ep_time:.2f}s/ep")
 
     if best_state:
         model.load_state_dict(best_state)

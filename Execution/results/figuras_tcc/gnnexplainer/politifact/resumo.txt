@@ -1,0 +1,28 @@
+GNNExplainer / UPFD-politifact
+SAGE com features [is_root, grau_normalizado], seed=42
+F1m no test: 0.3283
+
+
+--- idx=73  FAKE  pred=0  p_fake=0.600  OK  (185 nos, 184 arestas) ---
+   Arestas mais decisivas (importancia GNNExplainer):
+     0 -> 51  importancia = 0.1144
+     0 -> 111  importancia = 0.1140
+     0 -> 174  importancia = 0.1137
+     0 -> 23  importancia = 0.1133
+     0 -> 29  importancia = 0.1128
+
+--- idx=204  FAKE  pred=0  p_fake=0.599  OK  (129 nos, 128 arestas) ---
+   Arestas mais decisivas (importancia GNNExplainer):
+     0 -> 5  importancia = 0.1010
+     0 -> 38  importancia = 0.1008
+     119 -> 126  importancia = 0.1007
+     0 -> 91  importancia = 0.1006
+     0 -> 60  importancia = 0.1005
+
+--- idx=119  REAL  pred=0  p_fake=0.599  ERRO  (104 nos, 103 arestas) ---
+   Arestas mais decisivas (importancia GNNExplainer):
+     3 -> 100  importancia = 0.0955
+     0 -> 68  importancia = 0.0940
+     0 -> 52  importancia = 0.0938
+     20 -> 101  importancia = 0.0938
+     0 -> 13  importancia = 0.0938

@@ -1,0 +1,13 @@
+============================================================
+  Bloco grande vs Modelos mini -- Decisao
+============================================================
+
+Delta medio (bloco - mini): +0.0053
+Maior queda: -0.0048
+
+DECISAO: BLOCO ~ MINI -- generalizacao funciona, vale 1 modelo so.
+
+Detalhamento por dataset:
+  fnn                    delta=-0.0021
+  upfd_politifact        delta=+0.0227
+  upfd_gossipcop         delta=-0.0048

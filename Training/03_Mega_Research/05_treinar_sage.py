@@ -28,6 +28,7 @@ from pathlib import Path
 
 import torch
 import torch.nn.functional as F
+from sklearn.metrics import f1_score
 from torch_geometric.loader import DataLoader
 
 # ─── Caminhos ─────────────────────────────────────────────────────────────────
@@ -45,7 +46,7 @@ EPOCHS_DEFAULT = 30
 LR_DEFAULT     = 0.005
 WEIGHT_DECAY   = 5e-4
 BATCH_SIZE     = 64
-PATIENCE       = 7    # early stopping: épocas sem melhoria na val_acc
+PATIENCE       = 7    # early stopping: épocas sem melhoria no val_f1 (macro)
 
 VARIANTES = {
     "baseline":  {"peso_ce": [1.0, 1.0], "arquivo": "pesos_sage.pth"},
@@ -114,15 +115,17 @@ def treinar_epoca(model, loader, optimizer, criterion, device) -> tuple:
 @torch.no_grad()
 def avaliar(model, loader, device) -> float:
     model.eval()
-    total_correct = 0
-    total         = 0
+    y_true, y_pred = [], []
     for data in loader:
         data  = data.to(device)
         out, _ = model(data.x, data.edge_index, data.batch)
-        preds  = out.argmax(dim=1)
-        total_correct += int((preds == data.y.squeeze()).sum())
-        total         += data.num_graphs
-    return total_correct / total if total > 0 else 0.0
+        preds  = out.argmax(dim=1).cpu().tolist()
+        labels = data.y.squeeze().cpu().tolist()
+        y_pred.extend(preds)
+        y_true.extend(labels if isinstance(labels, list) else [labels])
+    if not y_true:
+        return 0.0
+    return f1_score(y_true, y_pred, average="macro", zero_division=0)
 
 
 # ─── Treinamento de uma variante ──────────────────────────────────────────────
@@ -151,25 +154,25 @@ def treinar_variante(
     criterion   = torch.nn.CrossEntropyLoss(weight=peso_tensor)
     optimizer   = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=WEIGHT_DECAY)
 
-    # LR scheduler: reduz pela metade se val_acc não melhora em 5 épocas
+    # LR scheduler: reduz pela metade se val_f1 não melhora em 5 épocas
     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
         optimizer, mode="max", factor=0.5, patience=5
     )
 
-    best_val_acc       = 0.0
+    best_val_f1        = 0.0
     best_state         = None
     epochs_sem_melhora = 0
     t_inicio           = time.time()
 
     for epoch in range(1, epochs + 1):
         train_loss, train_acc = treinar_epoca(model, train_loader, optimizer, criterion, device)
-        val_acc               = avaliar(model, val_loader, device)
+        val_f1                = avaliar(model, val_loader, device)
 
-        scheduler.step(val_acc)
+        scheduler.step(val_f1)
 
-        melhorou = val_acc > best_val_acc
+        melhorou = val_f1 > best_val_f1
         if melhorou:
-            best_val_acc       = val_acc
+            best_val_f1        = val_f1
             best_state         = {k: v.clone() for k, v in model.state_dict().items()}
             epochs_sem_melhora = 0
         else:
@@ -177,14 +180,14 @@ def treinar_variante(
 
         marker = " <- melhor" if melhorou else ""
         print(f"  Epoch {epoch:03d} | Loss: {train_loss:.4f} | "
-              f"Train Acc: {train_acc:.4f} | Val Acc: {val_acc:.4f}{marker}")
+              f"Train Acc: {train_acc:.4f} | Val F1: {val_f1:.4f}{marker}")
 
         if epochs_sem_melhora >= PATIENCE:
             print(f"  [Early stopping] {PATIENCE} épocas sem melhoria. Parando.")
             break
 
     t_total = time.time() - t_inicio
-    print(f"\n  Melhor Val Acc: {best_val_acc:.4f} | Tempo total: {t_total:.1f}s")
+    print(f"\n  Melhor Val F1 (macro): {best_val_f1:.4f} | Tempo total: {t_total:.1f}s")
 
     if best_state is not None:
         model.load_state_dict(best_state)

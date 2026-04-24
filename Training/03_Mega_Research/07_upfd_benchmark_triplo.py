@@ -71,18 +71,23 @@ def _inspecionar_dataset(nome, grafos):
           f"fake(0)={fk} ({100*fk/len(grafos):.1f}%)")
 
 
-def carregar_fakenewsnet(_device: torch.device) -> tuple:
+def carregar_fakenewsnet(_device: torch.device, data_suffix: str = None) -> tuple:
     """
-    Carrega grafos FakeNewsNet pre-construidos pelo script 00_construir_grafos_fakenewsnet.py.
-    Retorna (train_loader, val_loader, test_data, num_node_features).
+    Carrega grafos FakeNewsNet. Se data_suffix for None, raiz de data/.
+    Caso contrario, carrega de data/fakenewsnet_<suffix>/.
     """
     DATA_DIR = Path(__file__).resolve().parent / "data"
+    base = DATA_DIR / f"fakenewsnet_{data_suffix}" if data_suffix else DATA_DIR
     splits = {}
     for split in ["train", "val", "test"]:
-        p = DATA_DIR / f"fakenewsnet_{split}.pt"
+        p = base / f"fakenewsnet_{split}.pt"
         if not p.exists():
             print(f"[ERRO] {p} nao encontrado.")
-            print("       Execute: python 00_construir_grafos_fakenewsnet.py")
+            if data_suffix:
+                print(f"       Execute: python 00_construir_grafos_fakenewsnet.py "
+                      f"--feature-variant <variant> --output-suffix {data_suffix}")
+            else:
+                print("       Execute: python 00_construir_grafos_fakenewsnet.py")
             import sys; sys.exit(1)
         splits[split] = torch.load(p, weights_only=False)
         _inspecionar_dataset(split, splits[split])
@@ -123,7 +128,7 @@ def carregar_upfd(dataset_name: str, feature: str, _device: torch.device) -> tup
 
 def treinar(model, train_loader, val_loader, device, epochs, lr) -> tuple:
     """
-    Retorna (model, hist_loss, hist_val_acc, tempo_medio_por_epoca).
+    Retorna (model, hist_loss, hist_val_f1, tempo_medio_por_epoca).
     """
     optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=5e-4)
     criterion = torch.nn.CrossEntropyLoss()
@@ -165,8 +170,8 @@ def treinar(model, train_loader, val_loader, device, epochs, lr) -> tuple:
                 val_y_pred.extend(preds)
                 val_y_true.extend(labels if isinstance(labels, list) else [labels])
 
-        # Criterio de selecao: F1 (consistente com a metrica de avaliacao final)
-        val_f1   = f1_score(val_y_true, val_y_pred, pos_label=0, zero_division=0)
+        # Criterio de selecao: F1-macro (alinha com avaliacao final)
+        val_f1   = f1_score(val_y_true, val_y_pred, average="macro", zero_division=0)
         avg_loss = total_loss / sum(d.num_graphs for d in train_loader)
         scheduler.step(val_f1)
 
@@ -318,7 +323,7 @@ def plot_metricas(resultados: dict, tempos: dict, dataset_name: str, out_dir: Pa
 
 
 def plot_curvas(historicos: dict, out_dir: Path) -> None:
-    """Plota curvas de treinamento (loss e val_acc) para os 3 modelos."""
+    """Plota curvas de treinamento (loss e val_f1) para os 3 modelos."""
     fig, axes = plt.subplots(1, 2, figsize=(14, 5))
     fig.suptitle("Curvas de Treinamento -- UPFD", fontsize=13, fontweight="bold")
 
@@ -396,7 +401,7 @@ def salvar_relatorio(
     f1_vals = {n: resultados[n]["f1"] for n in resultados}
     f1_spread = max(f1_vals.values()) - min(f1_vals.values())
 
-    linhas.append(f"  Modelo com maior F1 nesta execucao: {vencedor}")
+    linhas.append(f"  Modelo com maior F1 nesta execução (sem teste de significância): {vencedor}")
     linhas.append(f"  Amplitude das diferencas de F1 entre modelos: {f1_spread:.4f}")
     linhas.append("")
     linhas.append("  ATENCAO: este relatorio descreve UMA execucao com seed fixo.")
@@ -440,12 +445,17 @@ def main():
     parser.add_argument("--lr",                type=float, default=0.001)
     parser.add_argument("--usar-pesos-salvos", action="store_true")
     parser.add_argument("--cpu",               action="store_true")
+    parser.add_argument("--data-suffix",       type=str, default=None,
+                        choices=["posfull", "posmin", "posgrau", "bugado_original"],
+                        help="So aplica para --dataset fakenewsnet. Carrega de "
+                             "data/fakenewsnet_<suffix>/. Default: raiz data/.")
     args = parser.parse_args()
 
     device = torch.device("cpu" if args.cpu else
                           ("cuda" if torch.cuda.is_available() else "cpu"))
 
-    OUT_DIR = RAIZ / "Execution" / "results" / f"upfd_benchmark_{args.dataset}"
+    suffix_tag = f"_{args.data_suffix}" if (args.dataset == "fakenewsnet" and args.data_suffix) else ""
+    OUT_DIR = RAIZ / "Execution" / "results" / "fase4_benchmarks" / f"upfd_benchmark_{args.dataset}{suffix_tag}"
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     WEIGHTS_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -461,7 +471,7 @@ def main():
     # ── Dados ────────────────────────────────────────────────────────────────
     print("[1/3] Carregando dataset...")
     if args.dataset == "fakenewsnet":
-        tr_loader, val_loader, test_data, num_features = carregar_fakenewsnet(device)
+        tr_loader, val_loader, test_data, num_features = carregar_fakenewsnet(device, args.data_suffix)
     else:
         tr_loader, val_loader, test_data, num_features = carregar_upfd(
             args.dataset, args.feature, device

@@ -1,0 +1,35 @@
+GNNExplainer / UPFD-gossipcop
+SAGE com features [is_root, grau_normalizado], seed=42
+F1m no test: 0.8138
+
+
+--- idx=1204  FAKE  pred=0  p_fake=0.948  OK  (152 nos, 151 arestas) ---
+   Arestas mais decisivas (importancia GNNExplainer):
+     0 -> 58  importancia = 0.9155
+     0 -> 14  importancia = 0.9151
+     0 -> 90  importancia = 0.9137
+     0 -> 33  importancia = 0.9133
+     0 -> 150  importancia = 0.9131
+
+--- idx=2883  FAKE  pred=0  p_fake=0.948  OK  (150 nos, 149 arestas) ---
+   Arestas mais decisivas (importancia GNNExplainer):
+     0 -> 137  importancia = 0.9160
+     0 -> 105  importancia = 0.9150
+     0 -> 50  importancia = 0.9149
+     0 -> 90  importancia = 0.9145
+     0 -> 146  importancia = 0.9144
+
+--- idx=346  REAL  pred=1  p_fake=0.000  OK  (3 nos, 2 arestas) ---
+   Arestas mais decisivas (importancia GNNExplainer):
+     0 -> 1  importancia = 0.9553
+     1 -> 2  importancia = 0.9298
+
+--- idx=417  REAL  pred=1  p_fake=0.000  OK  (3 nos, 2 arestas) ---
+   Arestas mais decisivas (importancia GNNExplainer):
+     1 -> 2  importancia = 0.9290
+     0 -> 1  importancia = 0.9289
+
+--- idx=146  FAKE  pred=1  p_fake=0.000  ERRO  (3 nos, 2 arestas) ---
+   Arestas mais decisivas (importancia GNNExplainer):
+     0 -> 1  importancia = 0.9310
+     1 -> 2  importancia = 0.0693

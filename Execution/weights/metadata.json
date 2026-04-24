@@ -1,0 +1,43 @@
+{
+  "timestamp": "2026-04-24 12:16:06",
+  "random_seed": 42,
+  "modelos": {
+    "logreg_bert_fnn": {
+      "tipo": "sklearn.LogisticRegression",
+      "input_dim": 768,
+      "treinado_em": "FakeNewsNet (754 grafos, x[0]=BERT raiz)",
+      "f1_macro_treino": 0.9523,
+      "path": "Execution\\weights\\logreg_bert_fnn.pkl",
+      "uso": "classificador textual canonico; rapido; equivalente a GCN no FNN"
+    },
+    "rf_struct_gossipcop": {
+      "tipo": "sklearn.RandomForestClassifier",
+      "n_estimators": 200,
+      "input_features": [
+        "num_nodes",
+        "grau_root"
+      ],
+      "treinado_em": "UPFD-GossipCop (1638 grafos train+val)",
+      "avaliado_em": "UPFD-GossipCop test (3826 grafos)",
+      "f1_macro_test": 0.7534,
+      "accuracy_test": 0.7535,
+      "path": "Execution\\weights\\rf_struct_gossipcop.pkl",
+      "uso": "classificador topologico leve e interpretavel; modelo principal de fallback quando texto nao esta disponivel"
+    },
+    "sage_struct_gossipcop": {
+      "tipo": "torch_geometric.SAGEClassifier",
+      "input_features": [
+        "is_root",
+        "grau_norm"
+      ],
+      "hidden_channels": 64,
+      "treinado_em": "UPFD-GossipCop (1092 train, 546 val)",
+      "avaliado_em": "UPFD-GossipCop test (3826)",
+      "f1_macro_test": 0.8138,
+      "f1_fake_test": 0.8191,
+      "accuracy_test": 0.8139,
+      "path": "Execution\\weights\\sage_struct_gossipcop.pth",
+      "uso": "classificador topologico GNN; usado para visualizacao via GNNExplainer (arestas decisivas) na ferramenta"
+    }
+  }
+}

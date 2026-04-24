@@ -1,0 +1,15 @@
+Textual vs Topologico -- UPFD-GossipCop
+============================================================
+
+F1 macro textual:  0.9540
+F1 macro topologico: 0.7534
+
+n: 3826
+concorda: 2903
+discorda: 923
+agreement_rate: 0.7588
+matriz_2x2: [[1483, 399], [524, 1420]]
+kappa: 0.5179
+f1_quando_concordam: 0.9662
+f1_text_quando_discordam: 0.9139
+f1_topo_quando_discordam: 0.0845
