@@ -98,6 +98,20 @@ python 00_construir_grafos_fakenewsnet.py --feature-variant pos-min  --output-su
 python 00_construir_grafos_fakenewsnet.py --feature-variant pos-grau --output-suffix posgrau --cpu
 ```
 
+### 1.b Instalando PyTorch + PyTorch Geometric
+
+O `requirements.txt` lista `torch==2.10.0` e `torch-geometric==2.7.0`, mas a combinação certa depende do seu OS e da presença de GPU/CUDA. **Não confie no `pip install` cego pro PyG** — eles distribuem wheels pré-compilados específicos.
+
+- **CPU-only (recomendado para reproduzir o TCC):**
+  ```bash
+  pip install torch==2.10.0 --index-url https://download.pytorch.org/whl/cpu
+  pip install torch-geometric==2.7.0
+  ```
+
+- **CUDA (se vc tem GPU NVIDIA):** consulte a [matriz oficial de instalação do PyG](https://pytorch-geometric.readthedocs.io/en/latest/install/installation.html) — eles geram o comando exato baseado no seu CUDA toolkit.
+
+Os experimentos do TCC rodaram em CPU; tempos reportados em "Reproduzindo o experimento completo" assumem CPU.
+
 ### 2. UPFD oficial (PolitiFact + GossipCop) — Google Drive
 
 **Tamanho:** PolitiFact ~200 MB + GossipCop ~1.4 GB (extraídos)

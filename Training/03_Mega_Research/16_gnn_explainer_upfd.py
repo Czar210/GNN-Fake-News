@@ -9,14 +9,18 @@ de cada amostra.
 Para cada dataset:
   1. Treina SAGE com seed fixa nas features B_estrutural [is_root, grau_norm]
   2. Avalia no test set
-  3. Seleciona 5 amostras interessantes:
-     - 2 FAKE corretamente classificadas (alta confianca)
-     - 2 REAL corretamente classificadas (alta confianca)
-     - 1 erro (baixa confianca) -- bordo/dificil
+  3. Seleciona 20 amostras estratificadas (resposta a feedback de banca):
+     - 5 FAKE-pequena (n_nodes < mediana, classificadas corretamente, ranqueadas por confianca)
+     - 5 FAKE-grande (n_nodes >= mediana, classificadas corretamente)
+     - 5 REAL-pequena (n_nodes < mediana, classificadas corretamente)
+     - 5 REAL-grande (n_nodes >= mediana, classificadas corretamente)
   4. Aplica GNNExplainer (edge_mask) em cada
-  5. Exporta:
+  5. Calcula hop-distance importance: fracao de massa de importancia em
+     arestas a 1-hop, 2-hop, 3+ hops da raiz (BFS distance).
+  6. Exporta:
      - PNG: layout com arestas coloridas por importancia
      - HTML PyVis interativo com espessura/cor proporcional
+     - hop_importance.csv: agregado por (classe, tamanho)
 
 Saidas em Execution/results/figuras_tcc/gnnexplainer/:
   <dataset>_<idx>_<classe>_pred<p>.png/html
@@ -133,23 +137,86 @@ def treinar_sage(train, val, num_features, device, epochs=30, lr=0.001, seed=42)
     return model
 
 
-def selecionar_amostras(test, info) -> list:
-    """Seleciona ate 5 amostras interessantes."""
-    # 2 fake corretas com alta confianca
-    fake_corr = sorted(
-        [(i, x) for i, x in enumerate(info) if x["y_true"] == 0 and x["y_pred"] == 0],
-        key=lambda kv: -kv[1]["prob_fake"]
-    )[:2]
-    real_corr = sorted(
-        [(i, x) for i, x in enumerate(info) if x["y_true"] == 1 and x["y_pred"] == 1],
-        key=lambda kv: kv[1]["prob_fake"]   # menor prob_fake = real mais "real"
-    )[:2]
-    erro = sorted(
-        [(i, x) for i, x in enumerate(info) if x["y_true"] != x["y_pred"]],
-        key=lambda kv: -abs(kv[1]["prob_fake"] - 0.5)  # pega o "mais errado"
-    )[:1]
-    sel = fake_corr + real_corr + erro
-    return [(i, info[i]) for i, _ in sel]
+def selecionar_amostras(test, info, n_per_strata: int = 5) -> list:
+    """
+    Selecao estratificada (resposta a feedback de banca):
+    n_per_strata amostras de cada um dos 4 estratos:
+      (FAKE, pequena), (FAKE, grande), (REAL, pequena), (REAL, grande).
+
+    "pequena" = num_nodes < mediana global do test set
+    "grande"  = num_nodes >= mediana
+    Apenas amostras CORRETAMENTE classificadas (y_true == y_pred).
+    Dentro de cada estrato, ranqueia por confianca (prob_fake mais distante de 0.5).
+    """
+    sizes = np.array([test[i].num_nodes for i in range(len(test))])
+    mediana = float(np.median(sizes))
+
+    estratos = {
+        ("FAKE", "pequena"): [],
+        ("FAKE", "grande"):  [],
+        ("REAL", "pequena"): [],
+        ("REAL", "grande"):  [],
+    }
+    for i, x in enumerate(info):
+        if x["y_true"] != x["y_pred"]:
+            continue
+        if test[i].num_nodes < 3 or test[i].edge_index.numel() == 0:
+            continue
+        classe = "FAKE" if x["y_true"] == 0 else "REAL"
+        tam = "pequena" if test[i].num_nodes < mediana else "grande"
+        # Score de confianca: |prob_fake - 0.5| -- maior = mais confiante
+        confianca = abs(x["prob_fake"] - 0.5)
+        estratos[(classe, tam)].append((i, x, confianca))
+
+    sel = []
+    for k, lista in estratos.items():
+        # Top n_per_strata por confianca
+        lista.sort(key=lambda t: -t[2])
+        for i, ent, _ in lista[:n_per_strata]:
+            sel.append((i, ent, k))   # carrega o estrato pra logging downstream
+
+    print(f"   Mediana de num_nodes (corte pequena/grande): {mediana:.1f}")
+    print(f"   Estratos: " + ", ".join(
+        f"{k}={min(len(v), n_per_strata)}/{n_per_strata}" for k, v in estratos.items()))
+    return sel
+
+
+def hop_distance_da_raiz(num_nodes: int, edge_index: torch.Tensor) -> dict:
+    """BFS a partir do no 0 (raiz). Retorna dict {edge_idx_no_edge_index: hop_dist}.
+    hop_dist = min(d(raiz, src), d(raiz, tgt)) + 1 (a aresta esta naquele hop)."""
+    if edge_index.numel() == 0:
+        return {}
+    adj = {i: [] for i in range(num_nodes)}
+    for s, t in edge_index.t().tolist():
+        adj[s].append(t)
+        adj[t].append(s)
+    dist = {0: 0}
+    fila = [0]
+    while fila:
+        u = fila.pop(0)
+        for v in adj[u]:
+            if v not in dist:
+                dist[v] = dist[u] + 1
+                fila.append(v)
+    out = {}
+    for k, (s, t) in enumerate(edge_index.t().tolist()):
+        ds = dist.get(s, 99)
+        dt = dist.get(t, 99)
+        out[k] = min(ds, dt) + 1   # ex: aresta raiz->filho = hop 1
+    return out
+
+
+def analisar_hop_importance(g, edge_mask: torch.Tensor) -> dict:
+    """Retorna {1: frac_1hop, 2: frac_2hop, '3+': frac_3plus} -- fracao da massa total."""
+    hops = hop_distance_da_raiz(g.num_nodes, g.edge_index)
+    total = float(edge_mask.sum().clamp(min=1e-9).item())
+    massa = {1: 0.0, 2: 0.0, "3+": 0.0}
+    for k, w in enumerate(edge_mask.tolist()):
+        h = hops.get(k, 99)
+        if h == 1: massa[1] += w
+        elif h == 2: massa[2] += w
+        else: massa["3+"] += w
+    return {k: v / total for k, v in massa.items()}
 
 
 def explicar(explainer, g, device) -> torch.Tensor:
@@ -273,50 +340,88 @@ def rodar_dataset(name: str, device, args) -> dict:
                           task_level="graph", return_type="raw"),
     )
 
-    print("[4] Selecionando amostras e gerando explicacoes...")
-    selecionados = selecionar_amostras(test, info)
+    print("[4] Selecionando 20 amostras estratificadas (5 por estrato) e explicando...")
+    selecionados = selecionar_amostras(test, info, n_per_strata=5)
     sumario = []
-    for idx, ent in selecionados:
+    hop_rows = []   # para CSV agregado por estrato
+    for idx, ent, estrato in selecionados:
         g = test[idx]
-        # ignora grafos triviais
-        if g.num_nodes < 3 or g.edge_index.numel() == 0:
-            continue
         em = explicar(explainer, g, device)
-        # rank top-5 arestas
         edges = g.edge_index.t().tolist()
         ranked = sorted(zip(edges, em.tolist()), key=lambda kv: -kv[1])[:5]
+        hop_imp = analisar_hop_importance(g, em)
 
-        classe = "FAKE" if ent["y_true"] == 0 else "REAL"
-        ok = "OK" if ent["y_true"] == ent["y_pred"] else "ERRO"
+        classe, tam = estrato
+        ok = "OK"
         prob = ent["prob_fake"]
-        titulo = f"{name} idx={idx} | {classe} (pred={ent['y_pred']}, p_fake={prob:.3f}) | {ok}"
+        titulo = (f"{name} idx={idx} | {classe}-{tam} (pred={ent['y_pred']}, "
+                  f"p_fake={prob:.3f}) | hop1={hop_imp[1]:.2f} hop2={hop_imp[2]:.2f}")
 
-        png_path = OUT_DS / f"idx{idx:04d}_{classe}_pred{ent['y_pred']}_{ok}.png"
-        html_path = OUT_DS / f"idx{idx:04d}_{classe}_pred{ent['y_pred']}_{ok}.html"
+        png_path = OUT_DS / f"idx{idx:04d}_{classe}_{tam}.png"
+        html_path = OUT_DS / f"idx{idx:04d}_{classe}_{tam}.html"
         visualizar_png(g, em, titulo, png_path)
         visualizar_html(g, em, titulo, html_path)
 
-        sumario.append({"idx": idx, "classe": classe, "pred": ent["y_pred"],
-                        "p_fake": prob, "ok": ok, "n_nos": g.num_nodes,
-                        "n_arestas": len(edges),
-                        "top5_arestas": ranked,
-                        "png": png_path.name})
-        print(f"   [OK] idx={idx} {classe} {ok} -> {png_path.name}")
+        sumario.append({"idx": idx, "classe": classe, "tam": tam,
+                        "pred": ent["y_pred"], "p_fake": prob, "ok": ok,
+                        "n_nos": g.num_nodes, "n_arestas": len(edges),
+                        "hop1": hop_imp[1], "hop2": hop_imp[2], "hop3plus": hop_imp["3+"],
+                        "top5_arestas": ranked, "png": png_path.name})
+        hop_rows.append({"classe": classe, "tam": tam, "idx": idx,
+                         "n_nos": g.num_nodes,
+                         "frac_hop1": hop_imp[1], "frac_hop2": hop_imp[2],
+                         "frac_hop3plus": hop_imp["3+"]})
+        print(f"   [OK] idx={idx} {classe}-{tam} hop1={hop_imp[1]:.2f}")
+
+    # CSV de hop-importance
+    import csv as _csv
+    csv_path = OUT_DS / "hop_importance.csv"
+    with open(csv_path, "w", newline="", encoding="utf-8") as f:
+        w = _csv.DictWriter(f, fieldnames=["classe","tam","idx","n_nos",
+                                            "frac_hop1","frac_hop2","frac_hop3plus"])
+        w.writeheader()
+        for r in hop_rows:
+            r2 = {**r, "frac_hop1": round(r["frac_hop1"], 4),
+                  "frac_hop2": round(r["frac_hop2"], 4),
+                  "frac_hop3plus": round(r["frac_hop3plus"], 4)}
+            w.writerow(r2)
+
+    # Agregado por estrato
+    estratos = sorted({(r["classe"], r["tam"]) for r in hop_rows})
+    agg_lines = ["", "Agregado por estrato (media +/- std da fracao de massa):", ""]
+    agg_lines.append(f"  {'estrato':<20} {'n':>3} {'hop1':>15} {'hop2':>15} {'hop3+':>15}")
+    agg_lines.append(f"  {'-'*70}")
+    for c, t in estratos:
+        sub = [r for r in hop_rows if r["classe"] == c and r["tam"] == t]
+        if not sub: continue
+        h1 = np.array([r["frac_hop1"] for r in sub])
+        h2 = np.array([r["frac_hop2"] for r in sub])
+        h3 = np.array([r["frac_hop3plus"] for r in sub])
+        agg_lines.append(f"  {c+'-'+t:<20} {len(sub):>3} "
+                         f"{h1.mean():.3f}+/-{h1.std():.3f}   "
+                         f"{h2.mean():.3f}+/-{h2.std():.3f}   "
+                         f"{h3.mean():.3f}+/-{h3.std():.3f}")
 
     # Resumo textual
     rel_path = OUT_DS / "resumo.txt"
     with open(rel_path, "w", encoding="utf-8") as f:
         f.write(f"GNNExplainer / UPFD-{name}\n")
         f.write(f"SAGE com features [is_root, grau_normalizado], seed={RANDOM_SEED}\n")
-        f.write(f"F1m no test: {f1:.4f}\n\n")
+        f.write(f"F1m no test: {f1:.4f}\n")
+        f.write(f"N amostras explicadas (estratificadas): {len(sumario)}\n")
+        for line in agg_lines: f.write(line + "\n")
+        f.write("\n\n")
         for s in sumario:
-            f.write(f"\n--- idx={s['idx']}  {s['classe']}  pred={s['pred']}  "
-                    f"p_fake={s['p_fake']:.3f}  {s['ok']}  "
+            f.write(f"\n--- idx={s['idx']}  {s['classe']}-{s['tam']}  pred={s['pred']}  "
+                    f"p_fake={s['p_fake']:.3f}  "
                     f"({s['n_nos']} nos, {s['n_arestas']} arestas) ---\n")
-            f.write(f"   Arestas mais decisivas (importancia GNNExplainer):\n")
+            f.write(f"   Hop importance: hop1={s['hop1']:.3f}  "
+                    f"hop2={s['hop2']:.3f}  hop3+={s['hop3plus']:.3f}\n")
+            f.write(f"   Top-5 arestas (importancia GNNExplainer):\n")
             for (src, tgt), imp in s["top5_arestas"]:
                 f.write(f"     {src} -> {tgt}  importancia = {imp:.4f}\n")
     print(f"\n   Resumo: {rel_path}")
+    print(f"   Hop CSV: {csv_path}")
     return {"f1": f1, "n_amostras": len(sumario), "out_dir": str(OUT_DS)}
 
 

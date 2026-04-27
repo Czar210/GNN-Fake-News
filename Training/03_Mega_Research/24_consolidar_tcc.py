@@ -68,21 +68,50 @@ def agregar(rows, group_keys, value_key):
     return grupos
 
 
+def _esc_latex(s: str) -> str:
+    """Escapa caracteres reservados do LaTeX em texto comum.
+    NB: nao escapamos comandos ja LaTeX (que vem dos call sites como
+    "$\\pm$", "0.852$\\pm$0.04" etc) -- so trocamos chars literais
+    em strings que nao tem barra invertida (heuristica)."""
+    s = str(s)
+    if "\\" not in s:
+        s = (s.replace("\\", "\\textbackslash{}")  # nunca dispara aqui (guardia)
+              .replace("&",  "\\&")
+              .replace("#",  "\\#")
+              .replace("_",  "\\_")
+              .replace("%",  "\\%")
+              .replace("$",  "\\$")
+              .replace("{",  "\\{")
+              .replace("}",  "\\}")
+              .replace("~",  "\\textasciitilde{}")
+              .replace("^",  "\\textasciicircum{}"))
+    # Cell comecando com '[' confunde parser de tabular (LaTeX pensa que
+    # o '[' e argumento opcional do \\ anterior). Blinda com '{}'.
+    if s.startswith("["):
+        s = "{}" + s
+    return s
+
+
 def latex_tabela(headers, rows, caption, label) -> str:
-    """Gera string LaTeX de uma tabela."""
+    """Gera string LaTeX de uma tabela.
+    Convencao: HEADERS sao controlados pelo programador (podem conter LaTeX
+    valido como '$N$', '$\\bar s_a$') -- NAO escapar.
+    CELLS vem do CSV (texto puro como '#Disability', 'upfd_gossipcop',
+    '[1,2)') -- escapar via _esc_latex."""
     align = "l" + "r" * (len(headers) - 1)
     lines = [
         "% " + caption,
-        f"\\begin{{table}}[h]\\centering",
+        f"\\begin{{table}}[H]\\centering",
         f"\\caption{{{caption}}}",
         f"\\label{{{label}}}",
         f"\\begin{{tabular}}{{{align}}}",
         "\\toprule",
-        " & ".join(headers) + " \\\\",
+        " & ".join(headers) + " \\\\",   # headers sem escape
         "\\midrule",
     ]
     for row in rows:
-        lines.append(" & ".join(str(c) for c in row) + " \\\\")
+        row_esc = [_esc_latex(c) for c in row]
+        lines.append(" & ".join(row_esc) + " \\\\")
     lines += ["\\bottomrule", "\\end{tabular}", "\\end{table}"]
     return "\n".join(lines)
 
@@ -354,6 +383,34 @@ def main():
                                 "por feature ('content' 310d vs 'bert' 768d).")
             print(f"[OK] T10_upfd_vs_publicado.tex")
 
+    # ── T11. RQ3 multilingual (Bluesky EN/DE/PT) ─────────────────────────
+    rows = ler_csv(FIGS_DIR / "rq3_multilingual" / "comparacoes.csv")
+    if rows:
+        tab_rows = []
+        for r in rows:
+            tab_rows.append([r["par"].replace("_", " "),
+                             r["n_a"], r["n_b"],
+                             f"{float(r['mean_a']):.3f}",
+                             f"{float(r['mean_b']):.3f}",
+                             f"{float(r['cohens_d']):+.3f}",
+                             f"{float(r['KS_p']):.2e}"])
+        if tab_rows:
+            tex = latex_tabela(
+                ["Par", "$n_a$", "$n_b$", r"$\bar s_a$", r"$\bar s_b$",
+                 "Cohen's $d$", "KS $p$"],
+                tab_rows,
+                "Comparacao da distribuicao de score topologico no Bluesky entre "
+                "idiomas (RQ3 parte b). PT vs EN: efeito desprezivel ($|d|<0.2$); "
+                "DE vs EN: efeito medio ($|d|=0.47$). Interpretacao com 3 hipoteses "
+                "alternativas em \\S 4.4-bis (shift dominio, vies amostral, desbalanco).",
+                "tab:rq3_multilingual")
+            (OUT_TAB / "T11_rq3_multilingual.tex").write_text(tex, encoding="utf-8")
+            indice_lines.append("- **T11** `T11_rq3_multilingual.tex` -- "
+                                "Capitulo de Aplicacao (\\S 5.5). RQ3 (b): topologia "
+                                "linguisticamente indiferente PT vs EN; sensivel a "
+                                "padroes de comunidade (DE vs EN).")
+            print(f"[OK] T11_rq3_multilingual.tex")
+
     # ── Figuras: copia as ja geradas pra final/figuras ───────────────────
     indice_lines += ["", "## Figuras", ""]
     figuras_relevantes = [
@@ -379,6 +436,26 @@ def main():
          "Agreement rate por feed Bluesky"),
         ("concordancia_bluesky/fig_concordancia_por_text_len.png","F11_bluesky_agreement_textlen.png",
          "Agreement rate por bin de comprimento de texto"),
+        # ─── F14-F15: RQ3 multilingual (script 26) ───
+        ("rq3_multilingual/fig_distribuicao.png",            "F14_rq3_multilingual_dist.png",
+         "Distribuicao de score topologico por idioma (EN/DE/PT) -- RQ3 parte b"),
+        ("rq3_multilingual/fig_qq.png",                      "F15_rq3_multilingual_qq.png",
+         "Q-Q plot PT vs EN, DE vs EN -- evidencia de invariancia parcial"),
+        # ─── F16-F24: comparativas (script 27) ───
+        ("comparativas/F16_painel_f1_mestre.png",            "F16_painel_f1_mestre.png",
+         "PAINEL MESTRE: F1 por dataset x modelo (textual / topologico puro / completo)"),
+        ("comparativas/F17_forest_plot_cohens_d.png",        "F17_forest_plot_cohens_d.png",
+         "Forest plot Cohen's $d$ por (dataset x metrica) com limiares de Cohen"),
+        ("comparativas/F18_heatmap_topo_sem_texto.png",      "F18_heatmap_topo_sem_texto.png",
+         "Heatmap (arch x feature variant x dataset) -- topologia sem texto"),
+        ("comparativas/F19_hop_importance.png",              "F19_hop_importance.png",
+         "GNNExplainer: hop1/hop2/hop3+ por (classe x tamanho) -- assimetria FAKE vs REAL"),
+        ("comparativas/F20_bluesky_crosstab.png",            "F20_bluesky_crosstab.png",
+         "Cross-tab textual x topologico no Bluesky (proxy de matriz confusao, sem labels)"),
+        ("comparativas/F23_bluesky_modelo_x_feed.png",       "F23_bluesky_modelo_x_feed.png",
+         "Heatmap score medio por (feed x modelo) no Bluesky -- divergencia tematica"),
+        ("comparativas/F24_fluxograma_regra_dual.png",       "F24_fluxograma_regra_dual.png",
+         "Fluxograma da regra dual de combinacao textual x topologico"),
     ]
     for src_rel, dst_name, descr in figuras_relevantes:
         src = FIGS_DIR / src_rel

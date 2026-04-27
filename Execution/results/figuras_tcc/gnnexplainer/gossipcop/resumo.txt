@@ -1,35 +1,180 @@
 GNNExplainer / UPFD-gossipcop
 SAGE com features [is_root, grau_normalizado], seed=42
 F1m no test: 0.8138
+N amostras explicadas (estratificadas): 20
+
+Agregado por estrato (media +/- std da fracao de massa):
+
+  estrato                n            hop1            hop2           hop3+
+  ----------------------------------------------------------------------
+  FAKE-grande            5 0.997+/-0.003   0.002+/-0.003   0.001+/-0.003
+  FAKE-pequena           5 0.978+/-0.001   0.022+/-0.001   0.000+/-0.000
+  REAL-grande            5 0.548+/-0.049   0.357+/-0.027   0.095+/-0.065
+  REAL-pequena           5 0.414+/-0.430   0.586+/-0.430   0.000+/-0.000
 
 
---- idx=1204  FAKE  pred=0  p_fake=0.948  OK  (152 nos, 151 arestas) ---
-   Arestas mais decisivas (importancia GNNExplainer):
-     0 -> 58  importancia = 0.9155
-     0 -> 14  importancia = 0.9151
-     0 -> 90  importancia = 0.9137
-     0 -> 33  importancia = 0.9133
-     0 -> 150  importancia = 0.9131
 
---- idx=2883  FAKE  pred=0  p_fake=0.948  OK  (150 nos, 149 arestas) ---
-   Arestas mais decisivas (importancia GNNExplainer):
-     0 -> 137  importancia = 0.9160
-     0 -> 105  importancia = 0.9150
-     0 -> 50  importancia = 0.9149
-     0 -> 90  importancia = 0.9145
-     0 -> 146  importancia = 0.9144
+--- idx=571  FAKE-pequena  pred=0  p_fake=0.874  (48 nos, 47 arestas) ---
+   Hop importance: hop1=0.978  hop2=0.022  hop3+=0.000
+   Top-5 arestas (importancia GNNExplainer):
+     0 -> 42  importancia = 0.9050
+     0 -> 14  importancia = 0.9035
+     0 -> 10  importancia = 0.8947
+     0 -> 24  importancia = 0.8906
+     0 -> 17  importancia = 0.8897
 
---- idx=346  REAL  pred=1  p_fake=0.000  OK  (3 nos, 2 arestas) ---
-   Arestas mais decisivas (importancia GNNExplainer):
-     0 -> 1  importancia = 0.9553
-     1 -> 2  importancia = 0.9298
+--- idx=634  FAKE-pequena  pred=0  p_fake=0.874  (48 nos, 47 arestas) ---
+   Hop importance: hop1=0.980  hop2=0.020  hop3+=0.000
+   Top-5 arestas (importancia GNNExplainer):
+     0 -> 8  importancia = 0.8843
+     0 -> 16  importancia = 0.8819
+     0 -> 24  importancia = 0.8807
+     0 -> 35  importancia = 0.8800
+     0 -> 31  importancia = 0.8785
 
---- idx=417  REAL  pred=1  p_fake=0.000  OK  (3 nos, 2 arestas) ---
-   Arestas mais decisivas (importancia GNNExplainer):
-     1 -> 2  importancia = 0.9290
-     0 -> 1  importancia = 0.9289
+--- idx=2000  FAKE-pequena  pred=0  p_fake=0.874  (48 nos, 47 arestas) ---
+   Hop importance: hop1=0.978  hop2=0.022  hop3+=0.000
+   Top-5 arestas (importancia GNNExplainer):
+     0 -> 32  importancia = 0.8977
+     0 -> 29  importancia = 0.8937
+     0 -> 12  importancia = 0.8911
+     0 -> 25  importancia = 0.8889
+     0 -> 26  importancia = 0.8855
 
---- idx=146  FAKE  pred=1  p_fake=0.000  ERRO  (3 nos, 2 arestas) ---
-   Arestas mais decisivas (importancia GNNExplainer):
-     0 -> 1  importancia = 0.9310
-     1 -> 2  importancia = 0.0693
+--- idx=2662  FAKE-pequena  pred=0  p_fake=0.874  (48 nos, 47 arestas) ---
+   Hop importance: hop1=0.978  hop2=0.022  hop3+=0.000
+   Top-5 arestas (importancia GNNExplainer):
+     0 -> 19  importancia = 0.9124
+     0 -> 1  importancia = 0.8960
+     0 -> 11  importancia = 0.8929
+     0 -> 32  importancia = 0.8926
+     0 -> 20  importancia = 0.8909
+
+--- idx=2718  FAKE-pequena  pred=0  p_fake=0.874  (48 nos, 47 arestas) ---
+   Hop importance: hop1=0.978  hop2=0.022  hop3+=0.000
+   Top-5 arestas (importancia GNNExplainer):
+     0 -> 33  importancia = 0.8984
+     26 -> 47  importancia = 0.8979
+     0 -> 40  importancia = 0.8961
+     0 -> 32  importancia = 0.8938
+     0 -> 29  importancia = 0.8844
+
+--- idx=1204  FAKE-grande  pred=0  p_fake=0.948  (152 nos, 151 arestas) ---
+   Hop importance: hop1=0.999  hop2=0.001  hop3+=0.000
+   Top-5 arestas (importancia GNNExplainer):
+     0 -> 86  importancia = 0.9172
+     0 -> 129  importancia = 0.9166
+     0 -> 5  importancia = 0.9161
+     0 -> 14  importancia = 0.9148
+     0 -> 8  importancia = 0.9145
+
+--- idx=2883  FAKE-grande  pred=0  p_fake=0.948  (150 nos, 149 arestas) ---
+   Hop importance: hop1=0.999  hop2=0.001  hop3+=0.000
+   Top-5 arestas (importancia GNNExplainer):
+     0 -> 127  importancia = 0.9148
+     0 -> 80  importancia = 0.9144
+     0 -> 81  importancia = 0.9143
+     0 -> 140  importancia = 0.9141
+     0 -> 52  importancia = 0.9137
+
+--- idx=1572  FAKE-grande  pred=0  p_fake=0.946  (137 nos, 136 arestas) ---
+   Hop importance: hop1=0.992  hop2=0.008  hop3+=0.000
+   Top-5 arestas (importancia GNNExplainer):
+     0 -> 13  importancia = 0.9119
+     0 -> 63  importancia = 0.9116
+     0 -> 84  importancia = 0.9107
+     0 -> 94  importancia = 0.9095
+     0 -> 99  importancia = 0.9091
+
+--- idx=114  FAKE-grande  pred=0  p_fake=0.945  (135 nos, 134 arestas) ---
+   Hop importance: hop1=0.999  hop2=0.001  hop3+=0.000
+   Top-5 arestas (importancia GNNExplainer):
+     0 -> 38  importancia = 0.9095
+     0 -> 39  importancia = 0.9089
+     0 -> 88  importancia = 0.9082
+     0 -> 10  importancia = 0.9080
+     0 -> 25  importancia = 0.9076
+
+--- idx=1056  FAKE-grande  pred=0  p_fake=0.945  (150 nos, 149 arestas) ---
+   Hop importance: hop1=0.993  hop2=0.001  hop3+=0.006
+   Top-5 arestas (importancia GNNExplainer):
+     0 -> 134  importancia = 0.9167
+     0 -> 16  importancia = 0.9134
+     0 -> 43  importancia = 0.9130
+     0 -> 63  importancia = 0.9129
+     0 -> 50  importancia = 0.9116
+
+--- idx=346  REAL-pequena  pred=1  p_fake=0.000  (3 nos, 2 arestas) ---
+   Hop importance: hop1=0.072  hop2=0.928  hop3+=0.000
+   Top-5 arestas (importancia GNNExplainer):
+     1 -> 2  importancia = 0.9286
+     0 -> 1  importancia = 0.0724
+
+--- idx=417  REAL-pequena  pred=1  p_fake=0.000  (3 nos, 2 arestas) ---
+   Hop importance: hop1=0.054  hop2=0.946  hop3+=0.000
+   Top-5 arestas (importancia GNNExplainer):
+     1 -> 2  importancia = 0.9289
+     0 -> 1  importancia = 0.0534
+
+--- idx=980  REAL-pequena  pred=1  p_fake=0.000  (3 nos, 2 arestas) ---
+   Hop importance: hop1=0.951  hop2=0.049  hop3+=0.000
+   Top-5 arestas (importancia GNNExplainer):
+     0 -> 1  importancia = 0.9285
+     1 -> 2  importancia = 0.0475
+
+--- idx=999  REAL-pequena  pred=1  p_fake=0.000  (3 nos, 2 arestas) ---
+   Hop importance: hop1=0.062  hop2=0.938  hop3+=0.000
+   Top-5 arestas (importancia GNNExplainer):
+     1 -> 2  importancia = 0.9584
+     0 -> 1  importancia = 0.0636
+
+--- idx=1002  REAL-pequena  pred=1  p_fake=0.000  (3 nos, 2 arestas) ---
+   Hop importance: hop1=0.928  hop2=0.072  hop3+=0.000
+   Top-5 arestas (importancia GNNExplainer):
+     0 -> 1  importancia = 0.9311
+     1 -> 2  importancia = 0.0724
+
+--- idx=3122  REAL-grande  pred=1  p_fake=0.002  (176 nos, 175 arestas) ---
+   Hop importance: hop1=0.580  hop2=0.374  hop3+=0.046
+   Top-5 arestas (importancia GNNExplainer):
+     0 -> 68  importancia = 0.2764
+     0 -> 27  importancia = 0.1830
+     68 -> 124  importancia = 0.1193
+     0 -> 43  importancia = 0.1186
+     74 -> 144  importancia = 0.1186
+
+--- idx=483  REAL-grande  pred=1  p_fake=0.003  (194 nos, 193 arestas) ---
+   Hop importance: hop1=0.483  hop2=0.310  hop3+=0.208
+   Top-5 arestas (importancia GNNExplainer):
+     0 -> 2  importancia = 0.1213
+     95 -> 99  importancia = 0.1212
+     136 -> 148  importancia = 0.1207
+     186 -> 188  importancia = 0.1197
+     169 -> 170  importancia = 0.1195
+
+--- idx=3102  REAL-grande  pred=1  p_fake=0.004  (102 nos, 101 arestas) ---
+   Hop importance: hop1=0.617  hop2=0.348  hop3+=0.035
+   Top-5 arestas (importancia GNNExplainer):
+     0 -> 32  importancia = 0.9286
+     0 -> 31  importancia = 0.9208
+     0 -> 23  importancia = 0.1176
+     31 -> 89  importancia = 0.1073
+     0 -> 50  importancia = 0.1043
+
+--- idx=1676  REAL-grande  pred=1  p_fake=0.005  (121 nos, 120 arestas) ---
+   Hop importance: hop1=0.558  hop2=0.386  hop3+=0.056
+   Top-5 arestas (importancia GNNExplainer):
+     0 -> 30  importancia = 0.9144
+     0 -> 45  importancia = 0.2061
+     30 -> 85  importancia = 0.1114
+     30 -> 90  importancia = 0.1112
+     20 -> 76  importancia = 0.1096
+
+--- idx=2140  REAL-grande  pred=1  p_fake=0.006  (197 nos, 196 arestas) ---
+   Hop importance: hop1=0.505  hop2=0.366  hop3+=0.129
+   Top-5 arestas (importancia GNNExplainer):
+     0 -> 69  importancia = 0.1225
+     137 -> 140  importancia = 0.1200
+     87 -> 169  importancia = 0.1197
+     0 -> 91  importancia = 0.1194
+     0 -> 86  importancia = 0.1194

@@ -1,0 +1,24 @@
+========================================================================
+  RQ3 (b) -- Topologia independente do idioma
+========================================================================
+
+Hipotese H0: distribuicao de score 'fake-like' eh igual entre idiomas.
+Se H0 nao eh rejeitada, classificador estrutural eh insensivel ao idioma.
+
+Notas:
+- Comparamos a distribuicao de scores; um efeito pequeno (Cohen's |d| < 0.2)
+  indica equivalencia pratica mesmo se p-value for significativo (n grande).
+- KS testa formato da distribuicao; Mann-Whitney testa diferenca de medianas.
+
+  par                  n_a      n_b    mean_a    mean_b  cohen_d     KS_D       KS_p       MW_p
+  ----------------------------------------------------------------------------------------------------
+  por_vs_eng          2661   132312    0.3807    0.3981   -0.057    0.136   2.69e-42   9.79e-06
+  deu_vs_eng          9686   132312    0.2590    0.3981   -0.468    0.425   0.00e+00   1.41e-91
+  por_vs_deu          2661     9686    0.3807    0.2590    0.739    0.511  5.48e-321   1.05e-60
+
+Interpretacao (Cohen 1988):
+  |d| < 0.2  -> efeito desprezivel (idiomas equivalentes p/ topologia)
+  0.2 <= |d| < 0.5  -> pequeno
+  0.5 <= |d| < 0.8  -> medio
+  |d| >= 0.8  -> grande
+

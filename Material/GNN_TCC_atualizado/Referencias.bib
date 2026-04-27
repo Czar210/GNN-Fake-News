@@ -1,81 +1,97 @@
 % ============================================================
-% Referencias.bib — TCC: Detecção de Fake News com GNNs
-% Baseado em: Busca de Artigos para TCC.md (março 2026)
+% Referencias.bib v2 - TCC: Deteccao de Fake News com GNNs
+% Auditado em 2026-04-24 (rev 2 do outline v2.2)
+% Total: 32 entries (10 novas/canonicas + 4 corrigidas + 18 mantidas)
 % ============================================================
 
-@article{tandfonline2025posttruth,
-  title   = {Post-truth in practice: evaluating disinformation and its consequences for security decision-making},
-  journal = {Cogent Social Sciences},
-  year    = {2025},
-  url     = {https://www.tandfonline.com/doi/full/10.1080/23311886.2025.2566300}
+% ============================================================
+% Foundation papers - GNN architectures (CRITICAL)
+% ============================================================
+
+@inproceedings{kipf2017gcn,
+  author    = {Kipf, Thomas N. and Welling, Max},
+  title     = {Semi-Supervised Classification with Graph Convolutional Networks},
+  booktitle = {International Conference on Learning Representations (ICLR)},
+  year      = {2017},
+  url       = {https://arxiv.org/abs/1609.02907}
 }
 
-@misc{umich_posttruth,
-  title        = {Fake news and critical thinking in the post-truth world},
-  howpublished = {Introduction to Global Change --- University of Michigan},
-  url          = {https://sites.lsa.umich.edu/globalchange/lectures/critical-thinking-in-the-age-of-fake-news/}
+@inproceedings{velickovic2018gat,
+  author    = {Veli{\v{c}}kovi{\'c}, Petar and Cucurull, Guillem and Casanova, Arantxa and Romero, Adriana and Li{\`o}, Pietro and Bengio, Yoshua},
+  title     = {Graph Attention Networks},
+  booktitle = {International Conference on Learning Representations (ICLR)},
+  year      = {2018},
+  url       = {https://arxiv.org/abs/1710.10903}
 }
 
-@misc{uga_digitalliteracy,
-  title        = {Digital Literacy: Detecting Fake News in a Post-Truth Era},
-  howpublished = {Digital Commons --- University of Georgia},
-  url          = {https://digitalcommons.law.uga.edu/cgi/viewcontent.cgi?article=1064&context=cle}
+@inproceedings{hamilton2017graphsage,
+  author    = {Hamilton, William L. and Ying, Rex and Leskovec, Jure},
+  title     = {Inductive Representation Learning on Large Graphs},
+  booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
+  year      = {2017},
+  url       = {https://arxiv.org/abs/1706.02216}
 }
 
-@article{scielo_posttruth,
-  title   = {Post-truth and fake news in scientific communication in Ibero-American journals},
-  journal = {Investigación Bibliotecológica},
-  year    = {2023},
-  url     = {https://www.scielo.org.mx/scielo.php?script=sci_arttext&pid=S0188-252X2023000100410}
-}
-
-@inproceedings{crosslanguagefakenews,
-  title     = {Cross-Language Fake News Detection},
-  booktitle = {Proceedings of the 3rd Workshop on Fact Extraction and VERification},
+@inproceedings{pei2020geomgcn,
+  author    = {Pei, Hongbin and Wei, Bingzhe and Chang, Kevin Chen-Chuan and Lei, Yu and Yang, Bo},
+  title     = {Geom-GCN: Geometric Graph Convolutional Networks},
+  booktitle = {International Conference on Learning Representations (ICLR)},
   year      = {2020},
-  url       = {https://www.researchgate.net/publication/347563252_Cross-Language_Fake_News_Detection}
+  url       = {https://arxiv.org/abs/2002.05287}
 }
 
-@article{ieee_fakenewslandscape,
-  title   = {Fake News Detection Landscape: Datasets, Data Modalities, {AI} Approaches, Their Challenges, and Future Perspectives},
-  journal = {IEEE Access},
-  year    = {2025},
-  url     = {https://ieeexplore.ieee.org/iel8/6287639/10820123/10937488.pdf}
+@inproceedings{ying2019gnnexplainer,
+  author    = {Ying, Zhitao and Bourgeois, Dylan and You, Jiaxuan and Zitnik, Marinka and Leskovec, Jure},
+  title     = {{GNNExplainer}: Generating Explanations for Graph Neural Networks},
+  booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
+  year      = {2019},
+  url       = {https://arxiv.org/abs/1903.03894}
 }
 
-@inproceedings{scitepress_nlpfakenews,
-  title     = {Fake News Detection---Classify Articles as Real or Fake Using {NLP}},
-  booktitle = {Proceedings of the 17th International Conference on Agents and Artificial Intelligence},
-  year      = {2025},
-  url       = {https://www.scitepress.org/publishedPapers/2025/139020/pdf/index.html}
+@misc{fey2019pyg,
+  author       = {Fey, Matthias and Lenssen, Jan E.},
+  title        = {Fast Graph Representation Learning with {PyTorch} {Geometric}},
+  howpublished = {ICLR Workshop on Representation Learning on Graphs and Manifolds},
+  year         = {2019},
+  url          = {https://arxiv.org/abs/1903.02428}
 }
 
-@misc{arxiv_llmfakenews,
-  author       = {Various},
-  title        = {Challenges and Innovations in {LLM}-Powered Fake News Detection: A Synthesis of Approaches and Future Directions},
-  howpublished = {arXiv preprint arXiv:2502.00339},
-  year         = {2025},
-  url          = {https://arxiv.org/abs/2502.00339}
+% ============================================================
+% Fake news with GNN - core datasets and benchmarks (CRITICAL)
+% ============================================================
+
+@inproceedings{dou2021upfd,
+  author    = {Dou, Yingtong and Shu, Kai and Xia, Congying and Yu, Philip S. and Sun, Lichao},
+  title     = {User Preference-aware Fake News Detection},
+  booktitle = {Proceedings of the 44th International ACM SIGIR Conference on Research and Development in Information Retrieval (SIGIR)},
+  year      = {2021},
+  pages     = {2051--2055},
+  doi       = {10.1145/3404835.3462990},
+  url       = {https://arxiv.org/abs/2104.12259}
 }
 
-@misc{cogent_nlpmisinformation,
-  title        = {The Role of Natural Language Processing ({NLP}) in Combating Misinformation and Fake News},
-  howpublished = {Cogent Infotech},
-  url          = {https://cogentinfo.com/resources/the-role-of-natural-language-processing-nlp-in-combating-misinformation-and-fake-news}
+@article{shu2020fakenewsnet,
+  author  = {Shu, Kai and Mahudeswaran, Deepak and Wang, Suhang and Lee, Dongwon and Liu, Huan},
+  title   = {{FakeNewsNet}: A Data Repository with News Content, Social Context, and Spatiotemporal Information for Studying Fake News on Social Media},
+  journal = {Big Data},
+  volume  = {8},
+  number  = {3},
+  pages   = {171--188},
+  year    = {2020},
+  doi     = {10.1089/big.2020.0062},
+  url     = {https://arxiv.org/abs/1809.01286}
 }
 
-@inproceedings{acl_hemt,
-  title     = {Cross-lingual Social Misinformation Detector based on Hierarchical Mixture-of-Experts Adapter},
-  booktitle = {Proceedings of the 31st International Conference on Computational Linguistics ({COLING} 2025)},
-  year      = {2025},
-  url       = {https://aclanthology.org/2025.coling-main.484.pdf}
-}
-
-@article{pmc_gnnsurveyfakenews,
-  title   = {Fake news detection: A survey of graph neural network methods},
-  journal = {Applied Soft Computing},
-  year    = {2023},
-  url     = {https://pmc.ncbi.nlm.nih.gov/articles/PMC10036155/}
+@inproceedings{bian2020bigcn,
+  author    = {Bian, Tian and Xiao, Xi and Xu, Tingyang and Zhao, Peilin and Huang, Wenbing and Rong, Yu and Huang, Junzhou},
+  title     = {Rumor Detection on Social Media with Bi-Directional Graph Convolutional Networks},
+  booktitle = {Proceedings of the AAAI Conference on Artificial Intelligence (AAAI)},
+  volume    = {34},
+  number    = {01},
+  pages     = {549--556},
+  year      = {2020},
+  doi       = {10.1609/aaai.v34i01.5393},
+  url       = {https://arxiv.org/abs/2001.06362}
 }
 
 @misc{monti2019fakenews,
@@ -86,11 +102,78 @@
   url          = {https://arxiv.org/abs/1902.06673}
 }
 
-@inproceedings{researchgate_temporalgraphs,
-  title     = {Tracking evolving communities in fake news cascades using temporal graphs},
-  booktitle = {ResearchGate},
-  year      = {2024},
-  url       = {https://www.researchgate.net/publication/399618584}
+% ============================================================
+% NLP / Embeddings (CRITICAL para Cap 2.3)
+% ============================================================
+
+@inproceedings{reimers2019sbert,
+  author    = {Reimers, Nils and Gurevych, Iryna},
+  title     = {Sentence-{BERT}: Sentence Embeddings using {Siamese} {BERT}-Networks},
+  booktitle = {Proceedings of the 2019 Conference on Empirical Methods in Natural Language Processing (EMNLP)},
+  year      = {2019},
+  pages     = {3982--3992},
+  doi       = {10.18653/v1/D19-1410},
+  url       = {https://arxiv.org/abs/1908.10084}
+}
+
+@article{devlin2019bert,
+  author  = {Devlin, Jacob and Chang, Ming-Wei and Lee, Kenton and Toutanova, Kristina},
+  title   = {{BERT}: Pre-training of Deep Bidirectional Transformers for Language Understanding},
+  journal = {Proceedings of NAACL-HLT 2019},
+  year    = {2019},
+  url     = {https://arxiv.org/abs/1810.04805}
+}
+
+% ============================================================
+% Estatistica / Effect size / Network science (CRITICAL para Cap 2.8 e 4.5)
+% ============================================================
+
+@book{cohen1988statistical,
+  author    = {Cohen, Jacob},
+  title     = {Statistical Power Analysis for the Behavioral Sciences},
+  edition   = {2},
+  year      = {1988},
+  publisher = {Lawrence Erlbaum Associates},
+  address   = {Hillsdale, NJ},
+  isbn      = {978-0805802832}
+}
+
+@article{newman2003mixing,
+  author  = {Newman, M. E. J.},
+  title   = {Mixing patterns in networks},
+  journal = {Physical Review E},
+  volume  = {67},
+  number  = {2},
+  year    = {2003},
+  pages   = {026126},
+  doi     = {10.1103/PhysRevE.67.026126},
+  url     = {https://arxiv.org/abs/cond-mat/0209450}
+}
+
+@article{newman2003structure,
+  author  = {Newman, M. E. J.},
+  title   = {The structure and function of complex networks},
+  journal = {SIAM Review},
+  volume  = {45},
+  number  = {2},
+  year    = {2003},
+  pages   = {167--256},
+  doi     = {10.1137/S003614450342480}
+}
+
+% ============================================================
+% Surveys / contexto fake news + GNN
+% ============================================================
+
+@article{pmc_gnnsurveyfakenews,
+  author  = {Phan, Huyen Trang and Nguyen, Ngoc Thanh and Hwang, Dosam},
+  title   = {Fake news detection: A survey of graph neural network methods},
+  journal = {Applied Soft Computing},
+  volume  = {139},
+  year    = {2023},
+  pages   = {110235},
+  doi     = {10.1016/j.asoc.2023.110235},
+  url     = {https://pmc.ncbi.nlm.nih.gov/articles/PMC10036155/}
 }
 
 @article{pmc_overviewfakenews,
@@ -100,32 +183,11 @@
   url     = {https://pmc.ncbi.nlm.nih.gov/articles/PMC11955031/}
 }
 
-@article{pmc_3ts,
-  title   = {A review on fake news detection 3T's: typology, time of detection, taxonomies},
-  journal = {PeerJ Computer Science},
-  year    = {2022},
-  url     = {https://pmc.ncbi.nlm.nih.gov/articles/PMC9664051/}
-}
-
-@article{pmc_slrfakenews,
-  title   = {Approaches to Identify Fake News: A Systematic Literature Review},
-  journal = {Applied Sciences},
-  year    = {2020},
-  url     = {https://pmc.ncbi.nlm.nih.gov/articles/PMC7250114/}
-}
-
-@article{pmc_multilangs_covid,
-  title   = {Does Fake News in Different Languages Tell the Same Story? An Analysis of Multi-level Thematic and Emotional Characteristics of News about {COVID}-19},
-  journal = {International Journal of Environmental Research and Public Health},
-  year    = {2022},
-  url     = {https://pmc.ncbi.nlm.nih.gov/articles/PMC9510725/}
-}
-
-@article{mdpi_cnn_llm_nlp,
-  title   = {Fake News Detection and Classification: A Comparative Study of Convolutional Neural Networks, Large Language Models, and Natural Language Processing Models},
-  journal = {Future Internet},
+@article{ieee_fakenewslandscape,
+  title   = {Fake News Detection Landscape: Datasets, Data Modalities, {AI} Approaches, Their Challenges, and Future Perspectives},
+  journal = {IEEE Access},
   year    = {2025},
-  url     = {https://www.mdpi.com/1999-5903/17/1/28}
+  url     = {https://ieeexplore.ieee.org/iel8/6287639/10820123/10937488.pdf}
 }
 
 @article{mdpi_bidirectionalgcn,
@@ -135,64 +197,6 @@
   url     = {https://www.mdpi.com/2076-3417/15/7/3457}
 }
 
-@article{pmc_multimodalfakenews,
-  title   = {Explainable multilingual and multimodal fake-news detection: toward robust and trustworthy {AI} for combating misinformation},
-  journal = {Frontiers in Artificial Intelligence},
-  year    = {2025},
-  url     = {https://pmc.ncbi.nlm.nih.gov/articles/PMC12727966/}
-}
-
-@misc{stanford_nlpmisinformation,
-  title        = {Detecting Misinformation in News Articles via Natural Language Processing},
-  howpublished = {Stanford University {CS224N} Final Project},
-  year         = {2024},
-  url          = {https://web.stanford.edu/class/archive/cs/cs224n/cs224n.1244/final-projects/SiyaGoelThuLeTiaVasudeva.pdf}
-}
-
-@misc{ufscar_iabrfakenews,
-  title        = {Pesquisadores criam modelo de {IA} para detectar fake news},
-  howpublished = {{SACI} --- {UFSCar}},
-  year         = {2023},
-  url          = {https://www.saci.ufscar.br/servico_release?id=153931&pro=3}
-}
-
-@misc{arxiv_topologicalfeatures,
-  title        = {Enhancing Fake-News Detection with Node-Level Topological Features},
-  howpublished = {arXiv preprint arXiv:2512.09974},
-  year         = {2024},
-  url          = {https://arxiv.org/html/2512.09974v1}
-}
-
-@article{pnasnexus_misinformation,
-  title   = {Containing misinformation: Modeling spatial games of fake news},
-  journal = {{PNAS} Nexus},
-  year    = {2024},
-  url     = {https://academic.oup.com/pnasnexus/article/3/3/pgae090/7614685}
-}
-
-@inproceedings{researchgate_tsnn,
-  title     = {Topological and Sequential Neural Network Model for Detecting Fake News},
-  booktitle = {ResearchGate},
-  year      = {2023},
-  url       = {https://www.researchgate.net/publication/376622725}
-}
-
-@misc{kipf2017gcn,
-  author       = {Kipf, Thomas N. and Welling, Max},
-  title        = {Semi-Supervised Classification with Graph Convolutional Networks},
-  howpublished = {arXiv preprint arXiv:1609.02907},
-  year         = {2017},
-  url          = {https://arxiv.org/abs/1609.02907}
-}
-
-@misc{velickovic2018gat,
-  author       = {Veličković, Petar and Cucurull, Guillem and Casanova, Arantxa and Romero, Adriana and Liò, Pietro and Bengio, Yoshua},
-  title        = {Graph Attention Networks},
-  howpublished = {arXiv preprint arXiv:1710.10903},
-  year         = {2018},
-  url          = {https://arxiv.org/abs/1710.10903}
-}
-
 @article{emory_temporalgnn,
   title   = {Temporally evolving graph neural network for fake news detection},
   journal = {Information Processing \& Management},
@@ -200,26 +204,123 @@
   url     = {https://www.cs.emory.edu/~kshu5/files/IPM_TGNN.pdf}
 }
 
+% ============================================================
+% Cross-language / multilingue (apoia 4.4-bis)
+% ============================================================
+
+@inproceedings{acl_hemt,
+  title     = {Cross-lingual Social Misinformation Detector based on Hierarchical Mixture-of-Experts Adapter},
+  booktitle = {Proceedings of the 31st International Conference on Computational Linguistics ({COLING} 2025)},
+  year      = {2025},
+  url       = {https://aclanthology.org/2025.coling-main.484.pdf}
+}
+
+@inproceedings{crosslanguagefakenews,
+  title     = {Cross-Language Fake News Detection},
+  booktitle = {Proceedings of the 3rd Workshop on Fact Extraction and VERification},
+  year      = {2020},
+  url       = {https://www.researchgate.net/publication/347563252_Cross-Language_Fake_News_Detection}
+}
+
+@article{pmc_multilangs_covid,
+  title   = {Does Fake News in Different Languages Tell the Same Story? An Analysis of Multi-level Thematic and Emotional Characteristics of News about {COVID}-19},
+  journal = {International Journal of Environmental Research and Public Health},
+  year    = {2022},
+  url     = {https://pmc.ncbi.nlm.nih.gov/articles/PMC9510725/}
+}
+
+% ============================================================
+% LLMs e fake news (contextual)
+% ============================================================
+
+@misc{arxiv_llmfakenews,
+  title        = {Challenges and Innovations in {LLM}-Powered Fake News Detection: A Synthesis of Approaches and Future Directions},
+  howpublished = {arXiv preprint arXiv:2502.00339},
+  year         = {2025},
+  url          = {https://arxiv.org/abs/2502.00339}
+}
+
+@article{mdpi_cnn_llm_nlp,
+  title   = {Fake News Detection and Classification: A Comparative Study of Convolutional Neural Networks, Large Language Models, and Natural Language Processing Models},
+  journal = {Future Internet},
+  year    = {2025},
+  url     = {https://www.mdpi.com/1999-5903/17/1/28}
+}
+
+@article{pmc_multimodalfakenews,
+  title   = {Explainable multilingual and multimodal fake-news detection: toward robust and trustworthy {AI} for combating misinformation},
+  journal = {Frontiers in Artificial Intelligence},
+  year    = {2025},
+  url     = {https://pmc.ncbi.nlm.nih.gov/articles/PMC12727966/}
+}
+
+% ============================================================
+% Topologia / features estruturais (apoia 2.6, 4.4)
+% ============================================================
+
+@misc{arxiv_topologicalfeatures,
+  title        = {Enhancing Fake-News Detection with Node-Level Topological Features},
+  howpublished = {arXiv preprint},
+  year         = {2024},
+  note         = {URL e numero arXiv a confirmar antes da entrega final},
+  url          = {https://arxiv.org/abs/2412.09974}
+}
+
+% ============================================================
+% Trabalhos brasileiros (contexto BR)
+% ============================================================
+
 @mastersthesis{ufc_fakewhatsapp,
   author = {Cunha, Lucas},
-  title  = {{FakeWhatsApp.BR}: Detecção de Desinformação e Desinformadores em Grupos Públicos do {WhatsApp} em {PT-BR}},
-  school = {Universidade Federal do Ceará},
+  title  = {{FakeWhatsApp.BR}: Detecc{\~a}o de Desinformac{\~a}o e Desinformadores em Grupos P{\'u}blicos do {WhatsApp} em {PT-BR}},
+  school = {Universidade Federal do Cear{\'a}},
   year   = {2021},
   url    = {https://repositorio.ufc.br/bitstream/riufc/63379/3/2021_dis_lcccunha.pdf}
 }
 
 @mastersthesis{pucsp_gnnfakenews,
   author = {Souza, Carlos Eduardo de},
-  title  = {Detecção de Fake News em Redes Sociais com o Uso de Redes Neurais Recorrentes, Redes Neurais Gráficas e Transformers},
-  school = {Pontifícia Universidade Católica de São Paulo},
+  title  = {Detecc{\~a}o de Fake News em Redes Sociais com o Uso de Redes Neurais Recorrentes, Redes Neurais Gr{\'a}ficas e Transformers},
+  school = {Pontif{\'i}cia Universidade Cat{\'o}lica de S{\~a}o Paulo},
   year   = {2023},
-  url    = {https://tede2.pucsp.br/bitstream/handle/39999/1/Carlos%20Eduardo%20de%20Souza.pdf}
+  url    = {https://tede2.pucsp.br/bitstream/handle/39999/1/Carlos\%20Eduardo\%20de\%20Souza.pdf}
 }
 
 @phdthesis{usp_fakenews,
   author = {Souza, Mariana Caravanti de},
-  title  = {Detecção de Desinformação em Redes Sociais com Mecanismos de Atenção},
-  school = {Universidade de São Paulo},
+  title  = {Detecc{\~a}o de Desinformac{\~a}o em Redes Sociais com Mecanismos de Atenc{\~a}o},
+  school = {Universidade de S{\~a}o Paulo},
   year   = {2023},
   url    = {https://www.teses.usp.br/teses/disponiveis/55/55134/tde-22122023-125502/}
+}
+
+% ============================================================
+% Bluesky / AT Protocol (capitulo 5 - Aplicacao)
+% ============================================================
+
+@misc{kleppmann2024atproto,
+  author       = {Kleppmann, Martin and Frazee, Daniel and Gold, Jake and Graber, Jay and Holmgren, Daniel and Ivy, Devin and Johnson, Jeromy and Newbold, Bryan and Volpert, Jaz},
+  title        = {Bluesky and the {AT} {Protocol}: Usable Decentralized Social Media},
+  howpublished = {arXiv preprint arXiv:2402.03239},
+  year         = {2024},
+  url          = {https://arxiv.org/abs/2402.03239}
+}
+
+@misc{quelle2024bluesky,
+  title        = {The {Bluesky} Social Network: A Snapshot of an Emerging Decentralized Platform},
+  howpublished = {arXiv preprint},
+  year         = {2024},
+  note         = {Snapshot dataset utilizado no Cap 5; checar artigo definitivo do dataset que usamos},
+  url          = {https://arxiv.org/abs/2404.09111}
+}
+
+% ============================================================
+% Pos-verdade / contexto (Cap 1) - manter 1 ref relevante
+% ============================================================
+
+@article{scielo_posttruth,
+  title   = {Post-truth and fake news in scientific communication in Ibero-American journals},
+  journal = {Investigaci{\'o}n Bibliotecol{\'o}gica},
+  year    = {2023},
+  url     = {https://www.scielo.org.mx/scielo.php?script=sci_arttext&pid=S0188-252X2023000100410}
 }
