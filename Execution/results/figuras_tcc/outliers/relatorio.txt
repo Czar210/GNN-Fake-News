@@ -1,0 +1,46 @@
+Relatorio -- script 29 (outliers)
+============================================================
+
+Dataset: UPFD-GossipCop test (3826 grafos)
+Baseline global: acc_RF=0.7535  acc_SAGE=0.8139
+
+Percentis empiricos:
+  grau_root     p5=4.0  p95=109.8
+  num_nodes     p5=7.0   p95=149.8
+  branching_avg p95=41.38
+
+--- Resultados ---
+
+[real_viral]  N=60  (fake=0, real=60)
+  RF:   acc=0.2333  (delta vs baseline = -0.5202)  %pred_fake=0.767
+  SAGE: acc=0.4333  (delta vs baseline = -0.3806)  %pred_fake=0.567
+
+[fake_contido]  N=31  (fake=31, real=0)
+  RF:   acc=0.0000  (delta vs baseline = -0.7535)  %pred_fake=0.000
+  SAGE: acc=0.0000  (delta vs baseline = -0.8139)  %pred_fake=0.000
+
+[cauda_alta_n]  N=192  (fake=117, real=75)
+  RF:   acc=0.5469  (delta vs baseline = -0.2067)  %pred_fake=0.677
+  SAGE: acc=0.8229  (delta vs baseline = +0.0090)  %pred_fake=0.578
+  F1-macro (subgrupo mixed): RF=0.5064  SAGE=0.8165
+
+[cauda_baixa_n]  N=265  (fake=23, real=242)
+  RF:   acc=0.9132  (delta vs baseline = +0.1597)  %pred_fake=0.000
+  SAGE: acc=0.9132  (delta vs baseline = +0.0993)  %pred_fake=0.000
+  F1-macro (subgrupo mixed): RF=0.4773  SAGE=0.4773
+
+[deep_extreme]  N=256  (fake=104, real=152)
+  RF:   acc=0.5312  (delta vs baseline = -0.2223)  %pred_fake=0.508
+  SAGE: acc=0.7617  (delta vs baseline = -0.0522)  %pred_fake=0.309
+  F1-macro (subgrupo mixed): RF=0.5278  SAGE=0.7406
+
+[wide_extreme]  N=192  (fake=188, real=4)
+  RF:   acc=0.9323  (delta vs baseline = +0.1788)  %pred_fake=0.932
+  SAGE: acc=0.9740  (delta vs baseline = +0.1601)  %pred_fake=0.995
+  F1-macro (subgrupo mixed): RF=0.5999  SAGE=0.4934
+
+--- Interpretacao chave ---
+  [real_viral] SAGE acc=0.433 < chance = degradacao forte (mas nao inversao plena).
+  [fake_contido] SAGE acc=0.000 < 0.20 = INVERSAO confirmada.
+    Subgrupo onde a regra 'fake=alto grau' aprendida falha sistematicamente.
+    Sustenta numericamente a narrativa de inversao distributiva da §4.6.

@@ -1,0 +1,54 @@
+Relatorio -- script 28 (distribuicao + estratificacao)
+============================================================
+
+Dataset: UPFD-GossipCop test (3826 grafos esperados)
+  N efetivo carregado: 3826
+
+Modelos (carregados de Execution/weights/):
+  RF   F1m=0.7534
+  SAGE F1m=0.8138
+
+--- Distribuicao (fit lognormal) ---
+  num_nodes      mu=+3.663 sigma=0.976  KS p=8.242e-33  (fit ruim (heavy-tail diferente))
+  depth_max      mu=+0.868 sigma=0.298  KS p=0  (fit ruim (heavy-tail diferente))
+  branching_avg  mu=+2.366 sigma=0.914  KS p=8.552e-12  (fit ruim (heavy-tail diferente))
+
+--- F1m por tercil ---
+
+  [num_nodes]
+    RF:  T1 (baixo)=0.620 (n=1300)  T2 (medio)=0.677 (n=1262)  T3 (alto)=0.581 (n=1264)
+    SAGE:  T1 (baixo)=0.647 (n=1300)  T2 (medio)=0.734 (n=1262)  T3 (alto)=0.769 (n=1264)
+
+  [depth_max]
+    RF:  T1 (baixo)=0.795 (n=2683)  T2 (medio)=nan (n=0)  T3 (alto)=0.657 (n=1143)
+    SAGE:  T1 (baixo)=0.823 (n=2683)  T2 (medio)=nan (n=0)  T3 (alto)=0.791 (n=1143)
+
+  [branching_avg]
+    RF:  T1 (baixo)=0.537 (n=1275)  T2 (medio)=0.590 (n=1277)  T3 (alto)=0.528 (n=1274)
+    SAGE:  T1 (baixo)=0.503 (n=1275)  T2 (medio)=0.637 (n=1277)  T3 (alto)=0.536 (n=1274)
+
+--- Profundidade (preparacao p/ script 30) ---
+  depth=2: 2683 grafos (70.1%)
+  depth=3: 665 grafos (17.4%)
+  depth=4: 222 grafos (5.8%)
+  depth=5: 205 grafos (5.4%)
+  depth=6: 34 grafos (0.9%)
+  depth=7: 13 grafos (0.3%)
+  depth=8: 3 grafos (0.1%)
+  depth=9: 1 grafos (0.0%)
+
+  depth>=2: 3826 (100.0%)
+  depth>=3: 1143 (29.9%)
+  -> SUFICIENTE p/ analise estatistica em script 30
+
+--- DECISOES PARA PROXIMAS RODADAS ---
+Script 29 (outliers): usar por_grafo.csv. Criterio sugerido pos-hoc:
+  - real_viral:   y_true=real (1) AND grau_root > p95
+  - fake_contido: y_true=fake (0) AND grau_root < p5
+  - cauda tamanho: num_nodes > p95 ou num_nodes <= p5
+  Confirmar percentis empiricos olhando por_grafo.csv
+
+Script 30 (cascatas profundas): focar em depth>=2 ou >=3 (ver acima).
+  Comparacao chave: RF (que so ve num_nodes,grau_root) vs SAGE neste subset.
+  Se ganho SAGE-RF for desproporcional aqui, e' evidencia direta de que
+  a GNN agrega valor onde tem multi-hop pra propagar.

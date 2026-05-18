@@ -1,0 +1,55 @@
+Relatorio -- script 30 (cascatas profundas)
+============================================================
+
+Dataset: UPFD-GossipCop test (3826 grafos)
+Baseline global: F1m_RF=0.7534  F1m_SAGE=0.8138
+Gap global: +0.0604
+
+--- F1 por valor exato de depth_max ---
+  depth= 2  N=2683  F1_RF=0.795  F1_SAGE=0.823
+  depth= 3  N= 665  F1_RF=0.685  F1_SAGE=0.815
+  depth= 4  N= 222  F1_RF=0.711  F1_SAGE=0.744
+  depth= 5  N= 205  F1_RF=0.528  F1_SAGE=0.758
+  depth= 6  N=  34  F1_RF=0.582  F1_SAGE=0.622
+  depth= 7  N=  13  F1_RF=0.381  F1_SAGE=0.764
+  depth= 8  N=   3  F1_RF=n/a  F1_SAGE=n/a
+  depth= 9  N=   1  F1_RF=n/a  F1_SAGE=n/a
+
+--- Gap em subsets (com CI 95% bootstrap, n_boot=2000) ---
+
+  [depth>=1]  N=3826
+    F1_RF   = 0.7534
+    F1_SAGE = 0.8138
+    diff    = +0.0604  CI95=[+0.0469, +0.0738]
+    significante (CI nao cruza zero): SIM
+
+  [depth>=2]  N=3826
+    F1_RF   = 0.7534
+    F1_SAGE = 0.8138
+    diff    = +0.0604  CI95=[+0.0469, +0.0738]
+    significante (CI nao cruza zero): SIM
+
+  [depth>=3]  N=1143
+    F1_RF   = 0.6565
+    F1_SAGE = 0.7907
+    diff    = +0.1342  CI95=[+0.1035, +0.1652]
+    significante (CI nao cruza zero): SIM
+
+  [depth>=5]  N=256
+    F1_RF   = 0.5278
+    F1_SAGE = 0.7406
+    diff    = +0.2129  CI95=[+0.1388, +0.2868]
+    significante (CI nao cruza zero): SIM
+
+--- Interpretacao ---
+
+  Gap em depth>=3 (+0.134) vs em depth>=1 (+0.060): razao = 2.22x
+  -> Gap DESPROPORCIONAL em cascatas profundas. Sustenta a tese:
+     SAGE agrega valor onde existe topologia multi-hop pra propagar.
+     Em estrelas planas (depth=2), RF tabular captura o sinal -- nao precisa de GNN.
+
+--- Implicacao para o TCC ---
+§6.3.a do TCC menciona limitacao 'FNN com cascatas estrela'. UPFD-GossipCop
+oficial NAO eh estrela plana: 100% tem depth>=2 e 30% tem depth>=3.
+Considerar refinar a redacao: a critica de 'estrela plana' se aplica ao
+FakeNewsNet construido por nos (Script 00), nao ao UPFD oficial.

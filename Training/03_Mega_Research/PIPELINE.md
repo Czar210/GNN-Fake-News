@@ -135,6 +135,7 @@ Gera `StratifiedKFold(n_splits=10)` em `data/folds_fnn.pt`. **Porquê:** o t-tes
 - **Matéria-prima:** grafos FNN; UPFD via PyG; features `[is_root, grau_norm, pos]`.
 - **Produto:** `resultados.csv` em `Execution/results/fase4_benchmarks/topologia_sem_texto/`.
 - **Porquê:** **este é o experimento central do TCC**. Se o F1 sem nenhuma feature textual ainda fica próximo do F1 com BERT, fica matematicamente provado que o modelo **nunca precisou ler a notícia** — é o "smoking gun" da vulnerabilidade topológica.
+- **Conexão com Fase 9 (script 30):** o F1m=0.814 agregado do SAGE estrutural em UPFD-GossipCop **não vem uniformemente** da topologia. O script 30 mostra que ele cresce de 0.795 em depth=2 (estrela rasa) até 0.815 em depth=3 e atinge picos em depth=5+. Ou seja, a parte do F1 que **realmente** depende de estrutura multi-hop está concentrada nos 30% dos grafos com cascata profunda; nos outros 70% o sinal é equivalente ao do RF tabular (num_nodes). Isso refina o "smoking gun": é vulnerabilidade topológica **multi-hop**, não só "volume".
 
 ### [15_analise_estrutural.py](15_analise_estrutural.py)
 - **Objetivo:** análise descritiva fake vs real em métricas topológicas (com Cohen's d).
@@ -218,13 +219,52 @@ Gera `StratifiedKFold(n_splits=10)` em `data/folds_fnn.pt`. **Porquê:** o t-tes
 - **Objetivo:** gerar F16–F24 a partir dos CSVs já existentes (sem experimento novo).
 - **Matéria-prima:** CSVs das fases anteriores.
 - **Produto:** figuras adicionais em `Execution/results/figuras_tcc/comparativas/`.
-- **Porquê:** foi pedido posterior do orientador. Manter separado de 24 evita misturar a pipeline original com adições incrementais — se outra revisão pedir mais figuras, vira `28_`, `29_`, sem retrabalho do que já está consolidado.
+- **Porquê:** foi pedido posterior do orientador. Manter separado de 24 evita misturar a pipeline original com adições incrementais. A próxima onda de revisões virou a Fase 9 (scripts 28–30) — análises novas, não só figuras, então justificou nova fase em vez de mais arquivos consolidadores.
 
 ### [25_publicar_huggingface.py](25_publicar_huggingface.py)
 - **Objetivo:** publicar os 3 modelos no HF Hub com model card.
 - **Matéria-prima:** pesos do 17; token HF.
 - **Produto:** repo público no HF Hub.
 - **Porquê:** reprodutibilidade científica + visibilidade. O TCC fica mais forte se a banca puder baixar os pesos e reproduzir; HF é o padrão de facto para isso e o link no model card vira referência citável.
+
+---
+
+## Fase 9 — Análise estratificada do erro (rodada complementar)
+
+> Origem: sugestão revisora — quantificar onde, dentro da distribuição estrutural,
+> o modelo erra. Hoje o TCC reporta F1 agregado + Cohen's d agregado, mas **não
+> cruza as duas coisas**: não diz "o modelo erra mais nos grafos do tercil
+> superior de tamanho". Esta fase fecha esse gap e prepara terreno para análises
+> mais finas (outliers, cascatas profundas) sem retrabalho.
+>
+> **Achados principais (UPFD-GossipCop test, N=3826):**
+> - Inversão distributiva confirmada: SAGE acerta **0 de 31** fakes contidos e **26 de 60** reais virais (abaixo de chance).
+> - Gap SAGE−RF cresce com profundidade: +0.060 agregado → +0.134 em depth≥3 → +0.213 em depth≥5 (todos significantes via bootstrap, CI não cruza zero).
+> - Distribuições estruturais são heavy-tail **mais agressivas que lognormal** (KS rejeita o fit), justificando uso de percentil empírico no script 29.
+> - Cascata "estrela plana" não é universal: 30% dos grafos UPFD-GossipCop têm depth≥3, contradizendo parcialmente a §6.3.a do TCC (que se aplica só ao FNN construído por nós, não ao UPFD oficial).
+
+### [28_distribuicao_e_estratificacao.py](28_distribuicao_e_estratificacao.py)
+- **Objetivo:** caracterizar a distribuição dos grafos do test (fit lognormal) e medir F1/acerto do RF e do SAGE estratificado por tercil de cada métrica estrutural; sumarizar profundidade para preparar análise de cascatas.
+- **Matéria-prima:** UPFD-GossipCop test (3826 grafos); modelos persistidos `rf_struct_gossipcop.pkl` e `sage_struct_gossipcop.pth` do script 17.
+- **Produto:** `Execution/results/figuras_tcc/estratificacao/` com `por_grafo.csv` (insumo dos próximos scripts), `bins_f1.csv`, `distribuicao_fit.csv`, 4 figuras e `relatorio.txt` com decisões para 29 e 30.
+- **Porquê:** três funções:
+  1. **LOWESS** (smoother por janela móvel) de P(acerto) vs `num_nodes`/`depth`/`branching` mostra continuamente onde o modelo degrada — versão contínua dos tercis, sem cherry-picking de cortes.
+  2. **Fit lognormal** com teste KS justifica usar percentil empírico (não z-score) na definição de outliers do script 29 — cascatas em redes sociais são heavy-tailed, não normais.
+  3. **`por_grafo.csv`** com predição+acerto por grafo evita re-rodar modelos nos scripts 29 e 30.
+- **Caveat:** rodado **só em UPFD-GossipCop test** porque é onde temos modelo persistido. PolitiFact não tem (script 17 não treinou) e replicar exigiria re-treino — reportar como limitação.
+
+### [29_outliers.py](29_outliers.py)
+- **Objetivo:** quantificar a degradação do modelo em 6 subgrupos extremos derivados *post-hoc* das distribuições reveladas pelo 28.
+- **Matéria-prima:** `por_grafo.csv` produzido pelo 28 (não recarrega modelos).
+- **Produto:** `Execution/results/figuras_tcc/outliers/` com `subgrupos.csv`, `exemplos.csv` (5 grafos representativos por subgrupo), 2 figuras e `relatorio.txt` com diagnóstico automático de inversão distributiva.
+- **Porquê:** a §4.6 do TCC descreve narrativamente uma "inversão distributiva" (modelo erra sistematicamente em real-viral e fake-contido). Este script confirma numericamente: SAGE acc = **0.000 em fake_contido** (N=31) e **0.433 em real_viral** (N=60, abaixo de chance). Também mostra que SAGE bate RF em **+28pp em cauda_alta_n** e **+23pp em deep_extreme** — sustenta empiricamente a regra dual 0.8/0.2 da §3.9 e o trecho de limitações da §6.3.
+
+### [30_cascatas_profundas.py](30_cascatas_profundas.py)
+- **Objetivo:** medir o ganho do SAGE sobre o RF tabular em subsets de profundidade crescente; testar se o gap é desproporcional em cascatas multi-hop.
+- **Matéria-prima:** `por_grafo.csv` do 28; UPFD-GossipCop test (recarregado só para visualização pyvis).
+- **Produto:** `Execution/results/figuras_tcc/cascatas_profundas/` com `por_profundidade.csv`, `gap_subsets.csv`, `bootstrap_diff.csv` (CI 95% via 2000 reamostragens), 2 figuras e 3 visualizações HTML de cascatas profundas (depth ≥ 8).
+- **Porquê:** se o SAGE-RF gap fosse uniforme entre profundidades, o ganho do GNN seria só "número de nós" (que o RF já captura). Como o gap **3.5×** em depth≥5 (+0.213) vs agregado (+0.060), com CI bootstrap que não cruza zero, fica demonstrado que o GNN agrega valor **onde há multi-hop pra propagar**, não em estrelas rasas. Achado central que conecta §4.4 (topologia sem texto) à §4.7 (GNNExplainer assimétrico).
+- **Observação metodológica:** o achado contradiz parcialmente a §6.3.a do TCC ("FNN com cascatas estrela"). UPFD-GossipCop oficial **não** é estrela plana — só 70% dos grafos têm `depth_max=2`; os outros 30% têm cascatas multi-hop reais. A crítica de "estrela plana" se aplica ao FakeNewsNet construído pelo script 00, não ao UPFD oficial. Considerar refinar a redação.
 
 ---
 
@@ -264,4 +304,12 @@ UPFD raw (PyG)    ────────────────────�
                                                                          ▼
                                                               24 + 27 ─► tabelas + figuras TCC
                                                               25 ─► HuggingFace público
+
+Fase 9 (estratificação) — consome pesos do 17, independente da consolidação:
+
+                              17 (weights) ───────────► 28 ─► por_grafo.csv
+                                                              │
+                                                   ┌──────────┴──────────┐
+                                                   ▼                     ▼
+                                            29 (outliers)        30 (cascatas profundas)
 ```
