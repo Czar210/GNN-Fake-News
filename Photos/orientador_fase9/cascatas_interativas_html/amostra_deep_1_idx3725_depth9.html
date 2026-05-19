@@ -1,0 +1,222 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        
+            <script src="lib/bindings/utils.js"></script>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/dist/vis-network.min.css" integrity="sha512-WgxfT5LWjfszlPHXRmBWHkV2eceiWTOBvrKCNbdgDYTHrT2AeLCGbF4sZlZw3UMN3WtL0tGUoIAKsu8mllg/XA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/vis-network.min.js" integrity="sha512-LnvoEWDFrqGHlHmDD2101OrLcbsfkrzoSpvtSQtxK3RMnRV0eOkhhBN2dXHKRrUU8p2DGRTk35n4O8nWSVe1mQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+            
+        
+<center>
+<h1></h1>
+</center>
+
+<!-- <link rel="stylesheet" href="../node_modules/vis/dist/vis.min.css" type="text/css" />
+<script type="text/javascript" src="../node_modules/vis/dist/vis.js"> </script>-->
+        <link
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6"
+          crossorigin="anonymous"
+        />
+        <script
+          src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js"
+          integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf"
+          crossorigin="anonymous"
+        ></script>
+
+
+        <center>
+          <h1></h1>
+        </center>
+        <style type="text/css">
+
+             #mynetwork {
+                 width: 100%;
+                 height: 600px;
+                 background-color: #fafafa;
+                 border: 1px solid lightgray;
+                 position: relative;
+                 float: left;
+             }
+
+             
+             #loadingBar {
+                 position:absolute;
+                 top:0px;
+                 left:0px;
+                 width: 100%;
+                 height: 600px;
+                 background-color:rgba(200,200,200,0.8);
+                 -webkit-transition: all 0.5s ease;
+                 -moz-transition: all 0.5s ease;
+                 -ms-transition: all 0.5s ease;
+                 -o-transition: all 0.5s ease;
+                 transition: all 0.5s ease;
+                 opacity:1;
+             }
+
+             #bar {
+                 position:absolute;
+                 top:0px;
+                 left:0px;
+                 width:20px;
+                 height:20px;
+                 margin:auto auto auto auto;
+                 border-radius:11px;
+                 border:2px solid rgba(30,30,30,0.05);
+                 background: rgb(0, 173, 246); /* Old browsers */
+                 box-shadow: 2px 0px 4px rgba(0,0,0,0.4);
+             }
+
+             #border {
+                 position:absolute;
+                 top:10px;
+                 left:10px;
+                 width:500px;
+                 height:23px;
+                 margin:auto auto auto auto;
+                 box-shadow: 0px 0px 4px rgba(0,0,0,0.2);
+                 border-radius:10px;
+             }
+
+             #text {
+                 position:absolute;
+                 top:8px;
+                 left:530px;
+                 width:30px;
+                 height:50px;
+                 margin:auto auto auto auto;
+                 font-size:22px;
+                 color: #000000;
+             }
+
+             div.outerBorder {
+                 position:relative;
+                 top:400px;
+                 width:600px;
+                 height:44px;
+                 margin:auto auto auto auto;
+                 border:8px solid rgba(0,0,0,0.1);
+                 background: rgb(252,252,252); /* Old browsers */
+                 background: -moz-linear-gradient(top,  rgba(252,252,252,1) 0%, rgba(237,237,237,1) 100%); /* FF3.6+ */
+                 background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(252,252,252,1)), color-stop(100%,rgba(237,237,237,1))); /* Chrome,Safari4+ */
+                 background: -webkit-linear-gradient(top,  rgba(252,252,252,1) 0%,rgba(237,237,237,1) 100%); /* Chrome10+,Safari5.1+ */
+                 background: -o-linear-gradient(top,  rgba(252,252,252,1) 0%,rgba(237,237,237,1) 100%); /* Opera 11.10+ */
+                 background: -ms-linear-gradient(top,  rgba(252,252,252,1) 0%,rgba(237,237,237,1) 100%); /* IE10+ */
+                 background: linear-gradient(to bottom,  rgba(252,252,252,1) 0%,rgba(237,237,237,1) 100%); /* W3C */
+                 filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fcfcfc', endColorstr='#ededed',GradientType=0 ); /* IE6-9 */
+                 border-radius:72px;
+                 box-shadow: 0px 0px 10px rgba(0,0,0,0.2);
+             }
+             
+
+             
+
+             
+        </style>
+    </head>
+
+
+    <body>
+        <div class="card" style="width: 100%">
+            
+            
+            <div id="mynetwork" class="card-body"></div>
+        </div>
+
+        
+            <div id="loadingBar">
+              <div class="outerBorder">
+                <div id="text">0%</div>
+                <div id="border">
+                  <div id="bar"></div>
+                </div>
+              </div>
+            </div>
+        
+        
+
+        <script type="text/javascript">
+
+              // initialize global variables.
+              var edges;
+              var nodes;
+              var allNodes;
+              var allEdges;
+              var nodeColors;
+              var originalNodes;
+              var network;
+              var container;
+              var options, data;
+              var filter = {
+                  item : '',
+                  property : '',
+                  value : []
+              };
+
+              
+
+              
+
+              // This method is responsible for drawing the graph, returns the drawn network
+              function drawGraph() {
+                  var container = document.getElementById('mynetwork');
+
+                  
+
+                  // parsing and collecting nodes and edges from the python
+                  nodes = new vis.DataSet([{"color": "#E07B54", "id": 0, "label": "RAIZ (REAL)", "shape": "dot", "size": 18}, {"color": "#5BAD72", "id": 1, "label": "n1", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 2, "label": "n2", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 3, "label": "n3", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 4, "label": "n4", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 5, "label": "n5", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 6, "label": "n6", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 7, "label": "n7", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 8, "label": "n8", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 9, "label": "n9", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 10, "label": "n10", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 11, "label": "n11", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 12, "label": "n12", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 13, "label": "n13", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 14, "label": "n14", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 15, "label": "n15", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 16, "label": "n16", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 17, "label": "n17", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 18, "label": "n18", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 19, "label": "n19", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 20, "label": "n20", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 21, "label": "n21", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 22, "label": "n22", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 23, "label": "n23", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 24, "label": "n24", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 25, "label": "n25", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 26, "label": "n26", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 27, "label": "n27", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 28, "label": "n28", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 29, "label": "n29", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 30, "label": "n30", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 31, "label": "n31", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 32, "label": "n32", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 33, "label": "n33", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 34, "label": "n34", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 35, "label": "n35", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 36, "label": "n36", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 37, "label": "n37", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 38, "label": "n38", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 39, "label": "n39", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 40, "label": "n40", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 41, "label": "n41", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 42, "label": "n42", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 43, "label": "n43", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 44, "label": "n44", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 45, "label": "n45", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 46, "label": "n46", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 47, "label": "n47", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 48, "label": "n48", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 49, "label": "n49", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 50, "label": "n50", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 51, "label": "n51", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 52, "label": "n52", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 53, "label": "n53", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 54, "label": "n54", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 55, "label": "n55", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 56, "label": "n56", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 57, "label": "n57", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 58, "label": "n58", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 59, "label": "n59", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 60, "label": "n60", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 61, "label": "n61", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 62, "label": "n62", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 63, "label": "n63", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 64, "label": "n64", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 65, "label": "n65", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 66, "label": "n66", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 67, "label": "n67", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 68, "label": "n68", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 69, "label": "n69", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 70, "label": "n70", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 71, "label": "n71", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 72, "label": "n72", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 73, "label": "n73", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 74, "label": "n74", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 75, "label": "n75", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 76, "label": "n76", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 77, "label": "n77", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 78, "label": "n78", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 79, "label": "n79", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 80, "label": "n80", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 81, "label": "n81", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 82, "label": "n82", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 83, "label": "n83", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 84, "label": "n84", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 85, "label": "n85", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 86, "label": "n86", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 87, "label": "n87", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 88, "label": "n88", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 89, "label": "n89", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 90, "label": "n90", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 91, "label": "n91", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 92, "label": "n92", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 93, "label": "n93", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 94, "label": "n94", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 95, "label": "n95", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 96, "label": "n96", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 97, "label": "n97", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 98, "label": "n98", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 99, "label": "n99", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 100, "label": "n100", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 101, "label": "n101", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 102, "label": "n102", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 103, "label": "n103", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 104, "label": "n104", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 105, "label": "n105", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 106, "label": "n106", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 107, "label": "n107", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 108, "label": "n108", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 109, "label": "n109", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 110, "label": "n110", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 111, "label": "n111", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 112, "label": "n112", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 113, "label": "n113", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 114, "label": "n114", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 115, "label": "n115", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 116, "label": "n116", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 117, "label": "n117", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 118, "label": "n118", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 119, "label": "n119", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 120, "label": "n120", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 121, "label": "n121", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 122, "label": "n122", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 123, "label": "n123", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 124, "label": "n124", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 125, "label": "n125", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 126, "label": "n126", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 127, "label": "n127", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 128, "label": "n128", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 129, "label": "n129", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 130, "label": "n130", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 131, "label": "n131", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 132, "label": "n132", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 133, "label": "n133", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 134, "label": "n134", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 135, "label": "n135", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 136, "label": "n136", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 137, "label": "n137", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 138, "label": "n138", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 139, "label": "n139", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 140, "label": "n140", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 141, "label": "n141", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 142, "label": "n142", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 143, "label": "n143", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 144, "label": "n144", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 145, "label": "n145", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 146, "label": "n146", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 147, "label": "n147", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 148, "label": "n148", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 149, "label": "n149", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 150, "label": "n150", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 151, "label": "n151", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 152, "label": "n152", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 153, "label": "n153", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 154, "label": "n154", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 155, "label": "n155", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 156, "label": "n156", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 157, "label": "n157", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 158, "label": "n158", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 159, "label": "n159", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 160, "label": "n160", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 161, "label": "n161", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 162, "label": "n162", "shape": "dot", "size": 8}, {"color": "#5BAD72", "id": 163, "label": "n163", "shape": "dot", "size": 8}]);
+                  edges = new vis.DataSet([{"arrows": "to", "from": 0, "to": 1}, {"arrows": "to", "from": 0, "to": 2}, {"arrows": "to", "from": 0, "to": 3}, {"arrows": "to", "from": 0, "to": 4}, {"arrows": "to", "from": 0, "to": 5}, {"arrows": "to", "from": 0, "to": 6}, {"arrows": "to", "from": 0, "to": 7}, {"arrows": "to", "from": 0, "to": 8}, {"arrows": "to", "from": 0, "to": 9}, {"arrows": "to", "from": 0, "to": 10}, {"arrows": "to", "from": 0, "to": 11}, {"arrows": "to", "from": 0, "to": 12}, {"arrows": "to", "from": 0, "to": 13}, {"arrows": "to", "from": 0, "to": 14}, {"arrows": "to", "from": 0, "to": 15}, {"arrows": "to", "from": 0, "to": 16}, {"arrows": "to", "from": 0, "to": 17}, {"arrows": "to", "from": 0, "to": 18}, {"arrows": "to", "from": 0, "to": 19}, {"arrows": "to", "from": 0, "to": 20}, {"arrows": "to", "from": 0, "to": 21}, {"arrows": "to", "from": 0, "to": 22}, {"arrows": "to", "from": 0, "to": 23}, {"arrows": "to", "from": 0, "to": 24}, {"arrows": "to", "from": 0, "to": 25}, {"arrows": "to", "from": 0, "to": 26}, {"arrows": "to", "from": 0, "to": 27}, {"arrows": "to", "from": 0, "to": 28}, {"arrows": "to", "from": 0, "to": 29}, {"arrows": "to", "from": 0, "to": 30}, {"arrows": "to", "from": 0, "to": 31}, {"arrows": "to", "from": 0, "to": 32}, {"arrows": "to", "from": 0, "to": 33}, {"arrows": "to", "from": 0, "to": 34}, {"arrows": "to", "from": 0, "to": 35}, {"arrows": "to", "from": 0, "to": 36}, {"arrows": "to", "from": 0, "to": 37}, {"arrows": "to", "from": 0, "to": 38}, {"arrows": "to", "from": 0, "to": 39}, {"arrows": "to", "from": 0, "to": 40}, {"arrows": "to", "from": 0, "to": 41}, {"arrows": "to", "from": 0, "to": 42}, {"arrows": "to", "from": 0, "to": 43}, {"arrows": "to", "from": 0, "to": 44}, {"arrows": "to", "from": 0, "to": 45}, {"arrows": "to", "from": 0, "to": 46}, {"arrows": "to", "from": 0, "to": 47}, {"arrows": "to", "from": 0, "to": 48}, {"arrows": "to", "from": 0, "to": 49}, {"arrows": "to", "from": 0, "to": 50}, {"arrows": "to", "from": 0, "to": 51}, {"arrows": "to", "from": 0, "to": 52}, {"arrows": "to", "from": 0, "to": 53}, {"arrows": "to", "from": 0, "to": 54}, {"arrows": "to", "from": 0, "to": 55}, {"arrows": "to", "from": 0, "to": 56}, {"arrows": "to", "from": 0, "to": 57}, {"arrows": "to", "from": 0, "to": 58}, {"arrows": "to", "from": 3, "to": 59}, {"arrows": "to", "from": 3, "to": 60}, {"arrows": "to", "from": 26, "to": 61}, {"arrows": "to", "from": 31, "to": 62}, {"arrows": "to", "from": 31, "to": 63}, {"arrows": "to", "from": 31, "to": 64}, {"arrows": "to", "from": 31, "to": 65}, {"arrows": "to", "from": 31, "to": 66}, {"arrows": "to", "from": 31, "to": 67}, {"arrows": "to", "from": 31, "to": 68}, {"arrows": "to", "from": 31, "to": 69}, {"arrows": "to", "from": 31, "to": 70}, {"arrows": "to", "from": 31, "to": 71}, {"arrows": "to", "from": 31, "to": 72}, {"arrows": "to", "from": 31, "to": 73}, {"arrows": "to", "from": 31, "to": 74}, {"arrows": "to", "from": 31, "to": 75}, {"arrows": "to", "from": 31, "to": 76}, {"arrows": "to", "from": 31, "to": 77}, {"arrows": "to", "from": 31, "to": 78}, {"arrows": "to", "from": 31, "to": 79}, {"arrows": "to", "from": 31, "to": 80}, {"arrows": "to", "from": 31, "to": 81}, {"arrows": "to", "from": 31, "to": 82}, {"arrows": "to", "from": 31, "to": 83}, {"arrows": "to", "from": 31, "to": 84}, {"arrows": "to", "from": 31, "to": 85}, {"arrows": "to", "from": 31, "to": 86}, {"arrows": "to", "from": 31, "to": 87}, {"arrows": "to", "from": 31, "to": 88}, {"arrows": "to", "from": 31, "to": 89}, {"arrows": "to", "from": 31, "to": 90}, {"arrows": "to", "from": 31, "to": 91}, {"arrows": "to", "from": 31, "to": 92}, {"arrows": "to", "from": 31, "to": 93}, {"arrows": "to", "from": 31, "to": 94}, {"arrows": "to", "from": 31, "to": 95}, {"arrows": "to", "from": 31, "to": 96}, {"arrows": "to", "from": 31, "to": 97}, {"arrows": "to", "from": 31, "to": 98}, {"arrows": "to", "from": 31, "to": 99}, {"arrows": "to", "from": 31, "to": 100}, {"arrows": "to", "from": 31, "to": 101}, {"arrows": "to", "from": 31, "to": 102}, {"arrows": "to", "from": 31, "to": 103}, {"arrows": "to", "from": 31, "to": 104}, {"arrows": "to", "from": 38, "to": 162}, {"arrows": "to", "from": 57, "to": 163}, {"arrows": "to", "from": 63, "to": 105}, {"arrows": "to", "from": 83, "to": 157}, {"arrows": "to", "from": 102, "to": 158}, {"arrows": "to", "from": 103, "to": 159}, {"arrows": "to", "from": 104, "to": 160}, {"arrows": "to", "from": 105, "to": 106}, {"arrows": "to", "from": 105, "to": 107}, {"arrows": "to", "from": 105, "to": 108}, {"arrows": "to", "from": 105, "to": 109}, {"arrows": "to", "from": 106, "to": 110}, {"arrows": "to", "from": 107, "to": 116}, {"arrows": "to", "from": 107, "to": 117}, {"arrows": "to", "from": 107, "to": 118}, {"arrows": "to", "from": 107, "to": 119}, {"arrows": "to", "from": 107, "to": 120}, {"arrows": "to", "from": 107, "to": 121}, {"arrows": "to", "from": 107, "to": 122}, {"arrows": "to", "from": 107, "to": 123}, {"arrows": "to", "from": 107, "to": 124}, {"arrows": "to", "from": 107, "to": 125}, {"arrows": "to", "from": 108, "to": 153}, {"arrows": "to", "from": 108, "to": 154}, {"arrows": "to", "from": 108, "to": 155}, {"arrows": "to", "from": 110, "to": 111}, {"arrows": "to", "from": 110, "to": 112}, {"arrows": "to", "from": 110, "to": 113}, {"arrows": "to", "from": 111, "to": 114}, {"arrows": "to", "from": 112, "to": 115}, {"arrows": "to", "from": 116, "to": 126}, {"arrows": "to", "from": 117, "to": 133}, {"arrows": "to", "from": 117, "to": 134}, {"arrows": "to", "from": 117, "to": 135}, {"arrows": "to", "from": 118, "to": 145}, {"arrows": "to", "from": 118, "to": 146}, {"arrows": "to", "from": 118, "to": 147}, {"arrows": "to", "from": 118, "to": 148}, {"arrows": "to", "from": 121, "to": 152}, {"arrows": "to", "from": 126, "to": 127}, {"arrows": "to", "from": 126, "to": 128}, {"arrows": "to", "from": 126, "to": 129}, {"arrows": "to", "from": 126, "to": 130}, {"arrows": "to", "from": 127, "to": 131}, {"arrows": "to", "from": 131, "to": 132}, {"arrows": "to", "from": 133, "to": 136}, {"arrows": "to", "from": 133, "to": 137}, {"arrows": "to", "from": 135, "to": 144}, {"arrows": "to", "from": 136, "to": 138}, {"arrows": "to", "from": 136, "to": 139}, {"arrows": "to", "from": 136, "to": 140}, {"arrows": "to", "from": 136, "to": 141}, {"arrows": "to", "from": 136, "to": 142}, {"arrows": "to", "from": 136, "to": 143}, {"arrows": "to", "from": 145, "to": 149}, {"arrows": "to", "from": 145, "to": 150}, {"arrows": "to", "from": 148, "to": 151}, {"arrows": "to", "from": 154, "to": 156}, {"arrows": "to", "from": 160, "to": 161}]);
+
+                  nodeColors = {};
+                  allNodes = nodes.get({ returnType: "Object" });
+                  for (nodeId in allNodes) {
+                    nodeColors[nodeId] = allNodes[nodeId].color;
+                  }
+                  allEdges = edges.get({ returnType: "Object" });
+                  // adding nodes and edges to the graph
+                  data = {nodes: nodes, edges: edges};
+
+                  var options = {"interaction": {"hover": true}};
+
+                  
+
+
+                  
+
+                  network = new vis.Network(container, data, options);
+
+                  
+
+                  
+
+                  
+
+
+                  
+                      network.on("stabilizationProgress", function(params) {
+                          document.getElementById('loadingBar').removeAttribute("style");
+                          var maxWidth = 496;
+                          var minWidth = 20;
+                          var widthFactor = params.iterations/params.total;
+                          var width = Math.max(minWidth,maxWidth * widthFactor);
+                          document.getElementById('bar').style.width = width + 'px';
+                          document.getElementById('text').innerHTML = Math.round(widthFactor*100) + '%';
+                      });
+                      network.once("stabilizationIterationsDone", function() {
+                          document.getElementById('text').innerHTML = '100%';
+                          document.getElementById('bar').style.width = '496px';
+                          document.getElementById('loadingBar').style.opacity = 0;
+                          // really clean the dom element
+                          setTimeout(function () {document.getElementById('loadingBar').style.display = 'none';}, 500);
+                      });
+                  
+
+                  return network;
+
+              }
+              drawGraph();
+        </script>
+    </body>
+</html>
