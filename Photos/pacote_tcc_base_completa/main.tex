@@ -3,8 +3,7 @@
 % --- Pacotes Basicos ---
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
-\usepackage[english]{babel}
-\usepackage[table]{xcolor}
+\usepackage[brazil]{babel}
 \usepackage{graphicx}
 \usepackage{amsmath}
 \usepackage{amsfonts}
@@ -16,12 +15,6 @@
 \usepackage{tikz}
 \usetikzlibrary{shapes.geometric, arrows, positioning, shapes.misc}
 \usepackage{float}
-\usepackage{enumitem}
-
-% Cores das c\'elulas para a Tabela~\ref{tab:sintese_resultados}
-\definecolor{cgood}{RGB}{198, 239, 206}  % verde claro (F1 >= 0.80)
-\definecolor{cmed}{RGB}{255, 235, 156}   % amarelo claro (0.60 <= F1 < 0.80)
-\definecolor{cbad}{RGB}{255, 199, 206}   % vermelho claro (F1 < 0.60)
 
 \titulo{Detec\c{c}\~ao de Fake News com Redes Neurais de Grafos: Ablation Sistem\'atica e Diagn\'ostico de Aplicabilidade Topol\'ogica}
 \autor{Andr\'e Messina Livingston \\ C\'esar Augusto Sibila \\ Enzo Kikuji Takida}
@@ -60,11 +53,10 @@ Os achados centrais s\~ao bilaterais. \textbf{Positivo}: GraphSAGE com apenas
 duas \emph{features} estruturais por n\'o atinge F1-macro = $0{,}810$ em
 UPFD-GossipCop \emph{sem usar texto algum} (10 \emph{seeds}, $\sigma = 0{,}002$).
 \textbf{Negativo}: a mesma arquitetura colapsa em UPFD-PolitiFact
-(F1 $\approx 0{,}33$, abaixo da chance de 0{,}50). A causa estrutural \'e
-identificada via Cohen's $d$: GossipCop apresenta diferen\c{c}a entre fake
-e real de $d = +1{,}53$ no \emph{branching factor} das cascatas; PolitiFact
-n\~ao alcan\c{c}a sequer um efeito m\'edio em nenhuma m\'etrica avaliada
-($|d| < 0{,}5$, com m\'aximo de $|d|=0{,}25$ em \texttt{num\_nodes}). A tese central -- formulada de forma
+(F1 $\approx 0{,}55$). A causa estrutural \'e identificada via Cohen's $d$:
+GossipCop apresenta diferen\c{c}a entre fake e real de $d = +1{,}53$ no
+\emph{branching factor} das cascatas; PolitiFact apresenta $|d| < 0{,}2$
+em todas as m\'etricas avaliadas. A tese central -- formulada de forma
 falsific\'avel -- \'e que modelos topol\'ogicos requerem diferen\c{c}a
 estrutural entre classes da ordem de magnitude de um efeito m\'edio de
 Cohen ($|d| \geq 0{,}5$) para serem efetivos.
@@ -107,11 +99,10 @@ Findings are bilateral. \textbf{Positive}: GraphSAGE with only two
 per-node structural features achieves F1-macro = $0{.}810$ on UPFD-GossipCop
 \emph{without using text at all} (10 seeds, $\sigma = 0{.}002$).
 \textbf{Negative}: the same architecture collapses on UPFD-PolitiFact
-(F1 $\approx 0{.}33$, below the chance level of 0{.}50). The structural
-cause is identified via Cohen's $d$: GossipCop shows a fake-vs-real
-difference of $d = +1{.}53$ on cascade branching factor; PolitiFact does
-not reach even a medium-effect size on any evaluated metric
-($|d| < 0{.}5$, with maximum $|d|=0{.}25$ on \texttt{num\_nodes}). Our central -- and falsifiable -- thesis is that topological
+(F1 $\approx 0{.}55$). The structural cause is identified via Cohen's $d$:
+GossipCop shows a fake-vs-real difference of $d = +1{.}53$ on cascade
+branching factor; PolitiFact shows $|d| < 0{.}2$ across all evaluated
+metrics. Our central -- and falsifiable -- thesis is that topological
 models require class-wise structural differences of at least a Cohen
 medium-effect magnitude ($|d| \geq 0{.}5$) to be effective.
 

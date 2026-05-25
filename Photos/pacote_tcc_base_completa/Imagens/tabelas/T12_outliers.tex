@@ -1,0 +1,19 @@
+% Subgrupos extremos (outliers) no UPFD-GossipCop test: confirmacao numerica da inversao distributiva da \S 4.6.
+% Subgrupos derivados *post-hoc* das distribuicoes do script 28.
+\begin{table}[H]\centering
+\caption{Acuracia do RF estrutural e do SAGE em seis subgrupos extremos do UPFD-GossipCop \emph{test}. Subgrupos derivados \emph{post-hoc} via percentil emp\'irico (n\~ao $z$-score, justificado pela rejei\c{c}\~ao do \emph{fit} lognormal em \S\ref{sec:estrat_distribuicao}). $\Delta$ = diferen\c{c}a vs. acur\'acia agregada (RF=0.754, SAGE=0.814). $^{*}$Subgrupos com classe \'unica n\~ao admitem F1-macro.}
+\label{tab:outliers}
+\small
+\begin{tabular}{lrrrrr}
+\toprule
+\textbf{Subgrupo} & $N$ & \textbf{acc RF ($\Delta$)} & \textbf{acc SAGE ($\Delta$)} & \textbf{F1m RF} & \textbf{F1m SAGE} \\
+\midrule
+\texttt{real\_viral}     & 60  & 0.233 ($-$0.520) & 0.433 ($-$0.381) & --$^{*}$ & --$^{*}$ \\
+\texttt{fake\_contido}   & 31  & 0.000 ($-$0.754) & 0.000 ($-$0.814) & --$^{*}$ & --$^{*}$ \\
+\texttt{cauda\_alta\_n}  & 192 & 0.547 ($-$0.207) & 0.823 ($+$0.009) & 0.506 & 0.816 \\
+\texttt{cauda\_baixa\_n} & 265 & 0.913 ($+$0.160) & 0.913 ($+$0.099) & 0.477 & 0.477 \\
+\texttt{deep\_extreme}   & 256 & 0.531 ($-$0.222) & 0.762 ($-$0.052) & 0.528 & 0.741 \\
+\texttt{wide\_extreme}   & 192 & 0.932 ($+$0.179) & 0.974 ($+$0.160) & 0.600 & 0.493 \\
+\bottomrule
+\end{tabular}
+\end{table}

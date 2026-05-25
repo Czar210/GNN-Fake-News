@@ -132,7 +132,7 @@ Mapa: "O Capítulo 2 apresenta... O Capítulo 3 detalha... etc." Um parágrafo p
 
 ## §3.2 Datasets (2 páginas)
 - **`[TAB:T0]` (criar):** tabela com #grafos, #classes, fonte, licença, tamanho. Datasets: FakeNewsNet PolitiFact, UPFD-PolitiFact, UPFD-GossipCop, Bluesky.
-- **Citações:** `\cite{shu2020fakenewsnet, dou2021upfd, kleppmann2024atproto, quelle2024bluesky}`.
+- **Citações:** `\cite{shu2020fakenewsnet, dou2021upfd, kleppmann2024atproto, failla2024bluesky}`.
 - Para cada dataset, 1 parágrafo: o que é, quem coletou, quantos grafos, qual feature dominante.
 - **Para Bluesky:** declarar explicitamente: "snapshot ~6GB de 2024-2025; sem ground-truth fake/real; usado em modo de demonstração no Capítulo 5".
 
@@ -271,7 +271,7 @@ Mapa: "O Capítulo 2 apresenta... O Capítulo 3 detalha... etc." Um parágrafo p
 
 ## §5.1 Dataset Bluesky (1 página)
 - 168.463 posts em 11 feeds temáticos (Blacksky, News, Science, Political Science, etc).
-- Coletado via AT Protocol \cite{kleppmann2024atproto}; snapshot acadêmico de 2024-2025 \cite{quelle2024bluesky}.
+- Coletado via AT Protocol \cite{kleppmann2024atproto}; snapshot acadêmico de 2024-2025 \cite{failla2024bluesky}.
 - **Sem figura.**
 
 ## §5.2 Análise cross-feed (1 página)

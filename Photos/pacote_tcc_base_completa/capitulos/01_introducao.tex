@@ -1,0 +1,73 @@
+% ============================================================
+% Capitulo 1 -- Introducao
+% Tamanho-alvo: 4-6 paginas | Sem figuras nem tabelas
+% Ordem de escrita: ULTIMO (depois de saber qual historia contar)
+% ============================================================
+
+\chapter{Introdu\c{c}\~ao}
+\label{cap:introducao}
+
+% ============================================================
+\section{Contextualiza\c{c}\~ao}
+\label{sec:contexto}
+
+% TESE: desinformacao e' problema epistemico que antecede LLMs; NLP isolada nao basta.
+%
+% CONTEUDO (~1 pagina):
+% - Por que fake news e' problema (impacto democratico/social).
+% - Limites do NLP puro: LLMs geram texto gramaticalmente impecavel.
+% - Topologia da propagacao como sinal complementar (nao substituto).
+% - Cuidado: nao culpar LLMs pela crise; eles aceleram, nao causam.
+%
+% CITACOES: \cite{ieee_fakenewslandscape}, \cite{pmc_overviewfakenews},
+%           \cite{scielo_posttruth}, \cite{arxiv_llmfakenews}.
+
+% ============================================================
+\section{Motiva\c{c}\~ao}
+\label{sec:motivacao}
+
+% TESE: topologia e' complementar e independente do idioma do post.
+%
+% CONTEUDO (~0.5 pagina):
+% - Topologia nao processa texto -> mecanismo arquiteturalmente
+%   independente de idioma.
+% - Aplicacao pratica: cenarios onde texto nao e' confiavel ou nao existe.
+%
+% CITACAO: \cite{monti2019fakenews} (fundador da linha GNN para fake news).
+
+% ============================================================
+\section{Perguntas de pesquisa}
+\label{sec:rqs}
+
+% TESE: 3 RQs operacionalizaveis com experimentos diretos.
+%
+% CONTEUDO (~0.5 pagina) -- listar como perguntas numeradas:
+% - RQ1: topologia carrega sinal acima do BERT da raiz?
+% - RQ2: sob quais condicoes estruturais? (operacionalizado via Cohen's d)
+% - RQ3: e' viavel detectar so com topologia, em cenarios sem texto util?
+%        (parte a: experimento estrutural puro; parte b: invariancia a idioma)
+
+% ============================================================
+\section{Contribui\c{c}\~oes}
+\label{sec:contribuicoes}
+
+% TESE: 4 contribuicoes distintas, todas com artefatos rastreaveis.
+%
+% CONTEUDO (~1 pagina) -- lista numerada, 1-2 frases cada:
+% (a) Ablation sistematica de encodings posicionais (corrige Erro 1).
+% (b) Demonstracao positivo+negativo (GossipCop vs PolitiFact) com
+%     explicacao estrutural via Cohen's d.
+% (c) Analise da concordancia textual x topologico + regra dual post-hoc.
+% (d) Pesos no Hugging Face Hub + ferramenta web (FastAPI + Next.js).
+%
+% FECHAMENTO: citar Apendice~\ref{ap:repo} pra detalhes tecnicos.
+
+% ============================================================
+\section{Estrutura do trabalho}
+\label{sec:estrutura}
+
+% TESE: mapa dos 5 capitulos restantes.
+%
+% CONTEUDO (~0.5 pagina) -- 1 paragrafo por capitulo, 2 frases cada:
+% Cap 2 (Fundamentacao) -> Cap 3 (Metodologia) ->
+% Cap 4 (Resultados) -> Cap 5 (Aplicacao) -> Cap 6 (Conclusao).

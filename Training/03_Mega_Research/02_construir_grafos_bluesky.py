@@ -280,8 +280,15 @@ def main():
     print(f"  Posts qualificados (>= {args.min_reposts} reposts): {qualifica:,}")
 
     # ── FILTRAGEM AGRESSIVA ANTES DO BERT ────────────────────────────────
-    # Bluesky tem 166k posts mas so ~994 sao qualificados. Gerar BERT em todos
-    # estoura memoria (OOM no Windows). Filtramos primeiro.
+    # PIPELINE LEGACY: este caminho usa CSVs coletados via atproto
+    # (Training/01_BlueSky_Pipe/data/raw/). O TCC final NAO usa estes grafos --
+    # o Cap 5 consome diretamente o dataset academico em dados_bluesky/
+    # (Quelle 2024, 168.463 posts) via scripts 18, 19, 22, 23, 26.
+    #
+    # Numero de qualificados aqui depende totalmente de quantos reposts
+    # foram baixados pelo script 01 (--max-reposts, default 300_000).
+    # Com 300k reposts: ~994 qualificados; com 10k reposts: ~2 qualificados.
+    # Gerar BERT em todos estoura memoria (OOM no Windows). Filtramos primeiro.
     posts_qualificados_ids = set(reposts_por_post[reposts_por_post >= args.min_reposts].index.astype(str))
     df_posts["post_id"] = df_posts["post_id"].astype(str)
     antes = len(df_posts)

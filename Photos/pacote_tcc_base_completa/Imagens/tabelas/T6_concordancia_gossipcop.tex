@@ -1,0 +1,18 @@
+% Comparacao TEXTUAL vs TOPOLOGICO no UPFD-GossipCop -- concordancia, kappa, e desempenho condicional.
+\begin{table}[H]\centering
+\caption{Comparacao TEXTUAL vs TOPOLOGICO no UPFD-GossipCop -- concordancia, kappa, e desempenho condicional.}
+\label{tab:concordancia_gossipcop}
+\begin{tabular}{lr}
+\toprule
+Metrica & Valor \\
+\midrule
+F1-macro textual (LogReg-content) & 0.9540 \\
+F1-macro topologico (RF estrutural) & 0.7534 \\
+Agreement rate & 0.7588 \\
+Cohen's kappa & 0.5179 \\
+F1 quando AMBOS concordam & 0.9662 \\
+F1 textual quando DISCORDAM & 0.9139 \\
+F1 topologico quando DISCORDAM & 0.0845 \\
+\bottomrule
+\end{tabular}
+\end{table}

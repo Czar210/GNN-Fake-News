@@ -1,0 +1,19 @@
+% Benchmark cross-dataset UPFD (PolitiFact + GossipCop) -- GCN/GAT/SAGE vs baseline textual.
+\begin{table}[H]\centering
+\caption{Benchmark cross-dataset UPFD (PolitiFact + GossipCop) -- GCN/GAT/SAGE vs baseline textual.}
+\label{tab:cross_dataset_upfd}
+\begin{tabular}{lrrr}
+\toprule
+Dataset & Modelo & Seeds/Folds & F1-macro \\
+\midrule
+gossipcop & GAT & 3 & 0.9390 $\pm$ 0.0050 \\
+gossipcop & GCN & 3 & 0.9411 $\pm$ 0.0059 \\
+gossipcop & LogReg\_root & 1 & 0.9540 $\pm$ 0.0000 \\
+gossipcop & SAGE & 3 & 0.9448 $\pm$ 0.0041 \\
+politifact & GAT & 5 & 0.6936 $\pm$ 0.1865 \\
+politifact & GCN & 5 & 0.7816 $\pm$ 0.0548 \\
+politifact & LogReg\_root & 1 & 0.8415 $\pm$ 0.0000 \\
+politifact & SAGE & 5 & 0.8166 $\pm$ 0.0095 \\
+\bottomrule
+\end{tabular}
+\end{table}
