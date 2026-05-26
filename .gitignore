@@ -177,9 +177,9 @@ Material/LIAR/src/*.html
 # Visualizacoes HTML interativas (geradas; pesadas; ~3 MB cada conjunto)
 Photos/*.html
 
-# Versao compilada do TCC (fonte fica no Overleaf)
+# Versao compilada do TCC
 GNN_TCC_atualizado.zip
-Material/GNN_TCC_atualizado/
+# Material/GNN_TCC_atualizado/ -- removido para versionar fontes .tex no Git
 
 # Embeddings BERT cacheados e grafos pre-construidos do FakeNewsNet
 # Regenerados por 00_construir_grafos_fakenewsnet.py + gerar_folds.py
