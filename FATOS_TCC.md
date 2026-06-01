@@ -337,7 +337,7 @@ os scripts 28/29/30 nesta sessão.
 | Fato | Valor | Fonte | Status |
 |---|---|---|---|
 | Posts pontuados pelo RF estrutural | **168.463** (todos) | `scores_por_post.csv` | ✅ |
-| Posts amostrados na concordância | **3.728** (não 5k apesar do nome do arquivo) ⚠️ ver D3 | `amostra_5k.csv` / soma T9 | ⚠️ |
+| Posts amostrados na concordância | **3.728** (não 5k apesar do nome do arquivo) | `amostra_5k.csv` / soma T9 | ✅ (D3 resolvido — Apêndice E usa 3.728) |
 | Threads visualizadas | 6 | `threads_bluesky/resumo.txt` | ✅ |
 | Feed mais "fake-like" | Political Science: score 0.6663, 69.2% pred fake, N=357 | 📊 T8 | ✅ |
 | Feed menos "fake-like" | News: score 0.2704, 6.7% pred fake, N=42112 | 📊 T8 | ✅ |
@@ -385,7 +385,7 @@ Capítulo de síntese, sem fatos novos. As 7 limitações:
 
 - Arquivo `amostra_5k.csv` e caption de T9 dizem "5k amostrado".
 - Soma real das linhas / dos N de T9 = **3.728**.
-- **Verdade:** 3.728. Corrigir a caption de T9 e qualquer menção a "5 mil" no Cap 5.
+- **Verdade:** 3.728. **Status (2026-05-25):** Corrigido — o Cap 5 deixou de existir (virou Apêndice E `apendices/E_aplicacao_bluesky.tex`, §sec:ap_bsky_concordancia) e o texto do apêndice usa 3.728. T9 não é mais referenciada na compilação.
 
 ### D4 — "FNN com cascatas estrela" como limitação universal
 

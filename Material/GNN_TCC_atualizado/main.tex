@@ -69,14 +69,14 @@ falsific\'avel -- \'e que modelos topol\'ogicos requerem diferen\c{c}a
 estrutural entre classes da ordem de magnitude de um efeito m\'edio de
 Cohen ($|d| \geq 0{,}5$) para serem efetivos.
 
-Aplicamos os modelos persistidos sobre 168.463 posts do Bluesky em modo de
-demonstra\c{c}\~ao (sem r\'otulos), confirmando que o classificador
-estrutural produz distribui\c{c}\~ao de \emph{score} estatisticamente
-equivalente entre portugu\^es e ingl\^es ($d = -0{,}057$), o que sustenta
-a propriedade de independ\^encia lingü\'istica do mecanismo. Toda a
-\'analise est\'a empacotada em uma aplica\c{c}\~ao web (FastAPI + Next.js)
-que combina os classificadores textual e topol\'ogico via regra emp\'irica
-derivada \emph{post-hoc} dos experimentos.
+Como complemento experimental para a parte (b) da RQ3, aplicamos o
+classificador estrutural sobre subconjuntos monol\'ingues de um
+\emph{snapshot} acad\^emico do Bluesky e confirmamos que sua
+distribui\c{c}\~ao de \emph{score} \'e estatisticamente equivalente entre
+portugu\^es e ingl\^es ($d = -0{,}057$), o que sustenta a propriedade de
+independ\^encia lingu\'istica do mecanismo. Os pesos persistidos no
+Hugging Face Hub e a ferramenta web (FastAPI + Next.js) que integra os
+classificadores est\~ao documentados no Ap\^endice~\ref{ap:aplicacao}.
 
 \textbf{Palavras-chave}: Fake news. Graph Neural Networks. UPFD. FakeNewsNet.
 Bluesky. Cohen's d. Encodings posicionais.
@@ -115,13 +115,13 @@ not reach even a medium-effect size on any evaluated metric
 models require class-wise structural differences of at least a Cohen
 medium-effect magnitude ($|d| \geq 0{.}5$) to be effective.
 
-We apply the persisted models on 168,463 Bluesky posts in demonstration
-mode (no labels), confirming that the structural classifier produces a
-statistically equivalent score distribution between Portuguese and English
-($d = -0{.}057$), supporting the linguistic independence of the mechanism.
-The full analysis is packaged in a web application (FastAPI + Next.js)
-that combines textual and topological classifiers via an empirical rule
-derived \emph{post-hoc} from the experiments.
+As complementary evidence for RQ3 part (b), we apply the structural
+classifier on monolingual subsets of an academic Bluesky snapshot and
+confirm that its score distribution is statistically equivalent between
+Portuguese and English ($d = -0{.}057$), supporting the linguistic
+independence of the mechanism. Persisted weights on the Hugging Face Hub
+and the web application (FastAPI + Next.js) integrating the classifiers
+are documented in Appendix~\ref{ap:aplicacao}.
 
 \textbf{Keywords}: Fake news. Graph Neural Networks. UPFD. FakeNewsNet.
 Bluesky. Cohen's d. Positional encodings.
@@ -140,7 +140,6 @@ Bluesky. Cohen's d. Positional encodings.
 \include{capitulos/02_fundamentacao}
 \include{capitulos/03_metodologia}
 \include{capitulos/04_resultados}
-\include{capitulos/05_aplicacao}
 \include{capitulos/06_conclusao}
 
 % ============================================================
@@ -158,6 +157,7 @@ Bluesky. Cohen's d. Positional encodings.
 \include{apendices/A_hiperparametros}
 \include{apendices/B_indice_figuras_tabelas}
 \include{apendices/C_estrutura_repositorio}
+\include{apendices/E_aplicacao_bluesky}
 % Apendice D opcional -- descomentar se a banca pedir contexto evolutivo:
 % \include{apendices/D_evolucao_metodologica}
 \end{apendicesenv}

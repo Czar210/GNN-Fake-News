@@ -27,9 +27,12 @@ Você é um assistente ajudando a escrever um Trabalho de Conclusão de Curso
    na prosa tem de vir daqui. Tem status por fato (✅ verificado /
    ⚠️ discrepância / ❓ a verificar) e uma lista de discrepâncias
    conhecidas (D1–D6).
-2. **`Training/03_Mega_Research/PIPELINE.md`** — o que cada script faz.
-3. **`estrutura_tcc_v2.md`** (raiz) — o outline aprovado dos capítulos.
-4. O capítulo em que se está trabalhando:
+2. **`PENDENCIAS_TCC.md`** (raiz) — **Decisões em aberto e mudanças
+   planejadas mas não executadas.** Antes de propor algo novo, conferir
+   se já não foi decidido aqui. Lê na hora de retomar uma sessão.
+3. **`Training/03_Mega_Research/PIPELINE.md`** — o que cada script faz.
+4. **`estrutura_tcc_v2.md`** (raiz) — o outline aprovado dos capítulos.
+5. O capítulo em que se está trabalhando:
    `Material/GNN_TCC_atualizado/capitulos/0X_*.tex`.
 
 ## Regras inquebráveis
