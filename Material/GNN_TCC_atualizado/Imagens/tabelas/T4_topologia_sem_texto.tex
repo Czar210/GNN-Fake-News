@@ -1,0 +1,20 @@
+% Topologia SEM texto: features [is\_root, grau\_norm] -- sinal estrutural puro por dataset/arch.
+\begin{table}[H]\centering
+\caption{Topologia SEM texto: features [is\_root, grau\_norm] -- sinal estrutural puro por dataset/arch.}
+\label{tab:topologia_sem_texto}
+\begin{tabular}{lrrr}
+\toprule
+Dataset & Modelo & Seeds/Folds & F1-macro \\
+\midrule
+fnn & GAT & 10 & 0.5372 $\pm$ 0.0709 \\
+fnn & GCN & 10 & 0.5275 $\pm$ 0.0678 \\
+fnn & SAGE & 10 & 0.5362 $\pm$ 0.0747 \\
+upfd\_gossipcop & GAT & 10 & 0.4834 $\pm$ 0.1075 \\
+upfd\_gossipcop & GCN & 10 & 0.6445 $\pm$ 0.0190 \\
+upfd\_gossipcop & SAGE & 10 & 0.8097 $\pm$ 0.0023 \\
+upfd\_politifact & GAT & 10 & 0.3800 $\pm$ 0.0802 \\
+upfd\_politifact & GCN & 10 & 0.3621 $\pm$ 0.0554 \\
+upfd\_politifact & SAGE & 10 & 0.3314 $\pm$ 0.0093 \\
+\bottomrule
+\end{tabular}
+\end{table}

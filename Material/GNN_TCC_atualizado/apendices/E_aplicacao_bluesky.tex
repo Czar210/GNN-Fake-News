@@ -1,0 +1,114 @@
+\chapter{Aplica\c{c}\~ao demonstrativa: Bluesky e ferramenta web}
+\label{ap:aplicacao}
+
+Este ap\^endice documenta a aplica\c{c}\~ao dos modelos persistidos sobre
+o \emph{dataset} acad\^emico do Bluesky e a ferramenta web que integra os
+classificadores textual e topol\'ogico. \'E mat\'eria
+\emph{demonstrativa}, n\~ao validat\'oria: o Bluesky n\~ao possui
+r\'otulos \emph{fake/real}, e portanto nenhum \emph{claim} supervisionado
+\'e feito a partir deste material. A valida\c{c}\~ao quantitativa do
+trabalho est\'a inteiramente no Cap\'itulo~\ref{cap:resultados}; a parte
+referente \`a independ\^encia lingu\'istica (RQ3-b) est\'a na
+\S\ref{sec:multilingual}.
+
+% ------------------------------------------------------------
+\section{O \emph{dataset} Bluesky}
+\label{sec:ap_bsky_dataset}
+
+Utilizamos o \emph{snapshot} acad\^emico publicado por Failla e
+Rossetti~\cite{failla2024bluesky}, que cobre $168.463$ posts distribu\'idos
+em $11$ \emph{feeds} tem\'aticos (\emph{Blacksky}, \emph{News},
+\emph{Science}, \emph{Political Science}, entre outros), coletados via
+AT Protocol~\cite{kleppmann2024atproto}. O dado \'e \emph{snapshot}
+e n\~ao amostra probabil\'istica --- a limita\c{c}\~ao temporal est\'a
+registrada como item (f) da \S\ref{sec:limitacoes}. O empacotamento
+publicado pelos autores deste trabalho no Hugging Face Hub
+\cite{sibila2025bluesky} preserva a estrutura origi\-nal dos
+\emph{feeds} e adiciona r\'otulos heur\'isticos por palavra-chave que
+\emph{n\~ao foram empregados} como supervis\~ao em momento algum do
+\emph{pipeline}.
+
+% ------------------------------------------------------------
+\section{Infer\^encia \emph{cross-domain} dos modelos persistidos}
+\label{sec:ap_bsky_inferencia}
+
+Aplicamos o classificador textual (LogReg-BERT-\emph{content} treinado em
+FakeNewsNet PolitiFact) e o classificador topol\'ogico (RF estrutural
+treinado em UPFD-GossipCop) sobre os $168.463$ posts. A
+Tabela~\ref{tab:bsky_inferencia_feeds} reporta a m\'edia do \emph{score}
+``\emph{fake-like}'' do RF estrutural por \emph{feed}, permitindo
+\emph{ranking} relativo entre comunidades.
+
+\input{Imagens/tabelas/T8_bluesky_inferencia_feeds}
+
+\begin{figure}[H]\centering
+\includegraphics[width=0.9\linewidth]{Imagens/F7_bluesky_scores_por_feed.png}
+\caption{Distribui\c{c}\~ao do \emph{score} ``\emph{fake-like}'' produzido
+pelo RF estrutural sobre os $168.463$ posts do Bluesky, estratificada
+por \emph{feed}.}
+\label{fig:ap_bsky_scores}
+\end{figure}
+
+\paragraph{Limita\c{c}\~ao expl\'icita de interpreta\c{c}\~ao.} O
+\emph{score} reportado \emph{n\~ao \'e probabilidade calibrada}. \'E a
+sa\'ida \texttt{predict\_proba} do RF treinado em UPFD-GossipCop,
+aplicada a um dom\'inio diferente (Bluesky), sem \emph{ground-truth} que
+permita calibra\c{c}\~ao por \emph{Platt scaling} ou regress\~ao
+isot\^onica. A interpreta\c{c}\~ao correta \'e como \emph{proxy ordinal}
+--- \'util para o \emph{ranking} relativo entre \emph{feeds} reportado
+na Tabela~\ref{tab:bsky_inferencia_feeds}, n\~ao para decis\~ao
+absoluta. Trabalho futuro (\S\ref{sec:futuros}, item 2) discute essa
+calibra\c{c}\~ao.
+
+% ------------------------------------------------------------
+\section{Concord\^ancia textual \texorpdfstring{$\times$}{x} topol\'ogico}
+\label{sec:ap_bsky_concordancia}
+
+Sobre uma amostra estratificada de $3.728$ posts com cascata m\'inima
+para visualiza\c{c}\~ao da \'arvore de propaga\c{c}\~ao, comparamos as
+predi\c{c}\~oes do classificador textual com as do topol\'ogico
+(novamente: sem \emph{ground-truth}, apenas concord\^ancia entre
+classificadores). A taxa de concord\^ancia agregada \'e moderada,
+seguindo o mesmo padr\~ao observado em UPFD-GossipCop
+(\S\ref{sec:concordancia}): \emph{posts} com cascata grande tendem \`a
+concord\^ancia ($\geq 74\%$ para $n_{\mathrm{nodes}} \geq 20$),
+\emph{posts} de tamanho m\'edio caem na zona cinzenta ($42\%$ a $44\%$
+para $2 \leq n_{\mathrm{nodes}} \leq 20$). O \emph{feed} \emph{Political
+Science} atinge $88{,}7\%$ de concord\^ancia agregada --- o mais alto da
+amostra --- o que sugere que comunidades politicamente engajadas geram
+sinais textuais e estruturais mais alinhados.
+
+% ------------------------------------------------------------
+\section{Ferramenta web}
+\label{sec:ap_ferramenta}
+
+A aplica\c{c}\~ao web (FastAPI \emph{backend} + Next.js \emph{frontend})
+integra os tr\^es modelos persistidos --- LogReg-BERT-\emph{content},
+RF estrutural e SAGE estrutural --- expostos atrav\'es do \emph{endpoint}
+\texttt{/api/result}. A combina\c{c}\~ao das predi\c{c}\~oes textual e
+topol\'ogica segue a regra dual derivada \emph{post-hoc} dos resultados
+do Cap\'itulo~\ref{cap:resultados} (Equa\c{c}\~ao~\ref{eq:regra_dual} e
+Figura~\ref{fig:fluxograma_dual}):
+
+\begin{lstlisting}[language=Python, basicstyle=\small\ttfamily, frame=single,
+                   caption={Trecho da regra dual no \emph{backend} FastAPI.},
+                   label={lst:dual_api}]
+def _combinar_scores(score_textual, score_topo):
+    pred_t = score_textual >= 0.5
+    pred_k = score_topo    >= 0.5
+    if pred_t == pred_k:
+        return 0.5 * score_textual + 0.5 * score_topo, True
+    return 0.8 * score_textual + 0.2 * score_topo,    False
+\end{lstlisting}
+
+Os pesos do modelo s\~ao carregados a partir do reposit\'orio publicado
+no Hugging Face Hub~\cite{sibila2025bluesky} sob licen\c{c}a CC-BY-4.0;
+o c\'odigo da \emph{API}, os \emph{scripts} de infer\^encia e o
+\emph{frontend} est\~ao no reposit\'orio Git do trabalho
+(Ap\^endice~\ref{ap:repo}). A ferramenta foi constru\'ida como prova de
+concei\-to de \emph{deploy}, n\~ao como produto auditado para uso em
+modera\c{c}\~ao real --- decis\~oes sobre conte\'udo a partir desses
+\emph{scores} devem respeitar as limita\c{c}\~oes documentadas no
+Cap\'itulo~\ref{cap:conclusao}, em especial a aus\^encia de
+calibra\c{c}\~ao de probabilidades e a depend\^encia de assortatividade
+estrutural do dom\'inio-alvo.

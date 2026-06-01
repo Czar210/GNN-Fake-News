@@ -1,0 +1,186 @@
+% ============================================================
+% Capitulo 2 -- Fundamentacao Teorica
+% Tamanho-alvo: 12-18 paginas
+% Ordem de escrita: PENULTIMO (depois de Resultados -- voce sabe melhor
+% o que precisa fundamentar quando ja viu os dados).
+% Sem figuras neste capitulo (toda visualizacao vai pra Resultados).
+% ============================================================
+
+\chapter{Fundamenta\c{c}\~ao Te\'orica}
+\label{cap:fundamentacao}
+
+% ------------------------------------------------------------
+\section{Detec\c{c}\~ao de fake news: panorama}
+\label{sec:panorama}
+
+% ESCREVER (1.5 pagina): NLP classico, contexto social, propagacao como
+% sinal complementar.
+% Citacoes: \cite{pmc_overviewfakenews}, \cite{ieee_fakenewslandscape},
+% \cite{mdpi_cnn_llm_nlp}.
+% Tese desta secao: "abordagens isoladas (NLP-only ou estrutura-only) tem
+% limites; trabalhos recentes movem para hibridizacao".
+
+% ------------------------------------------------------------
+\section{Grafos e redes sociais}
+\label{sec:grafos}
+
+% ESCREVER (1 pagina): definicoes basicas (grafo dirigido, arvore de
+% propagacao, raiz, profundidade, branching factor). Sem citacao
+% obrigatoria; pode usar \cite{newman2003structure} se quiser textbook.
+% Topico-ancora: propagacao numa rede social como cascata enraizada
+% (post original = raiz; reposts/replies = filhos diretos ou indiretos).
+
+% ------------------------------------------------------------
+\section{Embeddings textuais}
+\label{sec:embeddings}
+
+% ESCREVER (1 pagina): word embeddings -> BERT -> Sentence-BERT.
+% Citacoes obrigatorias: \cite{devlin2019bert}, \cite{reimers2019sbert}.
+% Modelo especifico: paraphrase-multilingual-mpnet-base-v2 (768 dim).
+% Pegadinha: Sentence-BERT NAO e BERT vanilla. Nao diga "usamos BERT" --
+% diga "usamos Sentence-BERT".
+
+% ------------------------------------------------------------
+\section{Redes Neurais de Grafos}
+\label{sec:gnns}
+
+% ESCREVER (3-4 paginas): subsecoes 2.4.1, 2.4.2, 2.4.3 (uma por arquitetura).
+
+\subsection{Graph Convolutional Networks (GCN)}
+\label{sec:gcn}
+
+% \cite{kipf2017gcn}. Equacao central, intuicao, complexidade.
+% Regra de propagacao:
+\begin{equation}
+H^{(l+1)} = \sigma\left(\hat{D}^{-1/2}\hat{A}\hat{D}^{-1/2} H^{(l)} W^{(l)}\right)
+\label{eq:gcn}
+\end{equation}
+% onde $\hat{A} = A + I$ (auto-loops) e $\hat{D}$ e a matriz diagonal de
+% graus de $\hat{A}$.
+
+\subsection{Graph Attention Networks (GAT)}
+\label{sec:gat}
+
+% \cite{velickovic2018gat}. Introduz coeficiente de atencao por aresta:
+\begin{equation}
+\alpha_{ij} = \frac{\exp\left(\mathrm{LeakyReLU}(\mathbf{a}^T [W h_i \,\|\, W h_j])\right)}{\sum_{k \in \mathcal{N}(i)} \exp\left(\mathrm{LeakyReLU}(\mathbf{a}^T [W h_i \,\|\, W h_k])\right)}
+\label{eq:gat_alpha}
+\end{equation}
+
+\subsection{GraphSAGE}
+\label{sec:sage}
+
+% \cite{hamilton2017graphsage}. Agregacao indutiva: amostra vizinhanca + agrega.
+% Mencionar: "Implementamos com PyTorch Geometric \cite{fey2019pyg}".
+% Mencionar: pooling final = global_mean_pool (alternativas: add, max).
+
+% ------------------------------------------------------------
+\section{Degenera\c{c}\~ao do GCN com features homog\^eneas}
+\label{sec:degeneracao}
+
+% SECAO CRITICA -- promessa explicita do outline v2.2. Conteudo obrigatorio:
+%
+% 1. Notacao: $X \in \mathbb{R}^{N \times d}$, $\tilde{A} = \hat{D}^{-1/2}\hat{A}\hat{D}^{-1/2}$.
+% 2. Cenario: suponha $X_i = X_j \, \forall i, j$. Entao $X = \mathbf{1}_N x^T$.
+% 3. Demonstracao matematica (abaixo).
+% 4. Conclusao: $h_i^{(1)}$ e multiplo escalar do mesmo $xW$, com fator
+%    dependente apenas do grau de $i$.
+% 5. Implicacao: justifica adicionar features posicionais (\ref{sec:encodings}).
+
+% Demonstracao a desenvolver na prosa:
+\begin{align}
+H^{(1)} &= \sigma\left(\tilde{A} X W\right) \notag \\
+        &= \sigma\left(\tilde{A} \mathbf{1}_N x^T W\right) \notag \\
+        &= \sigma\left((\tilde{A} \mathbf{1}_N)(x W)^T\right)
+\label{eq:degeneracao}
+\end{align}
+
+% O termo $(\tilde{A} \mathbf{1}_N)$ e vetor de "grau normalizado" -- mesmo
+% escalar para cada no, modulado apenas pelo seu grau.
+% Sem informacao para discriminar entre nos da mesma vizinhanca.
+
+% ------------------------------------------------------------
+\section{Encodings posicionais}
+\label{sec:encodings}
+
+% ESCREVER (1 pagina): definir as 3 features adicionadas.
+% - is_root \in \{0, 1\}: 1 se no e raiz da arvore.
+% - grau_norm = deg(v) / deg_max_global \in [0, 1].
+% - pos = ordem BFS do no / num_filhos, normalizado em [0, 1].
+% Justificar: quebram a degenerencia de \S\ref{sec:degeneracao}.
+% Citacao opcional relacionada: \cite{arxiv_topologicalfeatures}.
+
+% ------------------------------------------------------------
+\section{Explicabilidade em GNNs: GNNExplainer}
+\label{sec:gnn_explainer}
+
+% ESCREVER (1 pagina): mascara de arestas, mascara de features, problema
+% de otimizacao (mutual information).
+% Citacao obrigatoria: \cite{ying2019gnnexplainer}.
+% Mencionar uso pratico: torch_geometric.explain.Explainer com
+% algorithm=GNNExplainer(epochs=200), edge_mask_type="object",
+% modo multiclass_classification em nivel de grafo.
+
+% ------------------------------------------------------------
+\section{Valida\c{c}\~ao estat\'istica}
+\label{sec:estatistica}
+
+% ESCREVER (1 pagina): k-fold estratificado, teste t pareado vs independente
+% (justificar o pareado), Cohen's d.
+% Citacao obrigatoria: \cite{cohen1988statistical}.
+%
+% Tabela inline de interpretacao de Cohen's $d$ (Cohen 1988):
+
+\begin{table}[h]\centering
+\caption{Interpreta\c{c}\~ao de tamanho de efeito de Cohen ($d$).}
+\label{tab:cohen_d_interpretacao}
+\begin{tabular}{ll}
+\toprule
+$|d|$           & Interpreta\c{c}\~ao \\
+\midrule
+$< 0.2$         & desprez\'ivel \\
+$0.2 \leq |d| < 0.5$ & pequeno \\
+$0.5 \leq |d| < 0.8$ & m\'edio \\
+$\geq 0.8$      & grande \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% ------------------------------------------------------------
+\section{Trabalhos relacionados}
+\label{sec:relacionados}
+
+% ESCREVER (2-3 paginas):
+
+\subsection{Surveys de GNNs em fake news}
+\label{sec:surveys}
+% \cite{pmc_gnnsurveyfakenews}, \cite{pmc_overviewfakenews}.
+
+\subsection{M\'etodos GNN can\^onicos}
+\label{sec:metodos_canonicos}
+% \cite{monti2019fakenews}, \cite{dou2021upfd}, \cite{bian2020bigcn},
+% \cite{mdpi_bidirectionalgcn}.
+
+\subsection{Detec\c{c}\~ao multil\'ingue}
+\label{sec:multilingue}
+% \cite{acl_hemt}, \cite{crosslanguagefakenews}, \cite{pmc_multilangs_covid}.
+
+\subsection{Trabalhos brasileiros relacionados}
+\label{sec:trabalhos_br}
+% \cite{ufc_fakewhatsapp}, \cite{pucsp_gnnfakenews}, \cite{usp_fakenews}.
+
+\subsection{Homofilia e assortatividade em redes}
+\label{sec:homofilia}
+% Fundamentacao teorica para por que topologia funciona em alguns dominios
+% e nao em outros. Citacoes: \cite{newman2003mixing}, \cite{pei2020geomgcn}.
+
+\subsection{Posicionamento deste trabalho}
+\label{sec:posicionamento}
+
+% Texto sugerido (paragrafo final):
+% "O presente trabalho NAO propoe uma nova arquitetura GNN. Sua contribuicao
+% e uma analise sistematica + diagnostico sobre quando o paradigma topologico
+% funciona, ancorando achados positivos e negativos em uma tese estrutural
+% unificada. Limitacao assumida: nao rodamos BiGCN \cite{bian2020bigcn} ou
+% GCNFN diretamente -- comparacao numerica com esses metodos e feita apenas
+% via valores publicados (ver \S\ref{sec:limitacoes})."

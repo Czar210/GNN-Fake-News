@@ -1,0 +1,252 @@
+% ============================================================
+% Capitulo 6 -- Discussao e Conclusao
+% ============================================================
+
+\chapter{Discuss\~ao e Conclus\~ao}
+\label{cap:conclusao}
+
+Este cap\'itulo \'e o lugar onde se assume responsabilidade pelo que os
+experimentos efetivamente mostraram. Cada afirma\c{c}\~ao quantitativa
+aqui apresentada \'e ancorada na tabela, figura ou se\c{c}\~ao que a
+sustenta; afirma\c{c}\~oes sem essa \^ancora foram deliberadamente
+exclu\'idas.
+
+% ------------------------------------------------------------
+\section{S\'intese dos achados por pergunta de pesquisa}
+\label{sec:sintese}
+
+\paragraph{RQ1 --- a topologia carrega sinal acima do que o texto da raiz
+j\'a fornece?} A resposta depende do \emph{dataset} e do regime de
+\emph{features}. No FakeNewsNet, o texto da raiz isoladamente j\'a satura
+o sinal: o \emph{baseline} LogReg-BERT atinge F1-macro =
+$\mathbf{0{,}859 \pm 0{,}043}$ sobre 10 \emph{folds}
+(Tabela~\ref{tab:baseline_textual_fnn}), e nenhuma das tr\^es
+arquiteturas GNN adicionada ao mesmo protocolo (GCN, GAT e SAGE com
+\emph{features} estruturais sobre o FNN \emph{posfull}) difere
+significativamente desse valor pelo \emph{ttest\_rel} pareado (todos
+ranqueados como n\~ao-significantes em \S\ref{sec:protocolo}). No
+UPFD-GossipCop, ao contr\'ario, a topologia agrega ganho mensur\'avel: o
+SAGE com \emph{features} estruturais puras atinge
+$\mathbf{F1 = 0{,}810 \pm 0{,}002}$ (Tabela~\ref{tab:topologia_sem_texto}),
+e a an\'alise estratificada da \S\ref{sec:estratificacao} mostrou que
+esse ganho \emph{cresce mon\^otonicamente com a profundidade da cascata}:
+de $\mathbf{+0{,}060}$ no agregado para $\mathbf{+0{,}213}$ em
+\texttt{depth}$\geq 5$, com intervalo de confian\c{c}a \emph{bootstrap}
+de 2.000 reamostragens que n\~ao cruza zero em nenhum dos recortes
+(Tabela~\ref{tab:gap_profundidade}). Em UPFD-PolitiFact, finalmente, n\~ao
+se detecta ganho topol\'ogico significativo: a mesma arquitetura SAGE
+sem texto colapsa para $\mathbf{F1 = 0{,}331 \pm 0{,}009}$
+(Tabela~\ref{tab:topologia_sem_texto}), valor abaixo do n\'ivel de
+chance ($0{,}50$ em problema balanceado), e as outras duas arquiteturas
+testadas no mesmo regime ficam pouco acima ($0{,}362$ para GCN; $0{,}380$
+para GAT), todas em colapso equivalente.
+
+\paragraph{RQ2 --- sob quais condi\c{c}\~oes estruturais?} A resposta foi
+operacionalizada via tamanho de efeito de Cohen ($d$) entre as classes
+em m\'etricas de cascata (\S\ref{sec:porque} e
+Tabela~\ref{tab:cohens_d}). O UPFD-GossipCop apresenta $\mathbf{d =
++1{,}53}$ no \emph{branching factor} (efeito \emph{grande} pela escala
+de Cohen) e $d = +0{,}91$ em \texttt{num\_nodes} (tamb\'em grande); o
+UPFD-PolitiFact n\~ao alcan\c{c}a sequer um efeito m\'edio em nenhuma
+m\'etrica avaliada, com $|d|$ m\'aximo de $\mathbf{0{,}25}$ em
+\texttt{num\_nodes}; e o FakeNewsNet apresenta $|d| \approx 0{,}22$ em
+\texttt{num\_nodes} e \texttt{branching\_avg}, valores
+matematicamente id\^enticos por consequ\^encia direta da topologia em
+estrela (em estrela, \emph{branching avg} $=$ \texttt{num\_nodes}$-1$).
+Este contraste sustenta a \textbf{tese central}, que formulamos de modo
+deliberadamente falsific\'avel:
+
+\begin{quote}
+\emph{Modelos topol\'ogicos exigem diferen\c{c}a estrutural entre classes
+da ordem de magnitude de um efeito m\'edio de Cohen ($|d| \geq 0{,}5$) em
+pelo menos uma m\'etrica de cascata para serem efetivos; abaixo desse
+limiar, colapsam, independentemente da arquitetura GNN escolhida.}
+\end{quote}
+
+A tese \'e refut\'avel: a apresenta\c{c}\~ao de um \emph{dataset} com
+$0{,}2 < |d| < 0{,}5$ no qual uma arquitetura GNN atinja desempenho
+significativamente acima do \emph{baseline} textual e do RF tabular
+constituiria contra-evid\^encia direta.
+
+\paragraph{RQ3 --- \'e vi\'avel detectar fake news apenas pela topologia,
+em cen\'arios sem texto explor\'avel?} A resposta se divide nas duas partes embutidas na pergunta. Quanto \`a parte (a), vi\'avel sem texto algum?, a Tabela~\ref{tab:topologia_sem_texto} mostra que sim, mas
+\emph{condicional} \`a condi\c{c}\~ao da RQ2: SAGE com duas dimens\~oes
+estruturais por n\'o ($\texttt{is\_root}$, $\texttt{grau\_norm}$) atinge
+F1 = $0{,}810$ em GossipCop, sem nenhum acesso ao conte\'udo textual da
+not\'icia. Quanto \`a parte (b), indiferente ao idioma do post?, a \S\ref{sec:multilingual} aplicou o RF estrutural
+sobre subconjuntos monol\'ingues do Bluesky e encontrou $\mathbf{d =
+-0{,}057}$ entre portugu\^es e ingl\^es (efeito desprez\'ivel) e
+$\mathbf{d = -0{,}468}$ entre alem\~ao e ingl\^es (efeito m\'edio)
+(Tabela~\ref{tab:rq3_multilingual}). Como o classificador estrutural
+\emph{n\~ao processa texto}, seu mecanismo \'e arquiteturalmente
+independente do idioma; a diverg\^encia DE \emph{vs.} EN n\~ao p\^ode
+ser isolada entre fator lingu\'istico, fator de comunidade, \emph{shift}
+de dom\'inio e desbalan\c{c}o amostral.
+
+% ------------------------------------------------------------
+\section{Achado negativo \'e achado}
+\label{sec:negativo}
+
+O resultado de UPFD-PolitiFact merece tratamento expl\'icito porque \'e
+metodologicamente t\~ao importante quanto o resultado positivo de
+UPFD-GossipCop. N\~ao se trata de falha de implementa\c{c}\~ao: a
+mesma arquitetura, com o mesmo \emph{pipeline}, atinge F1 = $0{,}810$
+quando treinada em um \emph{dataset} estruturalmente assortativo
+(Tabela~\ref{tab:topologia_sem_texto}). Tampouco se trata de
+inadequa\c{c}\~ao da fam\'ilia GNN em geral: as tr\^es arquiteturas
+testadas (GCN, GAT, SAGE) colapsam de forma equivalente em PolitiFact,
+respectivamente para $0{,}362$, $0{,}380$ e $0{,}331$. O Cohen's $d$
+desprez\'ivel naquele dom\'inio (Tabela~\ref{tab:cohens_d}) mostra, no
+plano descritivo, que \emph{fake} e \emph{real} s\~ao
+\emph{estruturalmente indistingu\'iveis} nas m\'etricas de cascata
+avaliadas, e \'e justamente isso que a tese da \S\ref{sec:porque}
+prev\^e: causa estrutural identificada, n\~ao falha de modelo.
+
+Reportar este achado com a mesma extens\~ao dos achados positivos n\~ao
+\'e formalismo: \'e exig\^encia da tese central. Uma teoria que afirma
+``topologia funciona sob a condi\c{c}\~ao $X$'' \'e fortalecida, n\~ao
+enfraquecida, pela demonstra\c{c}\~ao de que ela \emph{n\~ao funciona}
+quando $X$ falha. A literatura de detec\c{c}\~ao de fake news com GNNs
+tende a reportar predominantemente resultados positivos; ao trazer
+explicitamente o caso negativo, este trabalho oferece o diagn\'ostico de
+aplicabilidade, e n\~ao apenas mais uma demonstra\c{c}\~ao, que
+prop\~oe como contribui\c{c}\~ao prim\'aria.
+
+Uma evid\^encia complementar refor\c{c}a a leitura. A
+\S\ref{sec:estrat_outliers} mostrou que, mesmo no UPFD-GossipCop (onde
+o modelo \emph{funciona}), h\'a subgrupos extremos em que a regra
+estrutural aprendida pelo SAGE se inverte sistematicamente: dos 31 grafos
+do subgrupo \texttt{fake\_contido} (\emph{fakes} com grau de raiz no
+percentil 5 inferior), o SAGE acerta \textbf{zero}; dos 60 grafos do
+subgrupo \texttt{real\_viral} (\emph{reais} com grau de raiz no
+percentil 95 superior), acerta apenas $43\%$, desempenho abaixo da
+chance (Tabela~\ref{tab:outliers}). Esses subgrupos demarcam o
+\emph{limite operacional} do mecanismo topol\'ogico: ele funciona quando
+a regra ``\emph{fake} = cascata maior'' vale, e inverte exatamente onde
+essa regra falha.
+
+% ------------------------------------------------------------
+\section{Limita\c{c}\~oes}
+\label{sec:limitacoes}
+
+Reconhecemos sete limita\c{c}\~oes do trabalho, listadas em ordem de
+import\^ancia decrescente.
+
+\begin{enumerate}[label=(\alph*)]
+\item \textbf{Topologia em estrela no FakeNewsNet constru\'ido por n\'os.}
+O grafo gerado por \texttt{00\_construir\_grafos\_fakenewsnet.py}
+(\S\ref{sec:construcao_fnn}) \'e sempre uma estrela rasa, pois o CSV
+bruto do reposit\'orio KaiDMML n\~ao fornece parentesco entre
+\emph{retweets} nem \emph{timestamps}. Adicionalmente, o filtro de
+\texttt{MAX\_NOS=100} adotado trunca metade dos grafos do
+\emph{dataset} (verifica\c{c}\~ao matem\'atica em \S\ref{sec:construcao_fnn}
+mostrou que a distribui\c{c}\~ao bruta tem m\'edia 552 e m\'aximo
+29.060 \emph{tweets} por not\'icia), tornando os 377 grafos truncados
+indistingu\'iveis quanto ao tamanho absoluto da cascata. Esta
+limita\c{c}\~ao vale exclusivamente para o FakeNewsNet que constru\'imos:
+no UPFD-GossipCop oficial, $30\%$ dos grafos possuem profundidade $\geq
+3$, com cauda at\'e profundidade $9$ (\S\ref{sec:estrat_cascatas}).
+
+\item \textbf{Regra dual derivada \emph{post-hoc} de um \'unico
+experimento.} A combina\c{c}\~ao textual + topol\'ogico exposta na
+\S\ref{sec:concordancia} usa pesos $0{,}8 / 0{,}2$ derivados ap\'os a
+observa\c{c}\~ao da invers\~ao distributiva no UPFD-GossipCop. Sua
+generaliza\c{c}\~ao a outros dom\'inios \'e uma conjectura a ser
+testada, n\~ao um resultado validado.
+
+\item \textbf{Bluesky sem r\'otulos de veracidade.} O \emph{dataset} de
+Failla e Rossetti~\cite{failla2024bluesky} n\~ao tra\c{c}a r\'otulos
+\emph{fake/real}, o que restringe seu uso \`a parte (b) da RQ3
+(\S\ref{sec:multilingual}) e \`a aplica\c{c}\~ao demonstrativa
+documentada no Ap\^endice~\ref{ap:aplicacao}, impedindo valida\c{c}\~ao
+supervisionada nesta fonte. Os r\'otulos heur\'isticos por
+palavras-chave que acompanham nossa publica\c{c}\~ao do \emph{dataset}
+processado n\~ao foram empregados como supervis\~ao.
+
+\item \textbf{Reprodutibilidade n\~ao \emph{bit-exact}.} Embora todos os
+\emph{seeds} sejam fixados (42 como semente universal), o
+n\~ao-determinismo de operadores \texttt{scatter}/\texttt{gather} do
+PyTorch Geometric e a sensibilidade aritm\'etica entre vers\~oes de
+biblioteca podem produzir varia\c{c}\~oes na terceira casa decimal das
+m\'etricas reportadas. As conclus\~oes qualitativas s\~ao robustas a
+essa varia\c{c}\~ao: os achados centrais foram validados em 10
+\emph{seeds} independentes (\S\ref{sec:topo_sem_texto}) e em
+\emph{bootstrap} pareado de 2.000 reamostragens
+(\S\ref{sec:estrat_cascatas}).
+
+\item \textbf{Aus\^encia de comparativo num\'erico direto com BiGCN e
+GCNFN.} N\~ao foi vi\'avel re-implementar essas arquiteturas dentro do
+escopo do trabalho; a compara\c{c}\~ao com Dou et al.~\cite{dou2021upfd}
+\'e indicativa (Tabela~\ref{tab:upfd_vs_publicado}) por tr\^es
+diferen\c{c}as declaradas: \emph{feature} \texttt{content} (310d) em
+vez de \texttt{bert} (768d), hiperpar\^ametros pr\'oprios, e m\'etrica
+F1-macro em vez de acur\'acia.
+
+\item \textbf{Bluesky \'e \emph{snapshot} temporal.} O dado coletado por
+\cite{failla2024bluesky} cobre $11$ \emph{feeds} tem\'aticos da
+plataforma em janela de aproximadamente um ano; generaliza\c{c}\~ao para
+janelas temporais futuras n\~ao \'e garantida.
+
+\item \textbf{Ambiente exclusivamente CPU.} Todos os experimentos foram
+executados em CPU (Intel \emph{Raptor Lake}, 16 \emph{cores} l\'ogicos,
+16~GB de RAM, PyTorch 2.10+cpu). Hiperpar\^ametros adotados podem ser
+sub\'otimos em ambientes com GPU; o \emph{pipeline}, no entanto, \'e
+port\'avel.
+\end{enumerate}
+
+% ------------------------------------------------------------
+\section{Trabalhos futuros}
+\label{sec:futuros}
+
+Quatro dire\c{c}\~oes naturais se desdobram dos achados deste trabalho.
+
+\paragraph{(1) Pseudo-r\'otulos no Bluesky para retreino especializado.}
+A infer\^encia \emph{cross-domain} demonstrada no
+Ap\^endice~\ref{ap:aplicacao} poderia ser convertida em ciclo de
+auto-treinamento: usar o LogReg-BERT treinado em FakeNewsNet como
+or\'aculo para gerar pseudo-r\'otulos em um subconjunto de alta
+confian\c{c}a do Bluesky, e ent\~ao retreinar classificadores
+estruturais especializados para a plataforma. Os $168.463$ posts
+dispon\'iveis (\S\ref{sec:ap_bsky_dataset}) tornariam o experimento
+trat\'avel.
+
+\paragraph{(2) Calibra\c{c}\~ao de probabilidades.} O \emph{score}
+produzido pelo RF estrutural sobre o Bluesky \'e empregado como
+\emph{proxy} ordinal (\S\ref{sec:ap_bsky_inferencia}); transform\'a-lo em
+probabilidade calibrada exigiria t\'ecnicas como \emph{Platt scaling}
+ou regress\~ao isot\^onica, o que demanda subconjunto rotulado no
+dom\'inio-alvo.
+
+\paragraph{(3) Expans\~ao para \emph{datasets} de notici\'ario
+contempor\^aneo.} A exist\^encia de pelo menos um dom\'inio com $|d| <
+0{,}5$ (UPFD-PolitiFact) sugere que a tese central possa ser refinada
+com mais \emph{datasets} de diferentes plataformas (Mastodon, Threads,
+X p\'os-2023) e diferentes janelas temporais, testando se o limiar de
+$0{,}5$ \'e exato ou apenas ordem de magnitude.
+
+\paragraph{(4) Replica\c{c}\~ao direta de BiGCN e GCNFN.} Para preencher
+a limita\c{c}\~ao (e) acima, vale re-implementar essas arquiteturas e
+submet\^e-las ao mesmo protocolo de avalia\c{c}\~ao adotado aqui (mesmo
+\emph{k}-fold, mesmo \emph{ttest\_rel} pareado), permitindo confronto
+\emph{bit-exact} com a literatura.
+
+% ------------------------------------------------------------
+\section{Considera\c{c}\~oes finais}
+\label{sec:final}
+
+Este trabalho n\~ao prop\^os uma nova arquitetura de Rede Neural de
+Grafos. Prop\^os, em seu lugar, um \emph{diagn\'ostico}: sob quais
+condi\c{c}\~oes a topologia da propaga\c{c}\~ao detecta fake news, e
+quando n\~ao detecta. Tr\^es \emph{datasets}, tr\^es arquiteturas e mais
+de uma dezena de m\'etricas (Tabela~\ref{tab:sintese_resultados})
+convergem para uma tese \'unica e refut\'avel: a aplicabilidade depende
+de assortatividade estrutural mensur\'avel ($|d| \geq 0{,}5$). A defesa
+de um resultado negativo (UPFD-PolitiFact) lado a lado de um resultado
+positivo (UPFD-GossipCop), ancorada em estat\'istica de tamanho de
+efeito e validada por an\'alise estratificada do erro com \emph{bootstrap}
+pareado, \'e a contribui\c{c}\~ao metodol\'ogica que esperamos
+transcender o escopo do \emph{dataset} espec\'ifico. O c\'odigo, os
+pesos persistidos no Hugging Face Hub e a ferramenta web
+(Ap\^endice~\ref{ap:aplicacao}) permitem que esta posi\c{c}\~ao seja
+contestada empiricamente em outros dom\'inios, exatamente como a
+tese, por ser falsific\'avel, exige.

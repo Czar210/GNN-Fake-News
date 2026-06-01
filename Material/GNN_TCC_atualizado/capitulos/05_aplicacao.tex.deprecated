@@ -1,0 +1,198 @@
+% ============================================================
+% Capitulo 5 -- Aplicacao: Bluesky e Ferramenta Web
+% Tamanho-alvo: 8-12 paginas
+% Ordem de escrita: TERCEIRO (depois de 3 e 4).
+% ============================================================
+
+\chapter{Aplica\c{c}\~ao: Bluesky e Ferramenta Web}
+\label{cap:aplicacao}
+
+% LEAD OBRIGATORIO (1 paragrafo) -- copiar literal:
+%
+% Este capitulo e *demonstracao*, nao validacao. O dataset Bluesky utilizado
+% nao possui rotulos fake/real; portanto nao realizamos claims supervisionados
+% neste capitulo. Toda a validacao quantitativa do trabalho esta no
+% Capitulo \ref{cap:resultados}.
+
+% ------------------------------------------------------------
+\section{O dataset Bluesky (acad\^emico, \emph{snapshot} 2024--2025)}
+\label{sec:bsky_dataset}
+
+% ESCREVER (1 pagina): 168.463 posts em 11 feeds tematicos (Blacksky,
+% News, Science, Political Science, etc).
+% Coletado via AT Protocol \cite{kleppmann2024atproto};
+% snapshot academico de 2024-2025 \cite{failla2024bluesky}.
+% Sem figura.
+% Limitacao temporal: e snapshot, nao amostra probabilistica
+% (Cap \ref{sec:limitacoes} item (f)).
+
+% ------------------------------------------------------------
+\section{An\'alise cross-feed}
+\label{sec:bsky_crossfeed}
+
+\begin{figure}[H]\centering
+\includegraphics[width=0.95\linewidth]{Imagens/F5_bluesky_crossfeed_distrib.png}
+\caption{Distribui\c{c}\~ao de \emph{likes}, \emph{reposts} e \emph{replies}
+por \emph{feed} tem\'atico do Bluesky.}
+\label{fig:bsky_crossfeed_distrib}
+\end{figure}
+
+\begin{figure}[H]\centering
+\includegraphics[width=0.85\linewidth]{Imagens/F6_bluesky_crossfeed_pares.png}
+\caption{\emph{Heatmap} de Cohen's $d$ entre pares de \emph{feeds} para
+intera\c{c}\~oes por post. Dist\^ancia entre comunidades indica
+heterogeneidade de regimes de engajamento.}
+\label{fig:bsky_crossfeed_pares}
+\end{figure}
+
+% Achado: distribuicoes de likes/reposts/replies variam fortemente por feed.
+% Fonte: script 18.
+
+% ------------------------------------------------------------
+\section{Aplica\c{c}\~ao dos modelos persistidos}
+\label{sec:bsky_inferencia}
+
+\input{Imagens/tabelas/T8_bluesky_inferencia_feeds}
+
+\begin{figure}[H]\centering
+\includegraphics[width=0.95\linewidth]{Imagens/F7_bluesky_scores_por_feed.png}
+\caption{Distribui\c{c}\~ao do \emph{score} `fake-like' produzido pelo RF
+estrutural sobre 168{.}463 posts do Bluesky, agrupada por \emph{feed}.}
+\label{fig:bsky_scores}
+\end{figure}
+
+% PARAGRAFO DE LIMITACAO EXPLICITA (obrigatorio) -- copiar literal:
+%
+% O `score' produzido NAO e probabilidade calibrada. E a saida
+% predict_proba do RF treinado em UPFD-GossipCop, aplicada a um dominio
+% diferente (Bluesky). Sua interpretacao correta e como *proxy ordinal* --
+% util para ranking relativo entre posts, nao para decisao absoluta.
+% Calibracao apropriada (e.g., Platt scaling, isotonica) requer ground-truth
+% no dominio alvo, ausente neste dataset.
+
+% ------------------------------------------------------------
+\section{Concord\^ancia textual \texorpdfstring{$\times$}{x} topol\'ogico no Bluesky}
+\label{sec:bsky_concordancia}
+
+\input{Imagens/tabelas/T9_bluesky_concord_size}
+
+\begin{figure}[H]\centering
+\includegraphics[width=0.7\linewidth]{Imagens/F20_bluesky_crosstab.png}
+\caption{Cross-tab agregado das predi\c{c}\~oes do classificador textual
+e do classificador topol\'ogico sobre 5{.}000 posts amostrados do Bluesky.
+\emph{Nota}: NAO e matriz de confus\~ao supervisionada (Bluesky n\~ao tem
+\emph{labels}); reporta apenas concord\^ancia entre classificadores.}
+\label{fig:bsky_crosstab}
+\end{figure}
+
+\begin{figure}[H]\centering
+\includegraphics[width=0.95\linewidth]{Imagens/F9_bluesky_agreement_size.png}
+\caption{Taxa de concord\^ancia textual \texorpdfstring{$\times$}{x} topol\'ogico por
+\emph{bin} de tamanho da cascata.}
+\label{fig:bsky_agreement_size}
+\end{figure}
+
+\begin{figure}[H]\centering
+\includegraphics[width=0.95\linewidth]{Imagens/F10_bluesky_agreement_feed.png}
+\caption{Taxa de concord\^ancia por \emph{feed}. \emph{Political Science}
+atinge 88.7\%; \emph{feeds} de menor engajamento ficam abaixo de 50\%.}
+\label{fig:bsky_agreement_feed}
+\end{figure}
+
+\begin{figure}[H]\centering
+\includegraphics[width=0.95\linewidth]{Imagens/F23_bluesky_modelo_x_feed.png}
+\caption{\emph{Heatmap} do \emph{score} m\'edio por (\emph{feed} \texorpdfstring{$\times$}{x}
+modelo). Diverg\^encia tem\'atica entre o classificador textual
+(LogReg-BERT) e o topol\'ogico (RF estrutural) por \emph{feed}.}
+\label{fig:bsky_modelo_x_feed}
+\end{figure}
+
+% Achados a destacar:
+% - Political Science: 88.7% agreement (alto).
+% - Posts medios (2-20 nos): 42-44% (zona cinzenta).
+% - Posts virais (20-100 nos): 74%.
+% Implicacao: posts em zona cinzenta podem ser sinalizados na interface
+% como "requer revisao humana".
+% Fonte: script 22.
+
+% ------------------------------------------------------------
+\section{Independ\^encia de idioma \emph{vs} sensibilidade de comunidade}
+\label{sec:bsky_multilingual}
+
+% NOTA: este conteudo TAMBEM aparece em \S\ref{sec:multilingual}.
+% Aqui em \S 5.5 fazemos *versao reduzida* focada na implicacao pratica.
+%
+% Texto sugerido:
+% "A analise multilingue (detalhada em \S\ref{sec:multilingual}) confirma
+% que o classificador estrutural pode ser aplicado a posts em qualquer
+% idioma com interpretacao consistente *do ponto de vista do mecanismo*;
+% mas o threshold absoluto deve ser calibrado por comunidade. Para a
+% ferramenta web, isso implica que a barra de decisao (\geq 0.5 = fake)
+% deve ser ajustada por feed na proxima iteracao -- fora do escopo deste
+% TCC."
+
+% ------------------------------------------------------------
+\section{Visualiza\c{c}\~ao de \emph{threads} reais}
+\label{sec:bsky_threads}
+
+% Escolher 3-4 PNGs de Imagens/F13_threads_bluesky/ (lado a lado).
+% Exemplo (substituir por nomes reais de arquivos da pasta):
+
+\begin{figure}[H]\centering
+\includegraphics[width=0.45\linewidth]{Imagens/F13_threads_bluesky/thread_00_n5_score000.png}
+\includegraphics[width=0.45\linewidth]{Imagens/F13_threads_bluesky/thread_05_n400_score088.png}
+\caption{Visualiza\c{c}\~oes de \emph{threads} reais do Bluesky de tamanhos
+contrastantes (esquerda: $n$=5 n\'os, direita: $n$=400 n\'os), com
+\emph{score} topol\'ogico sobreposto. Conjunto completo de 6 \emph{threads}
+em Imagens/F13\_threads\_bluesky/.}
+\label{fig:bsky_threads}
+\end{figure}
+
+% ------------------------------------------------------------
+\section{Arquitetura da ferramenta web}
+\label{sec:web_arquitetura}
+
+% ESCREVER (1.5 pagina): FastAPI + Next.js + 3 modelos persistidos.
+% Endpoint /api/result retorna 3 scores + flag concordancia.
+%
+% Snippet de codigo (em ambiente lstlisting): mostrar combinar_scores()
+% da API (8-10 linhas max).
+
+\begin{lstlisting}[language=Python, basicstyle=\small\ttfamily, frame=single,
+                   caption={Trecho da regra dual no \emph{backend} FastAPI.},
+                   label={lst:dual_api}]
+def _combinar_scores(score_textual, score_topo):
+    pred_t = score_textual >= 0.5
+    pred_k = score_topo    >= 0.5
+    if pred_t == pred_k:
+        return 0.5 * score_textual + 0.5 * score_topo, True
+    return 0.8 * score_textual + 0.2 * score_topo,    False
+\end{lstlisting}
+
+\subsection{Decis\~ao de produto: bloco \'unico \emph{vs} especialistas}
+\label{sec:bloco_vs_mini}
+
+\input{Imagens/tabelas/T7_bloco_vs_mini}
+
+\begin{figure}[H]\centering
+\includegraphics[width=0.85\linewidth]{Imagens/F4_bloco_vs_mini.png}
+\caption{Compara\c{c}\~ao MINI \emph{vs} BLOCO grande por \emph{dataset}.}
+\label{fig:bloco_vs_mini}
+\end{figure}
+
+% Achado: BLOCO ~ MINI; PolitiFact tem leve vantagem (+0.023) com bloco.
+% Decisao: 1 modelo grande e suficiente para deploy.
+% Marcar explicitamente: "Esta subsecao responde decisao de engenharia,
+% nao pergunta de pesquisa."
+
+% ------------------------------------------------------------
+\section{Pesos no Hugging Face Hub}
+\label{sec:hf_hub}
+
+% ESCREVER (0.5 pagina): persistencia reproduzivel; model card; CC-BY-4.0.
+% Comando para baixar:
+% \begin{lstlisting}
+% from huggingface_hub import snapshot_download
+% snapshot_download(repo_id="seu_user/gnn-fake-news-tcc")
+% \end{lstlisting}
+% Citacao ao Apendice \ref{ap:repo} para detalhes tecnicos.

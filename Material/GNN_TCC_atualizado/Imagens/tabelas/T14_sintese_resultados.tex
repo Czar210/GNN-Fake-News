@@ -1,0 +1,43 @@
+% T14 — Tabela síntese de resultados (dataset x modelo, F1-macro)
+% Cores: verde = F1 >= 0.80 (forte), amarelo = 0.60-0.79 (médio), vermelho = < 0.60 (colapso)
+% Negrito = melhor da coluna (por dataset)
+% Requer no preâmbulo do main.tex: \usepackage[table]{xcolor}
+% Cores definidas: \definecolor{cgood}{RGB}{198, 239, 206}  (verde claro)
+%                  \definecolor{cmed}{RGB}{255, 235, 156}  (amarelo claro)
+%                  \definecolor{cbad}{RGB}{255, 199, 206}  (vermelho claro)
+\begin{table}[H]\centering
+\caption{S\'intese de resultados: F1-macro por (\emph{dataset} $\times$ modelo). C\'elulas verdes indicam desempenho forte ($\geq 0{,}80$); amarelas, m\'edio ($0{,}60$--$0{,}79$); vermelhas, colapso ($<0{,}60$). Negrito marca o melhor modelo de cada \emph{dataset}. O contraste entre UPFD-GossipCop (todas as linhas verdes) e UPFD-PolitiFact com features estruturais puras (linha inteira em vermelho) e' o achado central do trabalho.}
+\label{tab:sintese_resultados}
+\small
+\setlength{\tabcolsep}{6pt}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{l|ccc|c}
+\toprule
+\textbf{Modelo / \emph{features}} & \textbf{FNN} & \textbf{UPFD-Polit} & \textbf{UPFD-Goss} & \textbf{Fonte} \\
+\midrule
+\multicolumn{5}{l}{\textit{Baselines textuais}} \\
+\midrule
+LogReg-BERT (t\'itulo) & \cellcolor{cgood}\textbf{0{,}859} & \cellcolor{cgood}0{,}842 & \cellcolor{cgood}0{,}954 & T1, T3 \\
+RandomForest-BERT      & \cellcolor{cgood}0{,}855 & --     & --     & T1 \\
+\midrule
+\multicolumn{5}{l}{\textit{GNNs com texto (\emph{feature} content/profile)}} \\
+\midrule
+GCN  & --     & \cellcolor{cmed}0{,}782 & \cellcolor{cgood}0{,}941 & T3 \\
+GAT  & --     & \cellcolor{cmed}0{,}694 & \cellcolor{cgood}0{,}939 & T3 \\
+SAGE & --     & \cellcolor{cgood}0{,}817 & \cellcolor{cgood}\textbf{0{,}945} & T3 \\
+\midrule
+\multicolumn{5}{l}{\textit{Modelos topol\'ogicos puros (sem texto)}} \\
+\midrule
+RF tabular {\scriptsize[\texttt{num\_nodes}, \texttt{grau\_root}]} & --     & --     & \cellcolor{cmed}0{,}753 & T6 \\
+GCN  {\scriptsize[\texttt{is\_root}, \texttt{grau\_norm}]}         & \cellcolor{cbad}0{,}528 & \cellcolor{cbad}0{,}362 & \cellcolor{cmed}0{,}645 & T4 \\
+GAT  {\scriptsize[\texttt{is\_root}, \texttt{grau\_norm}]}         & \cellcolor{cbad}0{,}537 & \cellcolor{cbad}0{,}380 & \cellcolor{cbad}0{,}483 & T4 \\
+SAGE {\scriptsize[\texttt{is\_root}, \texttt{grau\_norm}]}         & \cellcolor{cbad}0{,}536 & \cellcolor{cbad}\textbf{0{,}331} & \cellcolor{cgood}\textbf{0{,}810} & T4 \\
+\midrule
+\multicolumn{5}{l}{\textit{Refer\^encia (Dou et al., SIGIR 2021)}} \\
+\midrule
+GCN/GAT/SAGE publicado & --     & 0{,}846\textsuperscript{$\dagger$} & 0{,}971\textsuperscript{$\dagger$} & T10 \\
+\bottomrule
+\multicolumn{5}{l}{\scriptsize \textsuperscript{$\dagger$}\,Acur\'acia reportada por Dou et al.\ com \emph{feature} \texttt{bert} (768d); nosso F1-macro com \texttt{content} (310d). N\~ao bit-exact, indicativo apenas.} \\
+\multicolumn{5}{l}{\scriptsize ``Melhor da coluna'' aplicado dentro de cada bloco; o negrito da linha SAGE em UPFD-PolitiFact destaca o caso de colapso (n\~ao um \emph{melhor}).}
+\end{tabular}
+\end{table}

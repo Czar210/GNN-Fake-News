@@ -1,0 +1,419 @@
+% ============================================================
+% Capitulo 3 -- Metodologia
+% Tamanho-alvo: 8-12 paginas
+% Ordem de escrita: PRIMEIRO (junto com Resultados).
+% Mais denso em fatos verificaveis = menos espaco pra hand-waving.
+% ============================================================
+
+\chapter{Metodologia}
+\label{cap:metodologia}
+
+% ------------------------------------------------------------
+\section{Vis\~ao geral do pipeline}
+\label{sec:pipeline}
+
+% ESCREVER (1 paragrafo): descricao breve dos blocos do pipeline.
+% A figura \ref{fig:pipeline} (F0) abaixo e o diagrama em TikZ.
+
+\begin{figure}[H]\centering
+\resizebox{\linewidth}{!}{%
+\begin{tikzpicture}[
+    node distance=0.9cm and 0.7cm,
+    box/.style    ={rectangle, rounded corners, draw, thick,
+                    minimum width=2.0cm, minimum height=0.9cm,
+                    align=center, font=\scriptsize},
+    data/.style   ={box, fill=blue!10},
+    proc/.style   ={box, fill=green!15},
+    model/.style  ={box, fill=orange!18},
+    eval/.style   ={box, fill=red!12},
+    arr/.style    ={->, >=stealth, thick}
+]
+\node[data]  (raw)    {Dados brutos\\FNN, UPFD, Bluesky};
+\node[proc, right=of raw]   (graph)  {Constru\c{c}\~ao\\de grafos};
+\node[proc, right=of graph] (feat)   {\emph{Features}\\posicionais\\+\,BERT};
+\node[model, right=of feat] (model)  {GNN\\GCN/GAT/SAGE};
+\node[eval, right=of model] (val)    {Valida\c{c}\~ao\\k-fold pareado};
+\node[eval, right=of val]   (out)    {M\'etricas\\F1, Cohen's $d$};
+
+\draw[arr] (raw)   -- (graph);
+\draw[arr] (graph) -- (feat);
+\draw[arr] (feat)  -- (model);
+\draw[arr] (model) -- (val);
+\draw[arr] (val)   -- (out);
+\end{tikzpicture}}
+\caption{Vis\~ao geral do \emph{pipeline} de detec\c{c}\~ao. Dados brutos s\~ao
+transformados em grafos de propaga\c{c}\~ao com \emph{features} estruturais
+(e textuais via BERT, quando dispon\'iveis), passados por modelos GNN, e
+avaliados com protocolo de k-fold pareado.}
+\label{fig:pipeline}
+\end{figure}
+
+% ------------------------------------------------------------
+\section{Datasets}
+\label{sec:datasets}
+
+% ESCREVER (1 paragrafo introdutorio + tabela T0 abaixo).
+% Citacoes: \cite{shu2020fakenewsnet}, \cite{dou2021upfd},
+% \cite{kleppmann2024atproto}, \cite{failla2024bluesky}.
+
+\begin{table}[H]\centering
+\caption{Datasets utilizados, com tamanho, fonte e papel no trabalho.}
+\label{tab:datasets}
+\small
+\begin{tabular}{lrrll}
+\toprule
+\textbf{Dataset} & \textbf{N grafos} & \textbf{N classes} & \textbf{Fonte} & \textbf{Papel} \\
+\midrule
+FakeNewsNet PolitiFact   & $\sim$754   & 2 (50/50)   & \cite{shu2020fakenewsnet}      & Treino + valida\c{c}\~ao \\
+UPFD-PolitiFact          & $\sim$314   & 2 (50/50)   & \cite{dou2021upfd}             & Cross-dataset \\
+UPFD-GossipCop           & $\sim$5{.}464 & 2 (50/50) & \cite{dou2021upfd}             & Cross-dataset \\
+Bluesky (acad\^emico)    & 168{.}463   & --          & \cite{failla2024bluesky}       & Aplica\c{c}\~ao (sem \emph{labels}) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% Para cada dataset, 1 paragrafo: o que e, quem coletou, quantos grafos,
+% feature dominante. Para Bluesky: declarar explicitamente que NAO tem
+% ground-truth fake/real e e usado em modo demonstracao no Cap 5.
+
+% ------------------------------------------------------------
+\section{Constru\c{c}\~ao de grafos: FakeNewsNet}
+\label{sec:construcao_fnn}
+
+A constru\c{c}\~ao dos grafos do FakeNewsNet \'e realizada pelo \emph{script}
+\texttt{00\_construir\_grafos\_fakenewsnet.py}. O \emph{script} efetua o
+\emph{download} direto dos CSVs do reposit\'orio oficial do KaiDMML
+\cite{shu2020fakenewsnet}, gera o \emph{embedding} textual do t\'itulo de
+cada not\'icia via \emph{Sentence-BERT} multil\'ingue (modelo
+\texttt{paraphrase-multilingual-mpnet-base-v2}, dimens\~ao 768) e
+\emph{cacheia} o resultado em disco para evitar recomputa\c{c}\~ao. Cada
+not\'icia gera um grafo em estrela: o n\'o raiz \'e a not\'icia em si, e
+seus filhos s\~ao os identificadores de \emph{tweets} listados pelo CSV
+como tendo propagado a not\'icia.
+
+A topologia em estrela (e n\~ao em \'arvore com profundidade) \'e
+imposta pelo formato do CSV bruto, que fornece apenas uma lista plana de
+\texttt{tweet\_ids} por not\'icia, sem rela\c{c}\~ao de parentesco entre
+\emph{retweets} e sem \emph{timestamps} (caveat j\'a discutido em
+\S\ref{sec:datasets}). Aplicam-se dois filtros: o m\'inimo de dois
+\emph{tweets} de propaga\c{c}\~ao por not\'icia (descarta cascatas
+degeneradas, sem o que o grafo de propaga\c{c}\~ao seria reduzido a um
+\'unico n\'o) e o m\'aximo de 100 n\'os por grafo. A distribui\c{c}\~ao
+bruta de tamanhos de cascata \'e fortemente assim\'etrica: a mediana
+\'e de 30 \emph{tweets}, mas a m\'edia chega a 552 e o m\'aximo observado
+a 29.060. O limite de 100 n\'os trunca, portanto, 50\% dos grafos do
+\emph{dataset}; n\~ao se trata de remo\c{c}\~ao de \emph{outliers} raros,
+mas de decis\~ao de projeto com efeito substancial. A justificativa \'e
+estrutural: em um grafo-estrela, todos os n\'os-filho compartilham o mesmo
+\emph{embedding} BERT (replicado a partir do t\'itulo), e folhas
+adicionais al\'em de uma centena acrescentam informa\c{c}\~ao marginal
+desprez\'ivel; al\'em disso, o \emph{global mean pool} adotado pela
+camada final faria com que, em um grafo de dezenas de milhares de folhas
+quase id\^enticas, a contribui\c{c}\~ao do n\'o raiz, \'unico portador
+das \emph{features} \texttt{is\_root} e \texttt{grau\_norm}, fosse
+dilu\'ida a uma fra\c{c}\~ao \'infima do vetor agregado. Como
+contrapartida, os grafos truncados tornam-se indistingu\'iveis quanto ao
+tamanho absoluto da cascata (limita\c{c}\~ao retomada em
+\S\ref{sec:limitacoes}).
+
+O \emph{script} oferece tr\^es variantes de constru\c{c}\~ao, controladas
+pela \emph{flag} \texttt{--feature-variant}: \texttt{posfull} (todas as
+tr\^es codifica\c{c}\~oes posicionais ativas, vetor nodal de 771
+dimens\~oes), \texttt{posmin} (apenas \texttt{is\_root} e \texttt{pos}, com
+\texttt{grau\_norm} zerado) e \texttt{posgrau} (apenas \texttt{is\_root} e
+\texttt{grau\_norm}, com \texttt{pos} zerado). As tr\^es variantes
+materializam-se em diret\'orios distintos em
+\texttt{data/fakenewsnet\_<suffix>/} e s\~ao consumidas pela ablation
+intra-encoding (\S\ref{sec:topo_sem_texto}). Uma asser\c{c}\~ao de sanidade
+no construtor (\texttt{x.unique(dim=0).shape[0] >= min(num\_nos, 3)})
+garante que os vetores nodais de um mesmo grafo n\~ao sejam id\^enticos,
+prevenindo o cen\'ario de degenera\c{c}\~ao do \emph{message passing}
+descrito em \S\ref{sec:degeneracao}.
+
+% ------------------------------------------------------------
+\section{Folds compartilhados}
+\label{sec:folds}
+
+O \emph{script} \texttt{gerar\_folds.py} instancia
+\texttt{StratifiedKFold(n\_splits=10, shuffle=True, random\_state=42)} do
+\emph{scikit-learn} sobre os 754 grafos do FakeNewsNet e persiste os
+\'indices em \texttt{data/folds\_fnn.pt}. Esse arquivo \'e gerado
+\emph{uma \'unica vez} e consumido por todos os experimentos do trabalho
+que reportam compara\c{c}\~oes pareadas: o baseline textual
+(\S\ref{sec:baseline_textual}), o diagn\'ostico de \emph{confound}
+(\S\ref{sec:confound}), o teste de signific\^ancia entre arquiteturas
+GNN, entre outros.
+
+A motiva\c{c}\~ao \'e estat\'istica. O teste \emph{t} pareado
+(\texttt{scipy.stats.ttest\_rel}) que usamos para comparar dois modelos
+exige que cada par de m\'etricas comparado tenha sido obtido sobre os
+\emph{mesmos exemplos}. Caso contr\'ario, a varia\c{c}\~ao entre folds se
+mistura \`a diferen\c{c}a entre modelos, reduzindo o poder do teste e
+tornando suas conclus\~oes question\'aveis. O compartilhamento de
+\emph{folds} elimina essa fonte de ru\'ido e \'e pr\'e-requisito do
+protocolo de avalia\c{c}\~ao formalizado em \S\ref{sec:protocolo}.
+
+% ------------------------------------------------------------
+\section{Arquiteturas GNN e hiperpar\^ametros}
+\label{sec:arquiteturas}
+
+Tr\^es arquiteturas representativas das principais fam\'ilias de Redes
+Neurais de Grafos s\~ao avaliadas: a \emph{Graph Convolutional Network}
+(GCN, \cite{kipf2017gcn}), com agrega\c{c}\~ao espectral normalizada pelo
+grau; a \emph{Graph Attention Network} (GAT, \cite{velickovic2018gat}),
+com pesos de aresta aprendidos via mecanismo de aten\c{c}\~ao; e o
+GraphSAGE (\cite{hamilton2017graphsage}), com agrega\c{c}\~ao indutiva por
+m\'edia dos vizinhos. Todas as tr\^es s\~ao implementadas no \emph{PyTorch
+Geometric}~\cite{fey2019pyg} e compartilham a mesma arquitetura agregada:
+tr\^es camadas convolucionais, com 64 canais ocultos por camada,
+seguidas de \emph{global mean pool} sobre os n\'os, \emph{dropout} de 0,5
+e um classificador linear final. Os demais hiperpar\^ametros, incluindo as poucas diferen\c{c}as entre as
+arquiteturas, est\~ao na Tabela~\ref{tab:hyperparams}.
+
+\textit{Para o UPFD, o vetor de \emph{features} de entrada de cada n\'o
+\'e o vetor pr\'e-computado fornecido pelo dataset (variante
+\texttt{profile}, com 10 dimens\~oes); para o FakeNewsNet, o vetor \'e o
+de 771 dimens\~oes descrito em \S\ref{sec:construcao_fnn}; para os
+experimentos de topologia pura da \S\ref{sec:topo_sem_texto}, ambos os
+\emph{datasets} t\^em suas \emph{features} substitu\'idas por
+\texttt{[is\_root, grau\_norm]} (dimens\~ao 2).}
+
+\begin{table}[H]\centering
+\caption{Hiperpar\^ametros usados nos modelos GNN. Defaults s\~ao iguais
+entre arquiteturas; diferen\c{c}as anotadas na pr\'opria tabela.}
+\label{tab:hyperparams}
+\small
+\begin{tabular}{lrrr}
+\toprule
+\textbf{Hiperpar\^ametro} & \textbf{GCN} & \textbf{GAT} & \textbf{SAGE} \\
+\midrule
+\texttt{hidden\_channels}     & 64     & 64     & 64 \\
+\texttt{num\_layers}          & 3      & 3      & 3 \\
+\texttt{dropout}              & 0{.}5  & 0{.}5  & 0{.}5 \\
+\texttt{num\_heads} (atten\c{c}\~ao) & --     & 4      & -- \\
+\texttt{pooling}              & \texttt{global\_mean\_pool} & idem & idem \\
+\texttt{learning\_rate}       & 0{.}001 & 0{.}001 & 0{.}001 \\
+\texttt{weight\_decay}        & $5\times10^{-4}$ & $5\times10^{-4}$ & $5\times10^{-4}$ \\
+\texttt{batch\_size}          & 32     & 32     & 32 \\
+\texttt{optimizer}            & Adam   & Adam   & Adam \\
+\texttt{scheduler}            & \multicolumn{3}{c}{ReduceLROnPlateau (factor=0{.}5, patience=5)} \\
+\texttt{early\_stopping}      & \multicolumn{3}{c}{patience=7 sobre F1-macro de valida\c{c}\~ao} \\
+\texttt{max\_epochs}          & 30     & 30     & 30 \\
+\texttt{seed}                 & 42 (com varredura para 10 \emph{seeds} em \S\ref{sec:topo_sem_texto}) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+A op\c{c}\~ao por hiperpar\^ametros id\^enticos entre as tr\^es arquiteturas
+n\~ao busca otimizar cada uma ao m\'aximo (o que tornaria a compara\c{c}\~ao
+dependente de quanto cada modelo foi ajustado), mas sim \emph{isolar o
+efeito arquitetural}: se uma fam\'ilia se destaca consistentemente sob a
+mesma configura\c{c}\~ao b\'asica, o sinal observado \'e atribu\'ivel \`a
+arquitetura, n\~ao ao \emph{tuning}. Os defaults adotados s\~ao valores
+convencionais na literatura de GNNs e suficientes para conduzir o
+treinamento \`a converg\^encia dentro do m\'aximo de 30 \'epocas
+estabelecido.
+
+% ------------------------------------------------------------
+\section{\emph{Baselines} n\~ao-GNN}
+\label{sec:baselines}
+
+Dois \emph{baselines} deliberadamente simples acompanham as arquiteturas
+GNN ao longo do trabalho, cada um isolando uma dire\c{c}\~ao do espa\c{c}o
+de hip\'oteses.
+
+O primeiro \'e um classificador puramente \emph{textual}: a
+\emph{Regress\~ao Log\'istica} aplicada sobre o \emph{embedding} BERT da
+raiz da \'arvore de propaga\c{c}\~ao (isto \'e, o vetor de 768
+dimens\~oes do t\'itulo da not\'icia). Esse modelo n\~ao tem acesso a
+nenhuma informa\c{c}\~ao estrutural: ignora o grafo inteiro e v\^e apenas
+o conte\'udo textual. Estabelece, portanto, o \emph{teto textual} do
+problema; qualquer GNN que n\~ao supere significativamente este
+\emph{baseline} n\~ao est\'a agregando valor sobre a informa\c{c}\~ao do
+texto.
+
+O segundo \'e um classificador puramente \emph{estrutural tabular}: um
+\emph{Random Forest} com 200 \'arvores, treinado sobre apenas duas
+\emph{features} agregadas por grafo: o n\'umero total de n\'os
+(\texttt{num\_nodes}) e o grau do n\'o raiz (\texttt{grau\_root}). Esse
+modelo encarna o \emph{confound trivial} da detec\c{c}\~ao de fake news em
+redes: a observa\c{c}\~ao recorrente de que not\'icias falsas tendem a
+viralizar mais, gerando cascatas maiores. Se um \emph{Random Forest}
+alimentado apenas com tamanho e grau atinge um F1 pr\'oximo do da GNN, o
+ganho aparente da GNN n\~ao vem de capturar estrutura sutil, mas apenas
+de reproduzir esse \emph{confound}; se, por outro lado, o GNN supera
+significativamente o RF, h\'a sinal estrutural genu\'ino sendo aprendido.
+Os dois \emph{baselines} s\~ao confrontados, lado a lado, com as
+arquiteturas GNN em \S\ref{sec:baseline_textual} e \S\ref{sec:confound}.
+
+% ------------------------------------------------------------
+\section{Protocolo de avalia\c{c}\~ao}
+\label{sec:protocolo}
+
+A m\'etrica prim\'aria adotada \'e o \emph{F1-macro}, a m\'edia n\~ao
+ponderada dos F1 das duas classes (fake e real). Como os tr\^es
+\emph{datasets} supervisionados utilizados s\~ao aproximadamente
+balanceados em torno de $50\%/50\%$ entre as classes
+(\S\ref{sec:datasets}), o F1-macro \'e numericamente pr\'oximo da
+acur\'acia, mas com a vantagem de permanecer significativo caso futuros
+\emph{datasets} apresentem desequil\'ibrio, situa\c{c}\~ao comum em
+detec\c{c}\~ao de fake news em produ\c{c}\~ao, onde a classe
+\emph{fake} pode ser minorit\'aria. A literatura UPFD~\cite{dou2021upfd}
+reporta acur\'acia; usamos F1-macro para alinhar com pr\'aticas mais
+recentes em classifica\c{c}\~ao bin\'aria desbalanceada e marcamos
+expressamente a diferen\c{c}a quando confrontamos com valores publicados
+(Tabela~\ref{tab:upfd_vs_publicado}).
+
+Para comparar dois modelos sob o mesmo \emph{dataset}, utilizamos o
+\emph{teste t pareado} (\texttt{scipy.stats.ttest\_rel}) sobre os
+\emph{folds} compartilhados de \S\ref{sec:folds}. O pareamento tem
+duas implica\c{c}\~oes pr\'aticas: a varia\c{c}\~ao entre \emph{folds}
+\'e cancelada (cada \emph{fold} contribui com uma diferen\c{c}a entre
+modelos, n\~ao com uma m\'etrica absoluta), e o teste recupera o sinal
+mesmo em diferen\c{c}as pequenas que o teste n\~ao-pareado n\~ao
+detectaria. No caso particular dos \emph{subsets} \emph{post-hoc} (como
+os recortes por profundidade da cascata em \S\ref{sec:estratificacao}),
+nos quais o pareamento por fold \'e imposs\'ivel por o \emph{subset} ser
+definido sobre o conjunto de teste \'unico, recorremos ao \emph{bootstrap}
+pareado descrito em \S\ref{sec:metod_estratificacao}.
+
+Para a an\'alise descritiva de separabilidade estrutural entre fake e
+real (\S\ref{sec:porque}), reportamos o \emph{tamanho de efeito de Cohen}
+($d$), conforme defini\c{c}\~ao cl\'assica de
+\cite{cohen1988statistical}. A escala interpretativa adotada \'e a usual:
+$|d| < 0{,}2$ desprez\'ivel, $0{,}2 \leq |d| < 0{,}5$ pequeno,
+$0{,}5 \leq |d| < 0{,}8$ m\'edio, $|d| \geq 0{,}8$ grande. A tese
+central do trabalho est\'a operacionalizada nesse limiar (ver
+\S\ref{sec:negativo}).
+
+\textit{Caveat de reprodutibilidade.} Todos os experimentos foram
+executados em CPU (Intel \emph{Raptor Lake}, 16 \emph{cores} l\'ogicos,
+16~GB de RAM), sob Python~3.12.10 e PyTorch~2.10+cpu, com semente
+universal 42. Os resultados s\~ao reproduz\'iveis no mesmo ambiente, mas
+n\~ao bit-exato entre m\'aquinas: opera\c{c}\~oes \texttt{scatter} e
+\texttt{gather} do PyTorch Geometric n\~ao possuem \emph{kernel}
+determin\'istico em GPU, e diferen\c{c}as entre vers\~oes de CUDA/cuDNN
+ou entre CPUs distintas geram varia\c{c}\~ao tipicamente na terceira casa
+decimal das m\'etricas. Como contramedida, os achados centrais foram
+validados em 10 \emph{seeds} independentes (\S\ref{sec:topo_sem_texto}) e
+em \emph{bootstrap} pareado de 2.000 reamostragens
+(\S\ref{sec:estrat_cascatas}); as conclus\~oes qualitativas se mant\^em
+entre execu\c{c}\~oes.
+
+% ------------------------------------------------------------
+\section{An\'alise estratificada do erro}
+\label{sec:metod_estratificacao}
+
+O F1-macro agregado mede \emph{quanto} um modelo acerta, n\~ao \emph{onde}
+ele acerta. Para responder a essa segunda quest\~ao, relevante para a
+caracteriza\c{c}\~ao de regimes em que cada modelo falha ou prospera,
+adotamos tr\^es t\'ecnicas complementares aplicadas sobre o
+\emph{test set} do UPFD-GossipCop, em conjunto detalhadas em
+\S\ref{sec:estratificacao}.
+
+A primeira \'e uma \emph{regress\~ao localmente ponderada} (LOWESS) de
+$P(\text{acerto} \mid m)$ em fun\c{c}\~ao de cada m\'etrica estrutural $m$.
+Implementamo-la via \emph{rolling mean} de janela proporcional ($10\%$
+da amostra ordenada, com m\'inimo absoluto de 30 observa\c{c}\~oes),
+evitando a depend\^encia de \texttt{statsmodels}. A vantagem sobre o
+\emph{binning} discreto \'e dupla: visualiza-se continuamente a varia\c{c}\~ao
+da acur\'acia ao longo de $m$, sem decidir arbitrariamente onde cortar os
+\emph{bins}, o que evita o espa\c{c}o para \emph{cherry-picking}.
+
+A segunda \'e a defini\c{c}\~ao de \emph{outliers} via \emph{percentil
+emp\'irico} (p5/p95) sobre o pr\'oprio \emph{test set}, em vez de
+limiares baseados em \emph{z-score}. A escolha \'e justificada pela forma
+das distribui\c{c}\~oes: m\'etricas de cascata em redes sociais s\~ao
+\emph{heavy-tail}: a m\'edia n\~ao \'e robusta, o desvio-padr\~ao \'e
+inflado por poucos casos extremos, e crit\'erios baseados em $\sigma$
+tornam-se mal-definidos. O percentil emp\'irico \'e invariante \`a forma
+da distribui\c{c}\~ao e identifica reciprocamente o $5\%$ inferior e o
+$5\%$ superior independentemente da assimetria.
+
+A terceira \'e o \emph{bootstrap pareado} (com $n_{\mathrm{boot}}=2.000$)
+para intervalos de confian\c{c}a sobre a diferen\c{c}a de F1 entre dois
+modelos avaliados no mesmo \emph{subset}, t\'ecnica empregada em
+\S\ref{sec:estrat_cascatas} para confirmar a significancia do ganho do
+SAGE estrutural sobre o RF tabular em recortes de profundidade da
+cascata. O \emph{bootstrap} \'e o substituto natural do
+\texttt{ttest\_rel} pareado por \emph{fold} quando o pareamento por
+\emph{fold} n\~ao se aplica, como ocorre em \emph{subsets} definidos
+\emph{post-hoc} sobre o teste \'unico do UPFD.
+
+% ------------------------------------------------------------
+\section{An\'alise de explicabilidade}
+\label{sec:analise_explicabilidade}
+
+Para inspecionar o que a arquitetura SAGE estrutural efetivamente aprende
+do grafo de propaga\c{c}\~ao, recorremos ao \emph{GNNExplainer}
+\cite{ying2019gnnexplainer}, implementado em
+\texttt{torch\_geometric.explain.Explainer} com algoritmo
+\texttt{GNNExplainer(epochs=200)} e \texttt{edge\_mask\_type="object"}, em
+modo de classifica\c{c}\~ao multi-classe sobre o grafo inteiro. O
+GNNExplainer aprende uma m\'ascara sobre as arestas do grafo que maximiza
+a informa\c{c}\~ao m\'utua entre a sub-rede mascarada e a predi\c{c}\~ao do
+modelo, identificando assim quais arestas s\~ao mais decisivas para a
+classifica\c{c}\~ao de cada grafo.
+
+A an\'alise \'e aplicada sobre 20 amostras do \emph{test set} do
+UPFD-GossipCop estratificadas em quatro grupos de cinco grafos cada
+(\emph{fake}-pequena, \emph{fake}-grande, \emph{real}-pequena,
+\emph{real}-grande), permitindo identificar padr\~oes diferenciais por
+classe e por tamanho. Para cada amostra, calcula-se a fra\c{c}\~ao de
+massa de import\^ancia concentrada em arestas a $1$-hop (raiz $\to$ filhos
+diretos), $2$-hops e $\geq 3$-hops da raiz. Os resultados, apresentados
+em \S\ref{sec:explainer}, revelam uma assimetria sistem\'atica entre
+\emph{fake} e \emph{real} no padr\~ao espacial de import\^ancia,
+achado que sustenta interpreta\c{c}\~oes sobre o mecanismo de
+classifica\c{c}\~ao aprendido pelo modelo.
+
+% ------------------------------------------------------------
+\section{Classificador dual: regra de combina\c{c}\~ao \emph{post-hoc}}
+\label{sec:dual}
+
+Para a aplica\c{c}\~ao pr\'atica documentada no
+Ap\^endice~\ref{ap:aplicacao}, combinamos o classificador textual
+(LogReg-BERT) e o classificador topol\'ogico (RF estrutural) por meio de
+uma regra de combina\c{c}\~ao heur\'istica. Essa regra \textbf{n\~ao \'e uma decis\~ao metodol\'ogica a
+priori}: trata-se de uma heur\'istica derivada \emph{post-hoc}, ou seja,
+ap\'os a observa\c{c}\~ao emp\'irica dos resultados de
+\S\ref{sec:concordancia}. A formula\c{c}\~ao exata da regra, os n\'umeros
+que a justificam e as alternativas descartadas est\~ao naquela se\c{c}\~ao,
+sob a equa\c{c}\~ao \eqref{eq:regra_dual}. A regra \'e mencionada aqui
+porque a ferramenta web do Ap\^endice~\ref{ap:aplicacao} usa o
+classificador combinado.
+
+% ------------------------------------------------------------
+\section{Reprodutibilidade}
+\label{sec:reprodutibilidade}
+
+A reprodutibilidade depende de fixar o ambiente, controlar as fontes de
+aleatoriedade e expor as limita\c{c}\~oes ao determinismo. Primeiro,
+o ambiente de execu\c{c}\~ao \'e fixado: Python~3.12.10, PyTorch~2.10+cpu,
+PyTorch~Geometric~2.7.0, \emph{scikit-learn} e demais depend\^encias
+versionadas em \texttt{requirements.txt} (\emph{pinned}). Os experimentos
+foram conduzidos em \textbf{ambiente CPU} (Intel \emph{Raptor Lake}, 16
+\emph{cores} l\'ogicos, 16~GB de RAM, Windows~11); n\~ao se utilizou
+GPU em nenhum momento do treinamento ou da avalia\c{c}\~ao.
+
+Segundo, todas as fontes de aleatoriedade s\~ao semeadas com o valor 42:
+\texttt{torch.manual\_seed}, \texttt{numpy.random.seed},
+\texttt{random.seed}, \texttt{StratifiedKFold(random\_state=42)} e os
+construtores dos classificadores do \emph{scikit-learn} (\texttt{n\_jobs=-1}
+\'e adotado para o RF, sem efeito sobre determinismo). Para os
+experimentos sens\'iveis \`a inicializa\c{c}\~ao, conduzimos varredura
+expl\'icita sobre 10 \emph{seeds} independentes em \S\ref{sec:topo_sem_texto}
+e reportamos m\'edia e desvio-padr\~ao.
+
+Terceiro, reconhecemos as limita\c{c}\~oes ao determinismo: operadores
+\texttt{scatter} e \texttt{gather} do PyTorch Geometric n\~ao possuem
+\emph{kernel} determin\'istico em GPU
+\cite{ying2019gnnexplainer}\footnote{Refer\^encia da nota: a documenta\c{c}\~ao
+oficial do PyTorch sobre reprodutibilidade
+(\url{https://pytorch.org/docs/stable/notes/randomness.html}).}, e
+diferen\c{c}as de arquitetura de CPU ou de vers\~ao de bibliotecas
+geram varia\c{c}\~ao tipicamente na terceira casa decimal das m\'etricas
+reportadas. As conclus\~oes qualitativas do trabalho s\~ao robustas a
+essa varia\c{c}\~ao. O reposit\'orio oficial do c\'odigo, com o
+\texttt{README.md} como fonte autoritativa de instru\c{c}\~oes, est\'a
+publicado junto aos pesos persistidos em \cite{sibila2025bluesky}.
