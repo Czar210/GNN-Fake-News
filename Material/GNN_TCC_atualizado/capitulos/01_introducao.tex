@@ -1,0 +1,78 @@
+% ============================================================
+% Capítulo 1 — Introdução
+% ============================================================
+
+\chapter{Introdução}\label{cap:introducao}
+
+\section{Contextualização}\label{sec:contextualizacao}
+
+A internet acelerou a circulação de informação a um ponto sem precedentes e,
+com ela, a de desinformação% TODO: inserir referência aqui
+. Notícias falsas já existiam em jornais, rádio e televisão, mas as redes
+sociais transformaram sua escala e velocidade. Conteúdos falsos são criados e
+compartilhados por razões que vão do lucro financeiro à manipulação política,
+passando pela exploração da economia da atenção. O viés de confirmação funciona
+como acelerador: leitores tendem a compartilhar aquilo que reforça suas crenças
+sem verificar a origem. As consequências são concretas e documentadas: protestos,
+violência física, linchamentos, crimes de ódio, perseguição de minorias, erosão
+da confiança em instituições públicas, pânico financeiro e boicotes comerciais
+sem fundamento.
+
+A pandemia de COVID-19 ilustra bem esse fenômeno. No Brasil, supostos
+``remédios milagrosos'' sem qualquer respaldo científico foram promovidos em
+larga escala. Nos Estados Unidos, a desinformação gerou danos físicos diretos:
+segundo relatório do \textit{Centers for Disease Control and Prevention}
+\cite{cdc2020}, 39\% dos adultos entrevistados relataram ter utilizado
+desinfetantes e alvejantes de forma inadequada, motivados por falsas narrativas
+de prevenção contra o vírus. Esses episódios evidenciam que a desinformação se
+propaga mais rápido do que a capacidade humana de verificá-la, tornando
+necessárias soluções automatizadas de detecção.
+
+O padrão é estrutural. \citeonline{vosoughi2018} demonstraram que notícias
+falsas se propagam de forma significativamente mais ampla, rápida e profunda do
+que notícias verdadeiras nas redes sociais. Os algoritmos das plataformas agravam
+esse cenário ao priorizar conteúdo com alta taxa de interação, amplificando
+publicações que exploram reações emocionais independentemente de sua veracidade.
+O problema da desinformação, portanto, não se restringe ao conteúdo, reside
+também na topologia de propagação: quem compartilha o quê, para quem e com que
+velocidade. Compreender essa estrutura é pré-requisito para uma abordagem eficaz
+de detecção automatizada.
+
+
+\section{Motivação}\label{sec:motivacao}
+
+A verificação manual de veracidade não escala. O volume de postagens em redes
+sociais opera em escala de \textit{Big Data}, com fluxos massivos gerados em
+tempo real. Checar fontes e cruzar informações demanda um tempo que a velocidade
+de propagação não concede. Produzir uma mentira é instantâneo; desmenti-la é
+lento e custoso. Essa assimetria inviabiliza a curadoria humana e impõe a adoção
+de modelos computacionais de detecção.
+
+As abordagens tradicionais baseiam-se em Processamento de Linguagem Natural (PLN)
+e extraem padrões semânticos e sintáticos associados à falsidade a partir do
+conteúdo das publicações. Porém, essas técnicas falham diante de textos falsos
+com alta sofisticação linguística, que passam despercebidos por classificadores
+textuais. O que tais modelos desconsideram é a dinâmica de interação da rede: os
+perfis que compartilham a informação, suas conexões e a velocidade de
+disseminação. A topologia de propagação, conforme consolidado na literatura,
+carrega sinal preditivo equivalente ou superior ao do próprio conteúdo textual
+\cite{vosoughi2018,bian2020}. Redes Neurais em Grafos (\textit{Graph Neural
+Networks} --- GNNs) exploram justamente esse sinal: esses modelos aprendem de
+forma conjunta os atributos textuais, associados aos vértices do grafo, e a
+topologia de propagação, representada pelas arestas, superando as limitações de
+abordagens exclusivamente textuais.
+
+A aplicação de GNNs na detecção de notícias falsas já foi investigada em
+plataformas como Twitter e Facebook \cite{monti2019,dou2021}, mas o Bluesky
+permanece praticamente inexplorado. Aberta ao público em 2023 e fundamentada na
+arquitetura do AT Protocol (\textit{Authenticated Transfer Protocol}), a
+plataforma cresceu rapidamente em decorrência de migrações em massa provocadas
+por mudanças nas políticas de moderação de concorrentes. Sua infraestrutura
+descentralizada e a transparência na disponibilização de dados criam um ambiente
+propício para pesquisa acadêmica, ainda que faltem estudos que apliquem
+modelagem baseada em grafos à sua topologia de propagação. Este trabalho preenche
+essa lacuna ao integrar representações vetoriais textuais (\textit{embeddings}
+extraídos via BERT) a Redes Convolucionais em Grafos (GCNs) para classificar
+postagens no Bluesky. A contribuição é dupla: avançar nos métodos de detecção
+automatizada de desinformação e ampliar a compreensão sobre como conteúdo falso
+se propaga em plataformas descentralizadas emergentes.
