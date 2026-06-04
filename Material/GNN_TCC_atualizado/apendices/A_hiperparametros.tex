@@ -1,8 +1,173 @@
 \chapter{Hiperpar\^ametros completos}
 \label{ap:hiperparametros}
 
-% Tabela com hiperparametros por arquitetura: GCN, GAT, SAGE
-% Campos: hidden_channels, num_layers, dropout, lr, weight_decay,
-% batch_size, optimizer, scheduler, patience, max_epochs, seed.
-%
-% Fonte: gcn_model.py, gat_model.py, sage_model.py + scripts 09/13/14/16.
+Este ap\^endice consolida, para refer\^encia integral e reprodu\c{c}\~ao,
+todos os hiperpar\^ametros utilizados nos experimentos do
+Cap\'itulo~\ref{cap:resultados}. A Tabela~\ref{tab:hp_gnn} reproduz a
+configura\c{c}\~ao das tr\^es arquiteturas GNN; a Tabela~\ref{tab:hp_baselines}
+documenta os classificadores \emph{baseline} textuais e tabulares; a
+Tabela~\ref{tab:hp_protocolo} re\'une os par\^ametros do protocolo de
+avalia\c{c}\~ao estat\'istica; e a Tabela~\ref{tab:hp_ambiente} sumariza
+o ambiente de execu\c{c}\~ao adotado.
+
+% ============================================================
+\section{Arquiteturas GNN}
+\label{sec:hp_gnn}
+
+\begin{table}[H]\centering
+\caption{Hiperpar\^ametros das arquiteturas GNN avaliadas em GCN, GAT e
+SAGE. Defaults id\^enticos onde n\~ao indicado; diferen\c{c}as anotadas
+na coluna respectiva.}
+\label{tab:hp_gnn}
+\small
+\begin{tabular}{lrrr}
+\toprule
+\textbf{Hiperpar\^ametro} & \textbf{GCN} & \textbf{GAT} & \textbf{SAGE} \\
+\midrule
+\texttt{hidden\_channels}        & 64    & 64    & 64 \\
+\texttt{num\_layers}             & 3     & 3     & 3 \\
+\texttt{dropout}                 & $0{,}5$ & $0{,}5$ & $0{,}5$ \\
+\texttt{num\_heads} (aten\c{c}\~ao) & --   & 4     & -- \\
+\texttt{aggregator}              & --    & --    & \texttt{mean} \\
+\texttt{pooling}                 & \multicolumn{3}{c}{\texttt{global\_mean\_pool}} \\
+\texttt{activation}              & \multicolumn{3}{c}{\texttt{ReLU}} \\
+\texttt{optimizer}               & \multicolumn{3}{c}{Adam~\cite{kingma2015adam}} \\
+\texttt{learning\_rate}          & $10^{-3}$ & $10^{-3}$ & $10^{-3}$ \\
+\texttt{weight\_decay}           & $5 \times 10^{-4}$ & $5 \times 10^{-4}$ & $5 \times 10^{-4}$ \\
+\texttt{batch\_size}             & 32    & 32    & 32 \\
+\texttt{scheduler}               & \multicolumn{3}{c}{\texttt{ReduceLROnPlateau} (factor $= 0{,}5$, patience $= 5$)} \\
+\texttt{early\_stopping}         & \multicolumn{3}{c}{patience $= 7$ sobre F1-macro de valida\c{c}\~ao} \\
+\texttt{max\_epochs}             & 30    & 30    & 30 \\
+\texttt{seed}                    & \multicolumn{3}{c}{42 (com varredura para 10 \emph{seeds} em \S\ref{sec:topo_sem_texto})} \\
+\midrule
+\multicolumn{4}{l}{\emph{Vetor de entrada por n\'o:}} \\
+\quad UPFD (variante \texttt{profile})       & \multicolumn{3}{c}{10 dimens\~oes pr\'e-computadas pelo \emph{dataset}} \\
+\quad UPFD (variante \texttt{content})       & \multicolumn{3}{c}{310 dimens\~oes (\emph{spaCy} + \emph{profile})} \\
+\quad FakeNewsNet (vari\^ancia \texttt{posfull}) & \multicolumn{3}{c}{771 dimens\~oes (768 BERT + 3 posicionais)} \\
+\quad Topologia pura (\S\ref{sec:topo_sem_texto}) & \multicolumn{3}{c}{2 dimens\~oes: \texttt{[is\_root, grau\_norm]}} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% ============================================================
+\section{Classificadores \emph{baseline}}
+\label{sec:hp_baselines}
+
+\begin{table}[H]\centering
+\caption{Hiperpar\^ametros dos classificadores \emph{baseline} textuais
+e tabulares utilizados nos experimentos.}
+\label{tab:hp_baselines}
+\small
+\begin{tabular}{lll}
+\toprule
+\textbf{Classificador} & \textbf{Configura\c{c}\~ao} & \textbf{Onde usado} \\
+\midrule
+LogReg-BERT-t\'itulo & \multicolumn{1}{p{6.5cm}}{\texttt{LogisticRegression(C=1.0, max\_iter=1000, class\_weight=None)} de \emph{scikit-learn}; entrada $=$ \emph{embedding} BERT de 768 dimens\~oes do t\'itulo.} & §\ref{sec:baseline_textual} \\
+\addlinespace
+LogReg-BERT-\emph{content} & \multicolumn{1}{p{6.5cm}}{Idem acima, sobre a \emph{feature} \texttt{content} do UPFD (310 dimens\~oes).} & §\ref{sec:cross_dataset} \\
+\addlinespace
+Random Forest BERT-t\'itulo & \multicolumn{1}{p{6.5cm}}{\texttt{RandomForestClassifier(n\_estimators=200, max\_depth=None, min\_samples\_split=2, random\_state=42)}.} & §\ref{sec:baseline_textual} \\
+\addlinespace
+Random Forest estrutural & \multicolumn{1}{p{6.5cm}}{\texttt{RandomForestClassifier(n\_estimators=200, max\_depth=10, min\_samples\_leaf=5, random\_state=42)}; entrada $=$ \texttt{[num\_nodes, grau\_root]}.} & §\ref{sec:concordancia} \\
+\addlinespace
+Random Forest \emph{confound} & \multicolumn{1}{p{6.5cm}}{Idem acima; entrada $=$ apenas \texttt{num\_nodes} ($1$ dimens\~ao).} & §\ref{sec:confound} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% ============================================================
+\section{Protocolo de avalia\c{c}\~ao estat\'istica}
+\label{sec:hp_protocolo}
+
+\begin{table}[H]\centering
+\caption{Par\^ametros do protocolo estat\'istico adotado.}
+\label{tab:hp_protocolo}
+\small
+\begin{tabular}{ll}
+\toprule
+\textbf{Par\^ametro} & \textbf{Valor / refer\^encia} \\
+\midrule
+\emph{k}-fold estratificado                & $k = 10$ \cite{kohavi1995cv} \\
+Semente do \texttt{StratifiedKFold}        & \texttt{random\_state} $= 42$ \\
+Compartilhamento de \emph{folds}           & sim (mesmos \emph{folds} para todos os modelos comparados) \\
+Teste de signific\^ancia entre arquiteturas & \texttt{scipy.stats.ttest\_rel} ($t$ pareado por \emph{fold}) \\
+Tamanho de efeito                          & Cohen's $d$ \cite{cohen1988statistical, sawilowsky2009effect} \\
+\quad Limiar adotado para tese central     & $|d| \geq 0{,}5$ (efeito m\'edio) \\
+Bootstrap pareado                           & $n_{\mathrm{boot}} = 2.000$ \cite{efron1993bootstrap} \\
+\quad Intervalo de confian\c{c}a            & $95\%$ (percentis $2{,}5$ e $97{,}5$) \\
+Varredura de \emph{seeds} (\S\ref{sec:topo_sem_texto}) & 10 \emph{seeds} independentes (42, 123, 456, 789, 1024, 2048, 4096, 8192, 16384, 32768) \\
+Crit\'erio de decis\~ao final              & F1-macro (m\'edia sobre \emph{folds}) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% ============================================================
+\section{Constru\c{c}\~ao do FakeNewsNet}
+\label{sec:hp_fnn}
+
+\begin{table}[H]\centering
+\caption{Par\^ametros adotados na constru\c{c}\~ao dos grafos do
+FakeNewsNet (script \texttt{00\_construir\_grafos\_fakenewsnet.py}).}
+\label{tab:hp_fnn}
+\small
+\begin{tabular}{ll}
+\toprule
+\textbf{Par\^ametro} & \textbf{Valor} \\
+\midrule
+Fonte dos CSVs                       & Reposit\'orio KaiDMML/FakeNewsNet \cite{shu2020fakenewsnet} \\
+M\'inimo de \emph{tweets} por not\'icia & 2 (descarta cascatas degeneradas) \\
+M\'aximo de n\'os por grafo          & 100 (trunca 50\% dos grafos, ver \S\ref{sec:construcao_fnn}) \\
+Modelo de \emph{embedding} textual   & \texttt{paraphrase-multilingual-mpnet-base-v2} \cite{reimers2020multilingual} \\
+\quad Dimens\~oes do vetor textual   & 768 \\
+\quad Cache de \emph{embeddings}     & ativado (em disco) \\
+Codifica\c{c}\~oes posicionais       & \texttt{[is\_root, grau\_norm, pos]} (3 dimens\~oes) \\
+Vari\^ancias geradas                  & \texttt{posfull}, \texttt{posmin}, \texttt{posgrau} (\S\ref{sec:construcao_fnn}) \\
+Asser\c{c}\~ao de sanidade            & \texttt{x.unique(dim=0).shape[0] >= min(num\_nos, 3)} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% ============================================================
+\section{Ambiente de execu\c{c}\~ao}
+\label{sec:hp_ambiente}
+
+\begin{table}[H]\centering
+\caption{Configura\c{c}\~ao do ambiente computacional adotado em todos
+os experimentos.}
+\label{tab:hp_ambiente}
+\small
+\begin{tabular}{ll}
+\toprule
+\textbf{Componente} & \textbf{Configura\c{c}\~ao} \\
+\midrule
+Sistema operacional       & Windows 11 \\
+Processador               & Intel \emph{Raptor Lake}, 16 \emph{cores} l\'ogicos \\
+Mem\'oria RAM             & 16~GB \\
+Acelerador gr\'afico      & N\~ao utilizado (todos os experimentos em CPU) \\
+\midrule
+Python                    & 3.12.10 \\
+PyTorch                   & 2.10.0+cpu \\
+PyTorch Geometric         & 2.6.1 \cite{fey2019pyg} \\
+scikit-learn              & 1.5.x \\
+Transformers (Hugging Face) & 4.x (para Sentence-BERT) \\
+scipy                     & 1.13.x (para \texttt{ttest\_rel}, bootstrap) \\
+\midrule
+Semente universal         & 42 \\
+\emph{Tamanho t\'ipico de modelo persistido} & \\
+\quad LogReg-BERT-t\'itulo & $\approx$ 6,9~KB \\
+\quad Random Forest estrutural & $\approx$ 9,6~MB \\
+\quad SAGE estrutural (PyTorch state dict) & $\approx$ 71~KB \\
+\emph{Tempo de infer\^encia por amostra (CPU)} & \\
+\quad LogReg-BERT-t\'itulo & $\approx$ 0,07~ms \\
+\quad Random Forest estrutural & $\approx$ 50,8~ms \\
+\quad SAGE estrutural        & $\approx$ 0,56~ms \\
+\quad \emph{Embedding} BERT (\emph{forward}) & $\approx$ 17,9~ms \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+A reprodu\c{c}\~ao integral dos experimentos requer apenas os
+artefatos persistidos descritos no Ap\^endice~\ref{ap:repo} e a
+configura\c{c}\~ao do ambiente registrada acima. As ressalvas de
+\emph{n\~ao-determinismo} num\'erico entre m\'aquinas distintas
+est\~ao documentadas em \S\ref{sec:protocolo}.

@@ -121,9 +121,9 @@ percentil 5 inferior), o SAGE acerta \textbf{zero}; dos 60 grafos do
 subgrupo \texttt{real\_viral} (\emph{reais} com grau de raiz no
 percentil 95 superior), acerta apenas $43\%$, desempenho abaixo da
 chance (Tabela~\ref{tab:outliers}). Esses subgrupos demarcam o
-\emph{limite operacional} do mecanismo topol\'ogico: ele funciona quando
-a regra ``\emph{fake} = cascata maior'' vale, e inverte exatamente onde
-essa regra falha.
+\emph{limite operacional} do mecanismo topol\'ogico: ele depende de
+que a regra ``\emph{fake} = cascata maior'' valha, e erra justamente
+nos casos em que essa regra n\~ao se aplica.
 
 % ------------------------------------------------------------
 \section{Limita\c{c}\~oes}
@@ -198,7 +198,7 @@ port\'avel.
 \section{Trabalhos futuros}
 \label{sec:futuros}
 
-Quatro dire\c{c}\~oes naturais se desdobram dos achados deste trabalho.
+A partir dos resultados obtidos, identificamos quatro dire\c{c}\~oes de continuidade.
 
 \paragraph{(1) Pseudo-r\'otulos no Bluesky para retreino especializado.}
 A infer\^encia \emph{cross-domain} demonstrada no
@@ -244,8 +244,8 @@ de assortatividade estrutural mensur\'avel ($|d| \geq 0{,}5$). A defesa
 de um resultado negativo (UPFD-PolitiFact) lado a lado de um resultado
 positivo (UPFD-GossipCop), ancorada em estat\'istica de tamanho de
 efeito e validada por an\'alise estratificada do erro com \emph{bootstrap}
-pareado, \'e a contribui\c{c}\~ao metodol\'ogica que esperamos
-transcender o escopo do \emph{dataset} espec\'ifico. O c\'odigo, os
+pareado, \'e a contribui\c{c}\~ao metodol\'ogica que pretendemos seja
+reaplic\'avel para al\'em deste \emph{dataset} espec\'ifico. O c\'odigo, os
 pesos persistidos no Hugging Face Hub e a ferramenta web
 (Ap\^endice~\ref{ap:aplicacao}) permitem que esta posi\c{c}\~ao seja
 contestada empiricamente em outros dom\'inios, exatamente como a

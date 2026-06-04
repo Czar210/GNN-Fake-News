@@ -6,6 +6,8 @@
 > Este arquivo guarda os **14 restantes** — os de severidade baixa e os que
 > precisam do seu olho antes de colar.
 
+> **Status (2026-06-03):** Cesar pediu o lote de 8 recomendados — **aplicados nos `.tex`** os itens **1, 3, 4, 7, 10, 12, 13, 14** com as ressalvas do verificador. Pulados/mantidos no original: **2, 6, 8/9, 11**. Já obsoletos antes do lote: **5** (a prosa atual de §4.8 já tem $3.826$ ancorado em FATOS) e parte do **14** sobre inserção de $88{,}7\%$ (idem). Detalhes por item abaixo.
+
 **Como ler:** os trechos estão com acento normal para leitura. Ao colar no
 `.tex`, use o padrão de acento do arquivo (`\~ao`, `\'e`, `\c{c}`). Comandos
 LaTeX (`\ref`, `\emph`, `\S`, `$...$`) estão preservados.

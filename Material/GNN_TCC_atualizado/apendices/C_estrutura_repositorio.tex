@@ -1,11 +1,199 @@
 \chapter{Estrutura do reposit\'orio de c\'odigo}
 \label{ap:repo}
 
-% Descricao da estrutura de diretorios do repositorio:
-% - Training/03_Mega_Research/ (scripts numerados 00-26)
-% - Execution/{weights, results} (artefatos persistidos)
-% - Material/ (datasets brutos)
-% - Interface/frontend/ (API + Next.js)
-%
-% Cada subsecao com 1 paragrafo de descricao + comando de exemplo.
-% Fonte autoritativa: README.md do repositorio.
+O reposit\'orio Git que acompanha este trabalho est\'a organizado em
+cinco diret\'orios de primeiro n\'ivel, cada um cobrindo uma fase
+distinta do ciclo experimental: \texttt{Training/} concentra os
+\emph{scripts} de constru\c{c}\~ao de grafos, treinamento e
+avalia\c{c}\~ao; \texttt{Execution/} arquiva os artefatos persistidos
+(pesos, resultados, figuras); \texttt{Material/} cont\'em os
+\emph{datasets} brutos e os arquivos do TCC; \texttt{Interface/}
+abriga a aplica\c{c}\~ao web demonstrativa do
+Ap\^endice~\ref{ap:aplicacao}; e o n\'ivel raiz cont\'em os
+documentos de controle do trabalho.
+
+% ============================================================
+\section{\texttt{Training/} --- \emph{scripts} experimentais}
+\label{sec:ap_training}
+
+Subdivide-se em tr\^es fases hist\'oricas, das quais a relevante para
+a vers\~ao final \'e \texttt{Training/03\_Mega\_Research/}. Os
+diret\'orios \texttt{01\_BlueSky\_Pipe/} e \texttt{02\_UPFD\_Benchmark/}
+correspondem a itera\c{c}\~oes anteriores do \emph{pipeline} e s\~ao
+mantidos para refer\^encia hist\'orica; suas funcionalidades est\~ao
+consolidadas, em forma refatorada, em
+\texttt{03\_Mega\_Research/}.
+
+A pasta \texttt{Training/03\_Mega\_Research/} cont\'em $30$
+\emph{scripts} numerados de \texttt{00} a \texttt{32} (com sufixos
+\texttt{27b}, \texttt{27c}, \texttt{31}), organizados pelo papel no
+\emph{pipeline}:
+
+\begin{description}\setlength{\itemsep}{2pt}
+\item[Constru\c{c}\~ao de grafos:] \texttt{00\_construir\_grafos\_fakenewsnet.py},
+\texttt{01\_baixar\_dataset\_hf.py}, \texttt{02\_construir\_grafos\_bluesky.py}.
+
+\item[Treinamento e benchmark de arquiteturas:]
+\texttt{03\_treinar\_gat.py}, \texttt{04\_comparar\_gcn\_gat.py},
+\texttt{05\_treinar\_sage.py}, \texttt{06\_comparar\_gcn\_gat\_sage.py},
+\texttt{07\_upfd\_benchmark\_triplo.py},
+\texttt{13\_benchmark\_upfd\_oficial.py}.
+
+\item[Avalia\c{c}\~ao estat\'istica:] \texttt{09\_teste\_significancia.py}
+(\texttt{ttest\_rel} pareado por \emph{fold}); \texttt{15\_analise\_estrutural.py}
+(Cohen's $d$, T5/F17).
+
+\item[\emph{Baselines} e diagn\'osticos:] \texttt{10\_baseline\_textual.py}
+(LogReg-BERT e RF, T1), \texttt{11\_diagnostico\_confound.py}
+(RF sobre \texttt{num\_nodes}), \texttt{20\_textual\_vs\_topologico.py}
+(concord\^ancia, T6/F3).
+
+\item[\emph{Ablation} de \emph{features}:]
+\texttt{12\_ablation\_intra\_encoding.py},
+\texttt{14\_topologia\_sem\_texto.py} (T4/F18, achado central).
+
+\item[Explicabilidade:] \texttt{16\_gnn\_explainer\_upfd.py} (F19, F12).
+
+\item[Persist\^encia de modelos:] \texttt{17\_persistir\_modelos\_finais.py}
+(salva LogReg-BERT, RF estrutural e SAGE estrutural em
+\texttt{Execution/weights/}).
+
+\item[Bluesky:] \texttt{18\_analise\_bluesky\_crossfeed.py},
+\texttt{19\_aplicar\_modelo\_bluesky.py},
+\texttt{22\_concordancia\_bluesky.py},
+\texttt{23\_visualizar\_threads\_bluesky.py},
+\texttt{26\_rq3\_multilingual.py} (T11/F14).
+
+\item[Consolida\c{c}\~ao e publica\c{c}\~ao:]
+\texttt{21\_bloco\_vs\_mini.py} (T7/F4),
+\texttt{24\_consolidar\_tcc.py} (gera o
+\texttt{INDICE.md}), \texttt{25\_publicar\_huggingface.py},
+\texttt{27\_figuras\_comparativas.py},
+\texttt{27b\_repintar\_figuras\_orientador.py} (paleta sem\^antica),
+\texttt{27c\_matrizes\_confusao\_mono.py} (F33--F35).
+
+\item[\emph{Fase 9}, estratifica\c{c}\~ao do erro:]
+\texttt{28\_distribuicao\_e\_estratificacao.py} (F25--F27),
+\texttt{29\_outliers.py} (T12/F29/F30),
+\texttt{30\_cascatas\_profundas.py} (T13/F28/F31/F32).
+
+\item[Anota\c{c}\~ao de figuras:] \texttt{31\_anotar\_figuras\_cap4.py}
+(sobrep\~oe c\'irculos+texto em PNGs para vers\~oes destacadas em
+\texttt{Imagens/anotadas/}).
+\end{description}
+
+Os \emph{scripts} de defini\c{c}\~ao de arquitetura
+(\texttt{gcn\_model.py}, \texttt{gat\_model.py}, \texttt{sage\_model.py})
+e o utilit\'ario \texttt{gerar\_folds.py} ficam na raiz de
+\texttt{03\_Mega\_Research/}.
+
+% ============================================================
+\section{\texttt{Execution/} --- artefatos persistidos}
+\label{sec:ap_execution}
+
+\begin{description}\setlength{\itemsep}{2pt}
+\item[\texttt{Execution/weights/}] Pesos persistidos dos tr\^es
+classificadores finais empregados no Ap\^endice~\ref{ap:aplicacao}
+(LogReg-BERT, RF estrutural e SAGE estrutural), produzidos por
+\texttt{17\_persistir\_modelos\_finais.py}. Os tamanhos t\'ipicos
+constam da Tabela~\ref{tab:hp_ambiente}.
+
+\item[\texttt{Execution/results/}] Sa\'idas tabulares (CSVs) e arquivos
+de relat\'orio (TXT) de cada experimento. Cada \emph{script} de
+\texttt{03\_Mega\_Research/} grava aqui o conjunto de m\'etricas
+brutas que alimenta as tabelas e figuras do trabalho. A
+\texttt{figuras\_tcc/} subdiret\'orio cont\'em c\'opias finais das
+figuras incorporadas no TCC.
+
+\item[\texttt{Execution/scripts/}] Utilit\'arios de orquestra\c{c}\~ao
+(execu\c{c}\~ao em lote, limpeza de cache, sincroniza\c{c}\~ao com
+Hugging Face).
+\end{description}
+
+% ============================================================
+\section{\texttt{Material/} --- \emph{datasets} e o TCC}
+\label{sec:ap_material}
+
+\begin{description}\setlength{\itemsep}{2pt}
+\item[\texttt{Material/politifact/}, \texttt{gossipcop/}] CSVs brutos
+do FakeNewsNet baixados do reposit\'orio KaiDMML~\cite{shu2020fakenewsnet}.
+
+\item[\texttt{Material/gossipcop\_pyg/}] Vers\~ao do GossipCop
+constru\'ida em formato \emph{PyTorch Geometric}.
+
+\item[\texttt{Material/LIAR/}] \emph{Dataset} alternativo usado em
+ensaios iniciais; n\~ao integrado \`a vers\~ao final.
+
+\item[\texttt{Material/GNN\_TCC\_atualizado/}] \textbf{Fonte canonica
+deste TCC}: arquivos \texttt{.tex}, \texttt{.bib}, figuras e tabelas.
+A compila\c{c}\~ao ocorre nesta pasta. O \texttt{abntex2-alf.bst}
+e o \emph{stub} \texttt{abntex2.cls} acompanham o reposit\'orio para
+garantir compila\c{c}\~ao em ambientes sem o pacote \texttt{abntex2}
+instalado.
+
+\item[\texttt{Material/GNN\_TCC\_extraido/}] Vers\~oes anteriores do
+TCC, mantidas para refer\^encia hist\'orica.
+\end{description}
+
+% ============================================================
+\section{\texttt{Interface/} --- aplica\c{c}\~ao web demonstrativa}
+\label{sec:ap_interface}
+
+\begin{description}\setlength{\itemsep}{2pt}
+\item[\texttt{Interface/frontend/}] Aplica\c{c}\~ao Next.js +
+FastAPI documentada no Ap\^endice~\ref{ap:aplicacao}. O \emph{backend}
+exp\~oe o \emph{endpoint} \texttt{/api/result} que recebe um
+\emph{post} candidato e devolve os tr\^es \emph{scores} (textual,
+topol\'ogico, combinado) acompanhados de \emph{flag} de
+concord\^ancia.
+
+\item[\texttt{Interface/supabase/}] Configura\c{c}\~ao de persist\^encia
+opcional para hist\'orico de consultas (n\~ao essencial \`a demonstra\c{c}\~ao).
+\end{description}
+
+% ============================================================
+\section{Documentos de controle (raiz do reposit\'orio)}
+\label{sec:ap_docs}
+
+A raiz do reposit\'orio cont\'em documentos de controle do trabalho
+que n\~ao integram o texto do TCC mas governam a escrita e a
+auditoria:
+
+\begin{description}\setlength{\itemsep}{2pt}
+\item[\texttt{FATOS\_TCC.md}] Cat\'alogo de fatos verificados (n\'umeros,
+m\'etricas, decis\~oes), com estado (\(\checkmark\) verificado,
+\(\triangle\) discrepante, \(?\) a verificar) e lista de seis
+discrep\^ancias entre o \emph{draft} antigo e os dados reais (D1--D6).
+
+\item[\texttt{PENDENCIAS\_TCC.md}] Decis\~oes pendentes e mudan\c{c}as
+planejadas mas n\~ao executadas; auditoria de cada decis\~ao
+estrutural do trabalho.
+
+\item[\texttt{REVISAO\_CARA\_DE\_IA.md}] Itens pendentes de revis\~ao
+estil\'istica gerados por an\'alise adversarial autom\'atica.
+
+\item[\texttt{HISTORIA\_FASE9.md}, \texttt{MUDANCAS\_FASE9.md}] Documentos
+internos sobre a evolu\c{c}\~ao da an\'alise estratificada (Fase 9).
+
+\item[\texttt{GUIA\_COAUTORES\_TCC.md}, \texttt{PROMPT\_IA\_TCC.md}]
+Conven\c{c}\~oes de escrita para coautores e para sess\~oes de
+assist\^encia automatizada.
+\end{description}
+
+% ============================================================
+\section{Reprodu\c{c}\~ao integral do \emph{pipeline}}
+\label{sec:ap_reproducao}
+
+Sob o ambiente documentado no Ap\^endice~\ref{ap:hiperparametros}
+(Python 3.12, PyTorch 2.10 + CPU, semente universal 42), a execu\c{c}\~ao
+sequencial dos \emph{scripts} numerados em
+\texttt{Training/03\_Mega\_Research/} regenera, na ordem, todos os
+artefatos catalogados no Ap\^endice~\ref{ap:indice}. A reprodu\c{c}\~ao
+n\~ao \'e \emph{bit-exact} entre m\'aquinas distintas devido ao
+n\~ao-determinismo de \texttt{scatter}/\texttt{gather} do
+\emph{PyTorch Geometric} (caveat documentado em \S\ref{sec:protocolo});
+as conclus\~oes qualitativas s\~ao robustas a essa varia\c{c}\~ao.
+
+A vers\~ao desta tese registrada no Git em \texttt{main} corresponde
+ao \emph{commit} de submiss\~ao; futuras itera\c{c}\~oes do trabalho
+ser\~ao publicadas em \emph{branches} marcadas no mesmo reposit\'orio.

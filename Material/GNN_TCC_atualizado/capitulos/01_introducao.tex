@@ -1,78 +1,259 @@
 % ============================================================
-% Capítulo 1 — Introdução
+% Capitulo 1 -- Introducao
+% Reescrito em 2026-06-03 com a historia bilateral do TCC
+% (achado positivo + achado negativo + tese de Cohen's d).
+% Base parcial: prosa de Enzo Takida (PR #1), reorientada da
+% narrativa "GNN classifica Bluesky" para "diagnostico de
+% aplicabilidade topologica".
 % ============================================================
 
-\chapter{Introdução}\label{cap:introducao}
+\chapter{Introdu\c{c}\~ao}
+\label{cap:introducao}
 
-\section{Contextualização}\label{sec:contextualizacao}
+% ------------------------------------------------------------
+\section{Contextualiza\c{c}\~ao}
+\label{sec:contexto}
 
-A internet acelerou a circulação de informação a um ponto sem precedentes e,
-com ela, a de desinformação% TODO: inserir referência aqui
-. Notícias falsas já existiam em jornais, rádio e televisão, mas as redes
-sociais transformaram sua escala e velocidade. Conteúdos falsos são criados e
-compartilhados por razões que vão do lucro financeiro à manipulação política,
-passando pela exploração da economia da atenção. O viés de confirmação funciona
-como acelerador: leitores tendem a compartilhar aquilo que reforça suas crenças
-sem verificar a origem. As consequências são concretas e documentadas: protestos,
-violência física, linchamentos, crimes de ódio, perseguição de minorias, erosão
-da confiança em instituições públicas, pânico financeiro e boicotes comerciais
-sem fundamento.
+A circula\c{c}\~ao de desinforma\c{c}\~ao em redes sociais constitui um
+problema epist\^emico real, com consequ\^encias documentadas que v\~ao
+da eros\~ao de confian\c{c}a em institui\c{c}\~oes p\'ublicas
+\cite{ieee_fakenewslandscape, scielo_posttruth} a danos f\'isicos
+diretos. A pandemia de COVID-19 ofereceu casos paradigm\'aticos do
+fen\^omeno: no Brasil, ``rem\'edios milagrosos'' sem respaldo
+cient\'ifico foram promovidos em larga escala; nos Estados Unidos,
+relat\'orio dos \emph{Centers for Disease Control and Prevention}
+documentou que parcela substancial de adultos entrevistados aderiu a
+pr\'aticas de risco --- uso inadequado de desinfetantes e alvejantes
+como prote\c{c}\~ao contra o v\'irus --- motivada por narrativas falsas
+\cite{gharpure2020cdc}. O padr\~ao subjacente a esses epis\'odios n\~ao
+\'e fortuito: not\'icias falsas se propagam de forma sistematicamente
+mais ampla, mais r\'apida e mais profunda do que not\'icias verdadeiras
+nas redes sociais \cite{vosoughi2018spread}, em parte porque os
+algoritmos das plataformas amplificam conte\'udo de alta intera\c{c}\~ao
+independentemente de sua veracidade \cite{bakshy2015exposure}, e em
+parte porque o vi\'es de confirma\c{c}\~ao do leitor, refor\c{c}ado por
+\emph{echo chambers}, torna o compartilhamento mais r\'apido que a
+verifica\c{c}\~ao \cite{delvicario2016spreading}.
 
-A pandemia de COVID-19 ilustra bem esse fenômeno. No Brasil, supostos
-``remédios milagrosos'' sem qualquer respaldo científico foram promovidos em
-larga escala. Nos Estados Unidos, a desinformação gerou danos físicos diretos:
-segundo relatório do \textit{Centers for Disease Control and Prevention}
-\cite{cdc2020}, 39\% dos adultos entrevistados relataram ter utilizado
-desinfetantes e alvejantes de forma inadequada, motivados por falsas narrativas
-de prevenção contra o vírus. Esses episódios evidenciam que a desinformação se
-propaga mais rápido do que a capacidade humana de verificá-la, tornando
-necessárias soluções automatizadas de detecção.
+A escala em que esses fen\^omenos ocorrem inviabiliza a verifica\c{c}\~ao
+manual. O volume de postagens em redes sociais opera em regime de
+\emph{Big Data}, com fluxos massivos em tempo real; produzir uma mentira
+\'e instant\^aneo, desmenti-la \'e lento e custoso. Modelos
+computacionais de detec\c{c}\~ao tornam-se, portanto, n\~ao um
+acess\'orio, mas uma necessidade. A abordagem tradicional, baseada
+em Processamento de Linguagem Natural (PLN), tem limites bem
+estabelecidos: depende da qualidade textual dos exemplos rotulados,
+falha diante de textos com alta sofistica\c{c}\~ao lingu\'istica
+\cite{pmc_overviewfakenews, mdpi_cnn_llm_nlp}, e --- a limita\c{c}\~ao
+estruturalmente mais importante --- \'e atravessada pela ascens\~ao
+recente de modelos generativos capazes de produzir texto
+gramaticalmente impec\'avel em escala industrial \cite{arxiv_llmfakenews}.
+\'E plaus\'ivel, embora ainda n\~ao demonstrado em larga escala, que a
+detec\c{c}\~ao baseada \emph{exclusivamente} no texto perca robustez
+\`a medida que o conte\'udo gerado por LLMs se torne indistingu\'ivel
+do humano.
 
-O padrão é estrutural. \citeonline{vosoughi2018} demonstraram que notícias
-falsas se propagam de forma significativamente mais ampla, rápida e profunda do
-que notícias verdadeiras nas redes sociais. Os algoritmos das plataformas agravam
-esse cenário ao priorizar conteúdo com alta taxa de interação, amplificando
-publicações que exploram reações emocionais independentemente de sua veracidade.
-O problema da desinformação, portanto, não se restringe ao conteúdo, reside
-também na topologia de propagação: quem compartilha o quê, para quem e com que
-velocidade. Compreender essa estrutura é pré-requisito para uma abordagem eficaz
-de detecção automatizada.
+% ------------------------------------------------------------
+\section{Motiva\c{c}\~ao}
+\label{sec:motivacao}
 
+Uma linha alternativa de pesquisa observa que a desinforma\c{c}\~ao
+n\~ao se distingue apenas pelo conte\'udo, mas tamb\'em pelo
+\emph{padr\~ao com que se espalha pela rede}: quem compartilha o qu\^e,
+para quem, e em qual ordem temporal. Essa observa\c{c}\~ao deu origem
+\`a aplica\c{c}\~ao de Redes Neurais de Grafos (\emph{Graph Neural
+Networks} --- GNNs) ao problema, partindo de Monti et
+al.~\cite{monti2019fakenews} e consolidando-se em uma fam\'ilia de
+trabalhos que tratam a \'arvore de propaga\c{c}\~ao como objeto
+classific\'avel~\cite{dou2021upfd, bian2020bigcn, mdpi_bidirectionalgcn,
+pmc_gnnsurveyfakenews}. O ganho conceitual \'e claro: o sinal estrutural
+n\~ao depende do idioma do texto, n\~ao \'e degradado por par\'afrase ou
+sin\^onimo, e em princ\'ipio resiste a textos gerados por LLM ---
+desde que a topologia da propaga\c{c}\~ao, ela mesma, preserve
+diferen\c{c}as discrimin\'aveis entre conte\'udo falso e verdadeiro.
 
-\section{Motivação}\label{sec:motivacao}
+\emph{Sob quais condi\c{c}\~oes essa premissa se sustenta} \'e uma
+pergunta menos respondida do que parece. A literatura tende a reportar
+resultados positivos em \emph{datasets} espec\'ificos; reporta
+parcialmente os casos em que o paradigma \emph{n\~ao} funciona; e
+oferece poucos crit\'erios mensur\'aveis, a priori, sobre quando
+empregar arquiteturas topol\'ogicas e quando recorrer ao texto. \'E
+nesse vazio que o presente trabalho se posiciona: o objeto de
+investiga\c{c}\~ao n\~ao \'e propor uma nova arquitetura GNN, e sim
+\textbf{caracterizar as condi\c{c}\~oes estruturais sob as quais o
+paradigma topol\'ogico \'e aplic\'avel}, com igual peso evidencial para
+os resultados positivos e negativos observados.
 
-A verificação manual de veracidade não escala. O volume de postagens em redes
-sociais opera em escala de \textit{Big Data}, com fluxos massivos gerados em
-tempo real. Checar fontes e cruzar informações demanda um tempo que a velocidade
-de propagação não concede. Produzir uma mentira é instantâneo; desmenti-la é
-lento e custoso. Essa assimetria inviabiliza a curadoria humana e impõe a adoção
-de modelos computacionais de detecção.
+A Figura~\ref{fig:user_journey} ilustra, em alto n\'ivel, o caminho
+percorrido por uma not\'icia candidata desde a sua entrada at\'e o
+\emph{score} final produzido pelos modelos persistidos pelo trabalho:
+o texto \'e codificado por Sentence-BERT, a \'arvore de propaga\c{c}\~ao
+fornece \emph{features} estruturais, e os dois caminhos convergem na
+regra dual derivada \emph{post-hoc} dos experimentos (formalizada em
+\S\ref{sec:concordancia}).
 
-As abordagens tradicionais baseiam-se em Processamento de Linguagem Natural (PLN)
-e extraem padrões semânticos e sintáticos associados à falsidade a partir do
-conteúdo das publicações. Porém, essas técnicas falham diante de textos falsos
-com alta sofisticação linguística, que passam despercebidos por classificadores
-textuais. O que tais modelos desconsideram é a dinâmica de interação da rede: os
-perfis que compartilham a informação, suas conexões e a velocidade de
-disseminação. A topologia de propagação, conforme consolidado na literatura,
-carrega sinal preditivo equivalente ou superior ao do próprio conteúdo textual
-\cite{vosoughi2018,bian2020}. Redes Neurais em Grafos (\textit{Graph Neural
-Networks} --- GNNs) exploram justamente esse sinal: esses modelos aprendem de
-forma conjunta os atributos textuais, associados aos vértices do grafo, e a
-topologia de propagação, representada pelas arestas, superando as limitações de
-abordagens exclusivamente textuais.
+\begin{figure}[H]\centering
+\begin{tikzpicture}[
+  scale=0.85, transform shape,
+  postnode/.style    ={rectangle, rounded corners, draw, thick,
+                        minimum width=2.2cm, minimum height=0.9cm,
+                        align=center, font=\scriptsize, fill=blue!8},
+  encnode/.style     ={rectangle, rounded corners, draw, thick,
+                        minimum width=2.2cm, minimum height=0.9cm,
+                        align=center, font=\scriptsize, fill=orange!15},
+  graphnode/.style   ={rectangle, rounded corners, draw, thick,
+                        minimum width=2.2cm, minimum height=0.9cm,
+                        align=center, font=\scriptsize, fill=green!18},
+  modelnode/.style   ={rectangle, rounded corners, draw, thick,
+                        minimum width=2.2cm, minimum height=0.9cm,
+                        align=center, font=\scriptsize, fill=violet!15},
+  scorenode/.style   ={rectangle, rounded corners, draw, thick,
+                        minimum width=2.4cm, minimum height=0.9cm,
+                        align=center, font=\scriptsize\bfseries, fill=red!12},
+  combinenode/.style ={diamond, draw, thick, aspect=1.6,
+                        align=center, font=\scriptsize, fill=yellow!22,
+                        inner sep=1pt},
+  arr/.style         ={->, >=stealth, thick}
+]
+\node[postnode]                                              (post)   {\textbf{Post candidato}\\t\'itulo + \'arvore\\de propaga\c{c}\~ao};
+\node[encnode, above right=0.3cm and 1.0cm of post]          (bert)   {Sentence-BERT\\\texttt{paraphrase-}\\\texttt{multilingual-mpnet}};
+\node[graphnode, below right=0.3cm and 1.0cm of post]        (estrut) {\emph{Features}\\estruturais\\\texttt{[is\_root, grau\_norm]}};
+\node[modelnode, right=1.0cm of bert]                        (textual){LogReg-BERT\\textual ($s_{T}$)};
+\node[modelnode, right=1.0cm of estrut]                      (topo)   {RF / SAGE\\topol\'ogico ($s_{K}$)};
+\node[combinenode, right=0.8cm of textual, yshift=-1.3cm]    (combine){Regra dual\\$\mathrm{pred}_T \stackrel{?}{=} \mathrm{pred}_K$};
+\node[scorenode, right=1.0cm of combine]                     (score)  {Score final\\$\in [0, 1]$\\\textit{+ flag de}\\\textit{concord\^ancia}};
+\draw[arr] (post)         -- (bert);
+\draw[arr] (post)         -- (estrut);
+\draw[arr] (bert)         -- (textual);
+\draw[arr] (estrut)       -- (topo);
+\draw[arr] (textual.east) -- (combine.north west);
+\draw[arr] (topo.east)    -- (combine.south west);
+\draw[arr] (combine)      -- (score);
+\end{tikzpicture}
+\caption{Caminho percorrido por uma not\'icia candidata pelos modelos
+persistidos do trabalho. Em azul, a entrada bruta (t\'itulo e \'arvore
+de propaga\c{c}\~ao); em laranja e verde, os dois encoders
+independentes (\emph{embedding} textual e \emph{features}
+estruturais); em violeta, os classificadores treinados que produzem
+dois \emph{scores} ($s_{T}$, $s_{K}$); a regra dual (em amarelo)
+decide se os dois concordam e atribui pesos $0{,}5/0{,}5$ ou
+$0{,}8/0{,}2$ ao combinar (\S\ref{sec:concordancia}); o \emph{score}
+final \'e acompanhado de uma \emph{flag} de concord\^ancia que
+sinaliza confian\c{c}a do par.}
+\label{fig:user_journey}
+\end{figure}
 
-A aplicação de GNNs na detecção de notícias falsas já foi investigada em
-plataformas como Twitter e Facebook \cite{monti2019,dou2021}, mas o Bluesky
-permanece praticamente inexplorado. Aberta ao público em 2023 e fundamentada na
-arquitetura do AT Protocol (\textit{Authenticated Transfer Protocol}), a
-plataforma cresceu rapidamente em decorrência de migrações em massa provocadas
-por mudanças nas políticas de moderação de concorrentes. Sua infraestrutura
-descentralizada e a transparência na disponibilização de dados criam um ambiente
-propício para pesquisa acadêmica, ainda que faltem estudos que apliquem
-modelagem baseada em grafos à sua topologia de propagação. Este trabalho preenche
-essa lacuna ao integrar representações vetoriais textuais (\textit{embeddings}
-extraídos via BERT) a Redes Convolucionais em Grafos (GCNs) para classificar
-postagens no Bluesky. A contribuição é dupla: avançar nos métodos de detecção
-automatizada de desinformação e ampliar a compreensão sobre como conteúdo falso
-se propaga em plataformas descentralizadas emergentes.
+% ------------------------------------------------------------
+\section{Perguntas de pesquisa}
+\label{sec:rqs}
+
+O trabalho organiza-se em torno de tr\^es perguntas de pesquisa,
+respondidas em \S\ref{cap:resultados}:
+
+\begin{description}
+\item[RQ1.] A topologia da propaga\c{c}\~ao carrega sinal discriminante
+  para detec\c{c}\~ao de fake news \emph{acima} do que a \emph{feature}
+  textual da raiz da \'arvore de propaga\c{c}\~ao (\emph{embedding} BERT)
+  j\'a fornece?
+
+\item[RQ2.] Caso a resposta a RQ1 dependa do dom\'inio, \emph{sob quais
+  condi\c{c}\~oes estruturais} o paradigma topol\'ogico \'e efetivo?
+  Operacionalizamos essa pergunta atrav\'es do tamanho de efeito de
+  Cohen~\cite{cohen1988statistical} entre as classes \emph{fake} e
+  \emph{real} em m\'etricas de cascata.
+
+\item[RQ3.] \'E vi\'avel detectar fake news \emph{apenas} pela topologia,
+  em cen\'arios onde o texto n\~ao \'e explor\'avel? A pergunta \'e
+  composta de duas partes: (a) experimento sem acesso algum a texto em
+  UPFD-GossipCop; (b) experimento de consist\^encia da distribui\c{c}\~ao
+  do \emph{score} estrutural entre idiomas no \emph{snapshot}
+  acad\^emico do Bluesky~\cite{failla2024bluesky, kleppmann2024atproto}.
+\end{description}
+
+% ------------------------------------------------------------
+\section{Contribui\c{c}\~oes}
+\label{sec:contribuicoes}
+
+Apresentamos quatro contribui\c{c}\~oes, em ordem decrescente de
+import\^ancia:
+
+\begin{enumerate}[label=(\alph*)]
+\item \textbf{Ablation sistem\'atica de codifica\c{c}\~oes posicionais
+  contra a degenera\c{c}\~ao do GCN.} Demonstramos, com prova
+  matem\'atica em \S\ref{sec:degeneracao} e ablation em
+  \S\ref{sec:topo_sem_texto}, que a GCN cl\'assica
+  \cite{kipf2017gcn} degenera quando alimentada com \emph{features}
+  nodais homog\^eneas, e caracterizamos quais combina\c{c}\~oes de
+  codifica\c{c}\~oes posicionais nodais (\texttt{is\_root},
+  \texttt{grau\_norm}, \texttt{pos}) recuperam capacidade discriminativa
+  em cada \emph{dataset}.
+
+\item \textbf{Diagn\'ostico bilateral da aplicabilidade topol\'ogica.}
+  Mostramos, em prot\'ocolo de \emph{k-fold} pareado validado por teste
+  $t$ pareado e tamanho de efeito de Cohen, que o paradigma topol\'ogico
+  \emph{funciona} em UPFD-GossipCop (GraphSAGE estrutural atinge
+  $F1 = 0{,}810 \pm 0{,}002$ \emph{sem usar texto algum}) e
+  \emph{colapsa} em UPFD-PolitiFact (a mesma arquitetura alcan\c{c}a
+  $F1 \approx 0{,}33$, abaixo da chance). A explica\c{c}\~ao estrutural
+  do contraste, derivada \emph{a priori} a partir do Cohen's $d$ entre
+  as classes (\S\ref{sec:porque}), sustenta a tese central do trabalho
+  --- \emph{modelos topol\'ogicos exigem diferen\c{c}a estrutural entre
+  classes da ordem de $|d| \geq 0{,}5$ em pelo menos uma m\'etrica de
+  cascata para serem efetivos} --- formulada de maneira deliberadamente
+  \emph{falsific\'avel}.
+
+\item \textbf{An\'alise de concord\^ancia textual--topol\'ogico e regra
+  dual derivada \emph{post-hoc}.} Caracterizamos numericamente os
+  subgrupos em que o classificador estrutural \emph{inverte}
+  sistematicamente sua predi\c{c}\~ao em rela\c{c}\~ao ao textual
+  (subgrupos \texttt{real\_viral} e \texttt{fake\_contido} da
+  \S\ref{sec:estrat_outliers}) e derivamos, a partir dessa
+  caracteriza\c{c}\~ao, uma regra de combina\c{c}\~ao com pesos
+  assim\'etricos --- registrada explicitamente como heur\'istica
+  \emph{post-hoc}, n\~ao como decis\~ao metodol\'ogica a priori
+  (\S\ref{sec:concordancia}).
+
+\item \textbf{Pesos persistidos no Hugging Face Hub e aplica\c{c}\~ao
+  demonstrativa.} Os tr\^es classificadores (LogReg-BERT, RF estrutural,
+  SAGE estrutural) est\~ao publicados sob licen\c{c}a CC-BY-4.0 no
+  Hugging Face Hub, junto com uma aplica\c{c}\~ao web
+  (FastAPI + Next.js) que integra texto e topologia atrav\'es da regra
+  dual da contribui\c{c}\~ao (c). A aplica\c{c}\~ao foi exercitada em
+  \emph{snapshot} acad\^emico do Bluesky em modo demonstrativo
+  (sem r\'otulos) e est\'a documentada no Ap\^endice~\ref{ap:aplicacao}.
+\end{enumerate}
+
+\'E pertinente registrar o que este trabalho \emph{n\~ao} prop\~oe.
+N\~ao h\'a aqui uma nova arquitetura de Rede Neural de Grafos, nem
+proposta de \emph{benchmark} novo. A contribui\c{c}\~ao prim\'aria \'e
+diagn\'ostica: um crit\'erio mensur\'avel para decidir, \emph{antes de
+treinar}, se topologia tem chance de funcionar em um dom\'inio dado.
+
+% ------------------------------------------------------------
+\section{Estrutura do trabalho}
+\label{sec:estrutura}
+
+O Cap\'itulo~\ref{cap:fundamentacao} apresenta a fundamenta\c{c}\~ao
+te\'orica: arquiteturas GNN avaliadas (GCN, GAT, GraphSAGE),
+\emph{embeddings} textuais via Sentence-BERT, prova da
+degenera\c{c}\~ao do GCN com \emph{features} homog\^eneas, e
+revis\~ao de trabalhos relacionados em detec\c{c}\~ao multil\'ingue e
+em GNNs para fake news. O Cap\'itulo~\ref{cap:metodologia} descreve o
+\emph{pipeline} experimental: constru\c{c}\~ao dos grafos a partir dos
+tr\^es \emph{datasets} rotulados (FakeNewsNet, UPFD-PolitiFact,
+UPFD-GossipCop), hiperpar\^ametros das arquiteturas e protocolo de
+valida\c{c}\~ao com \emph{k-fold} pareado, \emph{ttest\_rel} e Cohen's
+$d$.
+
+O Cap\'itulo~\ref{cap:resultados} apresenta os resultados em ordem
+narrativa: \emph{baselines} textuais, diagn\'ostico de \emph{confound},
+calibra\c{c}\~ao com a literatura, achado central (topologia sem
+texto), explica\c{c}\~ao estrutural via Cohen's $d$, an\'alise de
+concord\^ancia, GNNExplainer, e an\'alise estratificada do erro
+(distribui\c{c}\~ao \emph{heavy-tail}, LOWESS, \emph{outliers} e
+cascatas profundas). O Cap\'itulo~\ref{cap:conclusao} sintetiza os
+achados, discute o resultado negativo de UPFD-PolitiFact com a mesma
+extens\~ao do positivo, enumera limita\c{c}\~oes do trabalho e aponta
+quatro dire\c{c}\~oes de continuidade. O Ap\^endice~\ref{ap:aplicacao}
+documenta a aplica\c{c}\~ao demonstrativa sobre o Bluesky e a
+ferramenta web.

@@ -12,8 +12,14 @@
 \section{Vis\~ao geral do pipeline}
 \label{sec:pipeline}
 
-% ESCREVER (1 paragrafo): descricao breve dos blocos do pipeline.
-% A figura \ref{fig:pipeline} (F0) abaixo e o diagrama em TikZ.
+O \emph{pipeline} experimental deste trabalho transforma dados brutos
+de propaga\c{c}\~ao em rede social em m\'etricas de classifica\c{c}\~ao
+auditadas estatisticamente, passando por cinco blocos sequenciais
+(constru\c{c}\~ao de grafos, computa\c{c}\~ao de \emph{features},
+treinamento GNN, avalia\c{c}\~ao com \emph{k-fold} pareado e produ\c{c}\~ao
+de m\'etricas). A Figura~\ref{fig:pipeline} representa esses blocos
+e o fluxo entre eles; as se\c{c}\~oes seguintes deste cap\'itulo
+detalham cada um.
 
 \begin{figure}[H]\centering
 \resizebox{\linewidth}{!}{%
@@ -52,9 +58,14 @@ avaliados com protocolo de k-fold pareado.}
 \section{Datasets}
 \label{sec:datasets}
 
-% ESCREVER (1 paragrafo introdutorio + tabela T0 abaixo).
-% Citacoes: \cite{shu2020fakenewsnet}, \cite{dou2021upfd},
-% \cite{kleppmann2024atproto}, \cite{failla2024bluesky}.
+Quatro \emph{datasets} sustentam os experimentos deste trabalho, com
+pap\'eis distintos. Tr\^es deles oferecem r\'otulos
+\emph{fake/real} e portanto s\~ao usados para treino e valida\c{c}\~ao
+quantitativa (FakeNewsNet PolitiFact, UPFD-PolitiFact, UPFD-GossipCop);
+o quarto, um \emph{snapshot} acad\^emico do Bluesky, n\~ao possui
+\emph{ground-truth} e \'e utilizado em modo de \emph{aplica\c{c}\~ao
+demonstrativa} (Ap\^endice~\ref{ap:aplicacao}). A
+Tabela~\ref{tab:datasets} resume tamanho, fonte e papel de cada um.
 
 \begin{table}[H]\centering
 \caption{Datasets utilizados, com tamanho, fonte e papel no trabalho.}
@@ -85,8 +96,10 @@ A constru\c{c}\~ao dos grafos do FakeNewsNet \'e realizada pelo \emph{script}
 \emph{download} direto dos CSVs do reposit\'orio oficial do KaiDMML
 \cite{shu2020fakenewsnet}, gera o \emph{embedding} textual do t\'itulo de
 cada not\'icia via \emph{Sentence-BERT} multil\'ingue (modelo
-\texttt{paraphrase-multilingual-mpnet-base-v2}, dimens\~ao 768) e
-\emph{cacheia} o resultado em disco para evitar recomputa\c{c}\~ao. Cada
+\texttt{paraphrase-multilingual-mpnet-base-v2}, dimens\~ao 768; treinado
+por destila\c{c}\~ao de conhecimento entre l\'inguas a partir de uma
+vers\~ao monol\'ingue~\cite{reimers2020multilingual}) e \emph{cacheia} o
+resultado em disco para evitar recomputa\c{c}\~ao. Cada
 not\'icia gera um grafo em estrela: o n\'o raiz \'e a not\'icia em si, e
 seus filhos s\~ao os identificadores de \emph{tweets} listados pelo CSV
 como tendo propagado a not\'icia.
@@ -99,11 +112,14 @@ imposta pelo formato do CSV bruto, que fornece apenas uma lista plana de
 \emph{tweets} de propaga\c{c}\~ao por not\'icia (descarta cascatas
 degeneradas, sem o que o grafo de propaga\c{c}\~ao seria reduzido a um
 \'unico n\'o) e o m\'aximo de 100 n\'os por grafo. A distribui\c{c}\~ao
-bruta de tamanhos de cascata \'e fortemente assim\'etrica: a mediana
-\'e de 30 \emph{tweets}, mas a m\'edia chega a 552 e o m\'aximo observado
-a 29.060. O limite de 100 n\'os trunca, portanto, 50\% dos grafos do
-\emph{dataset}; n\~ao se trata de remo\c{c}\~ao de \emph{outliers} raros,
-mas de decis\~ao de projeto com efeito substancial. A justificativa \'e
+bruta de tamanhos de cascata \'e fortemente assim\'etrica, regime
+caracter\'istico de redes sociais e consistente com \emph{power-law}
+em grau de v\'ertice~\cite{barabasi1999emergence, clauset2009powerlaw}:
+a mediana \'e de 30 \emph{tweets}, mas a m\'edia chega a 552 e o
+m\'aximo observado a 29.060. O limite de 100 n\'os trunca, portanto,
+50\% dos grafos do \emph{dataset}; n\~ao se trata de remo\c{c}\~ao de
+\emph{outliers} raros, mas de decis\~ao de projeto com efeito
+substancial. A justificativa \'e
 estrutural: em um grafo-estrela, todos os n\'os-filho compartilham o mesmo
 \emph{embedding} BERT (replicado a partir do t\'itulo), e folhas
 adicionais al\'em de uma centena acrescentam informa\c{c}\~ao marginal
@@ -137,14 +153,17 @@ descrito em \S\ref{sec:degeneracao}.
 O \emph{script} \texttt{gerar\_folds.py} instancia
 \texttt{StratifiedKFold(n\_splits=10, shuffle=True, random\_state=42)} do
 \emph{scikit-learn} sobre os 754 grafos do FakeNewsNet e persiste os
-\'indices em \texttt{data/folds\_fnn.pt}. Esse arquivo \'e gerado
+\'indices em \texttt{data/folds\_fnn.pt}. A escolha de $k=10$ segue
+recomenda\c{c}\~ao cl\'assica de Kohavi~\cite{kohavi1995cv} como
+compromisso entre vi\'es e vari\^ancia da estimativa da m\'etrica em
+\emph{datasets} de tamanho moderado. Esse arquivo \'e gerado
 \emph{uma \'unica vez} e consumido por todos os experimentos do trabalho
 que reportam compara\c{c}\~oes pareadas: o baseline textual
 (\S\ref{sec:baseline_textual}), o diagn\'ostico de \emph{confound}
 (\S\ref{sec:confound}), o teste de signific\^ancia entre arquiteturas
 GNN, entre outros.
 
-A motiva\c{c}\~ao \'e estat\'istica. O teste \emph{t} pareado
+O teste \emph{t} pareado
 (\texttt{scipy.stats.ttest\_rel}) que usamos para comparar dois modelos
 exige que cada par de m\'etricas comparado tenha sido obtido sobre os
 \emph{mesmos exemplos}. Caso contr\'ario, a varia\c{c}\~ao entre folds se
@@ -165,9 +184,24 @@ com pesos de aresta aprendidos via mecanismo de aten\c{c}\~ao; e o
 GraphSAGE (\cite{hamilton2017graphsage}), com agrega\c{c}\~ao indutiva por
 m\'edia dos vizinhos. Todas as tr\^es s\~ao implementadas no \emph{PyTorch
 Geometric}~\cite{fey2019pyg} e compartilham a mesma arquitetura agregada:
-tr\^es camadas convolucionais, com 64 canais ocultos por camada,
-seguidas de \emph{global mean pool} sobre os n\'os, \emph{dropout} de 0,5
-e um classificador linear final. Os demais hiperpar\^ametros, incluindo as poucas diferen\c{c}as entre as
+tr\^es camadas convolucionais --- limite cl\'assico para evitar o
+\emph{oversmoothing} demonstrado por Li, Han e
+Wu~\cite{li2018deeper} em GCNs profundas ---, com 64 canais ocultos
+por camada, seguidas de \emph{global mean pool} sobre os n\'os
+(invariante a permuta\c{c}\~ao de v\'ertices, opera\c{c}\~ao padr\~ao da
+fam\'ilia agregadora discutida por Xu et al.~\cite{xu2019gin}),
+\emph{dropout} de $0{,}5$ \cite{srivastava2014dropout} e um classificador
+linear final. O otimizador \'e Adam~\cite{kingma2015adam} com taxa de
+aprendizado $10^{-3}$ (valor \emph{default} do artigo original) e
+$\ell_2$ \emph{weight decay} de $5 \times 10^{-4}$ (conven\c{c}\~ao da
+literatura GNN seguindo Kipf e Welling~\cite{kipf2017gcn}). O
+\emph{batch size} de 32 foi adotado por raz\~oes de mem\'oria em
+ambiente CPU e \'e consistente com evid\^encias de que \emph{batches}
+pequenos melhoram a generaliza\c{c}\~ao em redes neurais
+profundas~\cite{masters2018batch}. \emph{Early stopping} com
+\emph{patience} sobre o $F_1$-macro de valida\c{c}\~ao segue a
+recomenda\c{c}\~ao de Prechelt~\cite{prechelt1998early}. Os demais
+hiperpar\^ametros, incluindo as poucas diferen\c{c}as entre as
 arquiteturas, est\~ao na Tabela~\ref{tab:hyperparams}.
 
 \textit{Para o UPFD, o vetor de \emph{features} de entrada de cada n\'o
@@ -256,9 +290,8 @@ ponderada dos F1 das duas classes (fake e real). Como os tr\^es
 balanceados em torno de $50\%/50\%$ entre as classes
 (\S\ref{sec:datasets}), o F1-macro \'e numericamente pr\'oximo da
 acur\'acia, mas com a vantagem de permanecer significativo caso futuros
-\emph{datasets} apresentem desequil\'ibrio, situa\c{c}\~ao comum em
-detec\c{c}\~ao de fake news em produ\c{c}\~ao, onde a classe
-\emph{fake} pode ser minorit\'aria. A literatura UPFD~\cite{dou2021upfd}
+\emph{datasets} apresentem desequil\'ibrio, por exemplo com a classe
+\emph{fake} em minoria. A literatura UPFD~\cite{dou2021upfd}
 reporta acur\'acia; usamos F1-macro para alinhar com pr\'aticas mais
 recentes em classifica\c{c}\~ao bin\'aria desbalanceada e marcamos
 expressamente a diferen\c{c}a quando confrontamos com valores publicados
@@ -280,9 +313,10 @@ pareado descrito em \S\ref{sec:metod_estratificacao}.
 Para a an\'alise descritiva de separabilidade estrutural entre fake e
 real (\S\ref{sec:porque}), reportamos o \emph{tamanho de efeito de Cohen}
 ($d$), conforme defini\c{c}\~ao cl\'assica de
-\cite{cohen1988statistical}. A escala interpretativa adotada \'e a usual:
-$|d| < 0{,}2$ desprez\'ivel, $0{,}2 \leq |d| < 0{,}5$ pequeno,
-$0{,}5 \leq |d| < 0{,}8$ m\'edio, $|d| \geq 0{,}8$ grande. A tese
+\cite{cohen1988statistical}, com refinamentos da escala discutidos por
+Sawilowsky~\cite{sawilowsky2009effect}. A escala interpretativa adotada
+\'e a usual: $|d| < 0{,}2$ desprez\'ivel, $0{,}2 \leq |d| < 0{,}5$
+pequeno, $0{,}5 \leq |d| < 0{,}8$ m\'edio, $|d| \geq 0{,}8$ grande. A tese
 central do trabalho est\'a operacionalizada nesse limiar (ver
 \S\ref{sec:negativo}).
 
@@ -312,7 +346,8 @@ adotamos tr\^es t\'ecnicas complementares aplicadas sobre o
 \S\ref{sec:estratificacao}.
 
 A primeira \'e uma \emph{regress\~ao localmente ponderada} (LOWESS) de
-$P(\text{acerto} \mid m)$ em fun\c{c}\~ao de cada m\'etrica estrutural $m$.
+$P(\text{acerto} \mid m)$ em fun\c{c}\~ao de cada m\'etrica estrutural $m$,
+segundo a formula\c{c}\~ao de Cleveland~\cite{cleveland1979lowess}.
 Implementamo-la via \emph{rolling mean} de janela proporcional ($10\%$
 da amostra ordenada, com m\'inimo absoluto de 30 observa\c{c}\~oes),
 evitando a depend\^encia de \texttt{statsmodels}. A vantagem sobre o
@@ -324,18 +359,22 @@ A segunda \'e a defini\c{c}\~ao de \emph{outliers} via \emph{percentil
 emp\'irico} (p5/p95) sobre o pr\'oprio \emph{test set}, em vez de
 limiares baseados em \emph{z-score}. A escolha \'e justificada pela forma
 das distribui\c{c}\~oes: m\'etricas de cascata em redes sociais s\~ao
-\emph{heavy-tail}: a m\'edia n\~ao \'e robusta, o desvio-padr\~ao \'e
-inflado por poucos casos extremos, e crit\'erios baseados em $\sigma$
-tornam-se mal-definidos. O percentil emp\'irico \'e invariante \`a forma
+\emph{heavy-tail}, com cauda mais agressiva do que a lognormal,
+regime amplamente reportado na literatura
+\cite{barabasi1999emergence, clauset2009powerlaw}. Nesse cen\'ario, a
+m\'edia n\~ao \'e robusta, o desvio-padr\~ao \'e inflado por poucos
+casos extremos, e crit\'erios baseados em $\sigma$ tornam-se
+mal-definidos. O percentil emp\'irico \'e invariante \`a forma
 da distribui\c{c}\~ao e identifica reciprocamente o $5\%$ inferior e o
 $5\%$ superior independentemente da assimetria.
 
-A terceira \'e o \emph{bootstrap pareado} (com $n_{\mathrm{boot}}=2.000$)
-para intervalos de confian\c{c}a sobre a diferen\c{c}a de F1 entre dois
-modelos avaliados no mesmo \emph{subset}, t\'ecnica empregada em
-\S\ref{sec:estrat_cascatas} para confirmar a significancia do ganho do
-SAGE estrutural sobre o RF tabular em recortes de profundidade da
-cascata. O \emph{bootstrap} \'e o substituto natural do
+A terceira \'e o \emph{bootstrap pareado} (com $n_{\mathrm{boot}}=2.000$
+reamostragens, na formula\c{c}\~ao de Efron e
+Tibshirani~\cite{efron1993bootstrap}) para intervalos de confian\c{c}a
+sobre a diferen\c{c}a de F1 entre dois modelos avaliados no mesmo
+\emph{subset}, t\'ecnica empregada em \S\ref{sec:estrat_cascatas} para
+confirmar a signific\^ancia do ganho do SAGE estrutural sobre o RF
+tabular em recortes de profundidade da cascata. O \emph{bootstrap} \'e o substituto natural do
 \texttt{ttest\_rel} pareado por \emph{fold} quando o pareamento por
 \emph{fold} n\~ao se aplica, como ocorre em \emph{subsets} definidos
 \emph{post-hoc} sobre o teste \'unico do UPFD.
@@ -416,4 +455,6 @@ geram varia\c{c}\~ao tipicamente na terceira casa decimal das m\'etricas
 reportadas. As conclus\~oes qualitativas do trabalho s\~ao robustas a
 essa varia\c{c}\~ao. O reposit\'orio oficial do c\'odigo, com o
 \texttt{README.md} como fonte autoritativa de instru\c{c}\~oes, est\'a
-publicado junto aos pesos persistidos em \cite{sibila2025bluesky}.
+documentado no Ap\^endice~\ref{ap:repo}; o \emph{dataset} processado
+do Bluesky utilizado em produ\c{c}\~ao est\'a publicado no
+Hugging Face Hub~\cite{sibila2025bluesky}.

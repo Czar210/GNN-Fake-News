@@ -86,13 +86,74 @@ Items ainda não recebidos do Cesar: **[3], [4], [6]** (presumivelmente em fila)
 
 Citações usadas no LaTeX mas **ainda ausentes** do `Referencias.bib`. Caçar na varredura final de bibliografia:
 
-| Chave | Para que | Onde |
+| Chave | Para que | Onde | Status |
+|---|---|---|---|
+| `cleveland1979lowess` | LOWESS | §3.8 | ✅ Adicionado em 2026-06-03 |
+| `efron1993bootstrap` | Bootstrap pareado | §3.8 | ✅ Adicionado em 2026-06-03 |
+| `sibila2025bluesky` | Artefatos publicados no HF Hub (não publicados ainda) | §3.2, §3.11, Apêndice E, §6.4 | ⏳ Pendente até publicar no HF Hub |
+
+### Refs metodológicas adicionadas em 2026-06-03 (Tier 1+2+3 do escopo aprovado)
+
+| Chave | Justifica | Onde aplicada |
 |---|---|---|
-| `cleveland1979lowess` | LOWESS | §3.8 |
-| `efron1993bootstrap` | Bootstrap pareado | §3.8 |
-| `sibila2025bluesky` | Artefatos publicados no HF Hub (não publicados ainda) | §3.2, §3.11, §5/Apêndice E, §6.4 |
+| `vosoughi2018spread` | Propagação assimétrica fake×real | §1.1 (Contextualização) |
+| `gharpure2020cdc` | Relatório CDC desinfetantes (39%) | §1.1 |
+| `bakshy2015exposure` | Algoritmos amplificam interação | §1.1 |
+| `delvicario2016spreading` | Echo chambers e viés de confirmação | §1.1 |
+| `reimers2020multilingual` | Sentence-BERT multilingual | §3.3 |
+| `kohavi1995cv` | k=10 folds | §3.4 |
+| `barabasi1999emergence` | Heavy-tail/power-law em redes sociais | §3.3, §3.8, §4.8.1 |
+| `clauset2009powerlaw` | Ajuste de power-law em dados empíricos | §3.3, §3.8, §4.8.1 |
+| `li2018deeper` | Oversmoothing → 3 camadas | §3.5 |
+| `xu2019gin` | Pooling agregador invariante | §3.5 |
+| `srivastava2014dropout` | Dropout = 0.5 | §3.5 |
+| `kingma2015adam` | Adam lr=1e-3 | §3.5 |
+| `masters2018batch` | Batch pequeno (32) | §3.5 |
+| `prechelt1998early` | Early stopping com patience | §3.5 |
+| `sawilowsky2009effect` | Refinamento da escala Cohen | §3.7 |
 
 **Importante:** `sibila2025bluesky` precisa ser criado quando o Cesar efetivamente publicar os artefatos no Hugging Face. Antes disso, vai dar *undefined reference* na compilação — pode marcar como `% TODO_CITE: sibila2025bluesky` se quiser que a compilação não pare.
+
+---
+
+## 📄 Descrições de figuras do Takida (`imagens_tcc.docx`, 2026-06-04)
+
+O Takida produziu legendas + interpretação para **18 figuras** num docx. Avaliação completa foi feita em 2026-06-04. Status por figura:
+
+### ✅ Já aproveitadas no Cap 4 (insights novos enxertados na prosa)
+
+| Figura | Onde | Insight enxertado |
+|---|---|---|
+| F17 | §4.5 (`sec:porque`) | **Eixo horizontal vs vertical**: `depth_max` tem |d| ≈ 0 nos 3 datasets. Diferença é largura/branching, não profundidade |
+| F19 | §4.7 (`sec:explainer`) | **No PolitiFact a assimetria classe-a-classe DESAPARECE**: hop1 dominante para fake E real — confirmação mecanicista do colapso |
+
+### ⚠️ 4 erros do docx (NÃO colar literal sem corrigir)
+
+1. **F14 multilíngue** — Takida escreve "topologia característica de **desinformação**" para o pico em 0,9. Bluesky não tem ground truth — viola a abertura obrigatória de §4.4-bis. **Corrigir para**: "score topológico elevado" (sem rotular como fake).
+2. **F16 painel mestre** — Takida diz "FNN sem comparativo topológico disponível". **Errado**: o painel TEM as 3 barras topo puro (0,53/0,54/0,54). O que falta é "texto+topo" (esse não fizemos no FNN).
+3. **F23 (modelo×feed)** — Takida cita "**5 mil postagens**". É **3.728** (D3 do FATOS). Discrepância já corrigida no Apêndice E.
+4. **Todo material Cap 5 do Takida** — foi escrito antes da decisão Cap 5 → Apêndice E. Maior parte fica órfã (ver abaixo).
+
+### 🗂️ Material Cap 5 órfão do Takida (descrições não incorporadas)
+
+8 figuras descritas por Takida que **não cabem mais** no Apêndice E condensado. Decisão: arquivar como referência para o caso de reabrir o escopo do apêndice. Material em `Downloads/imagens_tcc.docx`, parágrafos correspondentes:
+
+| Figura | Tema | Por que ficou órfã |
+|---|---|---|
+| F5 | Bluesky crossfeed (boxplots engajamento) | Apêndice E não tem análise crossfeed |
+| F6 | Bluesky crossfeed (heatmap Cohen's d) | Idem |
+| F20 | Bluesky crosstab (textual×topo) | Substituído por descrição curta no Apêndice E §sec:ap_bsky_concordancia |
+| F9 | Agreement por tamanho de thread | Apêndice E só menciona em texto corrido |
+| F10 | Agreement por feed | Idem (Political Science 88,7% mencionado) |
+| F23 | Score médio modelo×feed | Apêndice E não tem; descrição usa N errado (5k vs 3,7k) |
+| F13a/b | Threads ilustrativas | Apêndice E não inclui visualização de threads |
+| F4 | Bloco vs mini | Apêndice E não discute essa decisão de engenharia |
+
+**Se o orientador reabrir o escopo do Apêndice E**, todas essas descrições podem ser reaproveitadas — está tudo no docx do Takida em `Downloads/imagens_tcc.docx`. Antes de colar literal, **F23 precisa do número corrigido (5k → 3.728)** e F20 idem.
+
+### ✅ Figuras descritas e já cobertas pela prosa do Cap 4
+
+F18, F25, F26, F27, F28, F29, F30, F31, F32, F16, F3, F24 — Takida descreveu, mas a prosa atual do Cap 4 já cobre os mesmos pontos sem necessidade de retrabalho.
 
 ---
 
@@ -121,8 +182,14 @@ Citações usadas no LaTeX mas **ainda ausentes** do `Referencias.bib`. Caçar n
 
 ## ❓ Confirmar com o orientador (próxima conversa do Cesar com ele)
 
-- A "matriz de confusão página 25 RF" que o professor mencionou é qual figura exatamente? A página 25 do PDF anterior tinha o **Painel Mestre** (F16), não uma matriz de confusão real. Candidatas: F20 (cross-tab Bluesky, pág 28) ou F16. Confirmar pra repintura final.
-- Se Apêndice E é aceitável pelo orientador (alternativa a cortar tudo do Bluesky).
+- ~~A "matriz de confusão página 25 RF" que o professor mencionou é qual figura exatamente?~~ **✅ Confirmado em 2026-06-04: era as DUAS (F16 painel mestre + F20 cross-tab Bluesky). Ambas já foram repintadas em paleta semântica via script `27b`.**
+- Se Apêndice E é aceitável pelo orientador (alternativa a cortar tudo do Bluesky). **⏳ Pendente — Cesar vai ver com ele.**
+
+### Itens novos executados em 2026-06-04
+
+- `sibila2025bluesky` no `.bib`: ✅ Criado apontando para o dataset publicado em https://huggingface.co/datasets/Zaras210/bluesky-fake-news-dataset (Cap 3 §3.11 e Apêndice E §sec:ap_ferramenta agora citam o **dataset** publicado, não os pesos do modelo — pesos ficam no repositório Git via `Execution/weights/`).
+- Figura "Passagem de fake news pelo modelo" (Figura 1.1): ✅ Criada em TikZ no Cap 1 §1.2 (Motivação), mostrando o fluxo `post → BERT/features estruturais → LogReg/RF/SAGE → regra dual → score`. Versão Cap 1 é ilustrativa; a figura F0 do Cap 3 §3.1 segue como diagrama abstrato do pipeline.
+- Trocar "Chapter/Appendix" para PT: ✅ Verificado. O babel `brazil` já renderiza tudo como "Capítulo X" e "Apêndice X" automaticamente (confirmado via `pdftotext`: zero ocorrências de "Chapter" no PDF compilado). Única ocorrência de "Appendix" sobra no abstract em inglês obrigatório bilíngue (linha `main.tex:129`), que está dentro do bloco `\begin{otherlanguage*}{english}` — manter conforme norma ABNT.
 
 ---
 

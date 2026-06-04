@@ -34,10 +34,14 @@ publicado pelos autores deste trabalho no Hugging Face Hub
 
 Aplicamos o classificador textual (LogReg-BERT-\emph{content} treinado em
 FakeNewsNet PolitiFact) e o classificador topol\'ogico (RF estrutural
-treinado em UPFD-GossipCop) sobre os $168.463$ posts. A
-Tabela~\ref{tab:bsky_inferencia_feeds} reporta a m\'edia do \emph{score}
-``\emph{fake-like}'' do RF estrutural por \emph{feed}, permitindo
-\emph{ranking} relativo entre comunidades.
+treinado em UPFD-GossipCop) sobre os $168.463$ posts e organizamos a
+sa\'ida em duas representa\c{c}\~oes complementares. A
+Tabela~\ref{tab:bluesky_inferencia_feeds} reporta a m\'edia do \emph{score}
+``\emph{fake-like}'' do RF estrutural por \emph{feed}, permitindo o
+\emph{ranking} relativo entre comunidades; a
+Figura~\ref{fig:ap_bsky_scores} mostra a distribui\c{c}\~ao completa
+do \emph{score} por \emph{feed}, expondo a dispers\~ao interna em
+torno das m\'edias da tabela.
 
 \input{Imagens/tabelas/T8_bluesky_inferencia_feeds}
 
@@ -56,7 +60,7 @@ aplicada a um dom\'inio diferente (Bluesky), sem \emph{ground-truth} que
 permita calibra\c{c}\~ao por \emph{Platt scaling} ou regress\~ao
 isot\^onica. A interpreta\c{c}\~ao correta \'e como \emph{proxy ordinal}
 --- \'util para o \emph{ranking} relativo entre \emph{feeds} reportado
-na Tabela~\ref{tab:bsky_inferencia_feeds}, n\~ao para decis\~ao
+na Tabela~\ref{tab:bluesky_inferencia_feeds}, n\~ao para decis\~ao
 absoluta. Trabalho futuro (\S\ref{sec:futuros}, item 2) discute essa
 calibra\c{c}\~ao.
 
@@ -75,8 +79,11 @@ concord\^ancia ($\geq 74\%$ para $n_{\mathrm{nodes}} \geq 20$),
 \emph{posts} de tamanho m\'edio caem na zona cinzenta ($42\%$ a $44\%$
 para $2 \leq n_{\mathrm{nodes}} \leq 20$). O \emph{feed} \emph{Political
 Science} atinge $88{,}7\%$ de concord\^ancia agregada --- o mais alto da
-amostra --- o que sugere que comunidades politicamente engajadas geram
-sinais textuais e estruturais mais alinhados.
+amostra. Como se trata de um \'unico \emph{feed} e a m\'etrica \'e apenas
+concord\^ancia entre os dois classificadores (sem \emph{ground-truth}),
+n\~ao \'e poss\'ivel afirmar a causa; uma hip\'otese a investigar \'e
+que conte\'udo pol\'itico produza texto e padr\~ao de propaga\c{c}\~ao
+mais consistentes entre si.
 
 % ------------------------------------------------------------
 \section{Ferramenta web}
@@ -101,11 +108,14 @@ def _combinar_scores(score_textual, score_topo):
     return 0.8 * score_textual + 0.2 * score_topo,    False
 \end{lstlisting}
 
-Os pesos do modelo s\~ao carregados a partir do reposit\'orio publicado
-no Hugging Face Hub~\cite{sibila2025bluesky} sob licen\c{c}a CC-BY-4.0;
-o c\'odigo da \emph{API}, os \emph{scripts} de infer\^encia e o
-\emph{frontend} est\~ao no reposit\'orio Git do trabalho
-(Ap\^endice~\ref{ap:repo}). A ferramenta foi constru\'ida como prova de
+Os pesos dos tr\^es classificadores s\~ao carregados a partir de
+\texttt{Execution/weights/} do reposit\'orio Git do trabalho
+(Ap\^endice~\ref{ap:repo}); o \emph{dataset} processado do Bluesky
+utilizado em produ\c{c}\~ao --- com a estrutura de \emph{feeds} e os
+r\'otulos heur\'isticos por palavra-chave aplicados pelos autores ---
+est\'a publicado no Hugging Face Hub~\cite{sibila2025bluesky}. O
+c\'odigo da \emph{API}, os \emph{scripts} de infer\^encia e o
+\emph{frontend} integram o reposit\'orio Git. A ferramenta foi constru\'ida como prova de
 concei\-to de \emph{deploy}, n\~ao como produto auditado para uso em
 modera\c{c}\~ao real --- decis\~oes sobre conte\'udo a partir desses
 \emph{scores} devem respeitar as limita\c{c}\~oes documentadas no

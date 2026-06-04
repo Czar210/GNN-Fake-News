@@ -201,7 +201,7 @@
   title   = {Temporally evolving graph neural network for fake news detection},
   journal = {Information Processing \& Management},
   year    = {2022},
-  url     = {https://www.cs.emory.edu/~kshu5/files/IPM_TGNN.pdf}
+  url     = {https://www.cs.emory.edu/~kshu5/files/IPM\_TGNN.pdf}
 }
 
 % ============================================================
@@ -219,7 +219,7 @@
   title     = {Cross-Language Fake News Detection},
   booktitle = {Proceedings of the 3rd Workshop on Fact Extraction and VERification},
   year      = {2020},
-  url       = {https://www.researchgate.net/publication/347563252_Cross-Language_Fake_News_Detection}
+  url       = {https://www.researchgate.net/publication/347563252\_Cross-Language\_Fake\_News\_Detection}
 }
 
 @article{pmc_multilangs_covid,
@@ -275,7 +275,7 @@
   title  = {{FakeWhatsApp.BR}: Detecc{\~a}o de Desinformac{\~a}o e Desinformadores em Grupos P{\'u}blicos do {WhatsApp} em {PT-BR}},
   school = {Universidade Federal do Cear{\'a}},
   year   = {2021},
-  url    = {https://repositorio.ufc.br/bitstream/riufc/63379/3/2021_dis_lcccunha.pdf}
+  url    = {https://repositorio.ufc.br/bitstream/riufc/63379/3/2021\_dis\_lcccunha.pdf}
 }
 
 @mastersthesis{pucsp_gnnfakenews,
@@ -327,5 +327,314 @@
   title   = {Post-truth and fake news in scientific communication in Ibero-American journals},
   journal = {Investigaci{\'o}n Bibliotecol{\'o}gica},
   year    = {2023},
-  url     = {https://www.scielo.org.mx/scielo.php?script=sci_arttext&pid=S0188-252X2023000100410}
+  url     = {https://www.scielo.org.mx/scielo.php?script=sci\_arttext\&pid=S0188-252X2023000100410}
+}
+
+% ============================================================
+% Artefato publicado pelos autores (dataset Bluesky no HF Hub)
+% ============================================================
+
+@misc{sibila2025bluesky,
+  author       = {Sibila, C{\'e}sar Augusto and Livingston, Andr{\'e} Messina and Takida, Enzo Kikuji},
+  title        = {Bluesky Fake News Dataset: A Curated Snapshot of Bluesky Posts and Repost Cascades},
+  year         = {2025},
+  howpublished = {Hugging Face Datasets},
+  url          = {https://huggingface.co/datasets/Zaras210/bluesky-fake-news-dataset},
+  note         = {Curado pelos autores a partir do \emph{snapshot} acad\^emico de Failla e Rossetti~\cite{failla2024bluesky}; r\'otulos heur\'isticos por palavra-chave acompanham o reposit\'orio.}
+}
+
+% ============================================================
+% Referencias adicionadas em 2026-06-03 para sustentar decisoes
+% metodologicas. Organizadas por sub-topico.
+% ============================================================
+
+% --- Cap 1: contextualizacao (Vosoughi propagacao; CDC desinfetantes) ---
+@article{vosoughi2018spread,
+  title   = {The spread of true and false news online},
+  author  = {Vosoughi, Soroush and Roy, Deb and Aral, Sinan},
+  journal = {Science},
+  volume  = {359},
+  number  = {6380},
+  pages   = {1146--1151},
+  year    = {2018},
+  doi     = {10.1126/science.aap9559}
+}
+
+@article{gharpure2020cdc,
+  title   = {Knowledge and Practices Regarding Safe Household Cleaning and Disinfection for {COVID-19} Prevention --- United States, May 2020},
+  author  = {Gharpure, Radhika and Hunter, Candis M. and Schnall, Amy H. and Barrett, Catherine E. and Kirby, Amy E. and Yoder, Jonathan and Hlavsa, Michele C.},
+  journal = {MMWR. Morbidity and Mortality Weekly Report},
+  volume  = {69},
+  number  = {23},
+  pages   = {705--709},
+  year    = {2020},
+  doi     = {10.15585/mmwr.mm6923e2}
+}
+
+% --- Cap 3: protocolo experimental ---
+
+% k-fold k=10: defesa canonica de k=10 como bom compromisso vies-variancia
+@inproceedings{kohavi1995cv,
+  title     = {A Study of Cross-Validation and Bootstrap for Accuracy Estimation and Model Selection},
+  author    = {Kohavi, Ron},
+  booktitle = {Proceedings of the 14th International Joint Conference on Artificial Intelligence (IJCAI)},
+  volume    = {2},
+  pages     = {1137--1143},
+  year      = {1995}
+}
+
+% Bootstrap pareado n=2000: referencia classica de Efron-Tibshirani
+@book{efron1993bootstrap,
+  title     = {An Introduction to the Bootstrap},
+  author    = {Efron, Bradley and Tibshirani, Robert J.},
+  publisher = {Chapman \& Hall/CRC},
+  series    = {Monographs on Statistics and Applied Probability},
+  number    = {57},
+  year      = {1993}
+}
+
+% LOWESS: referencia original de Cleveland
+@article{cleveland1979lowess,
+  title   = {Robust Locally Weighted Regression and Smoothing Scatterplots},
+  author  = {Cleveland, William S.},
+  journal = {Journal of the American Statistical Association},
+  volume  = {74},
+  number  = {368},
+  pages   = {829--836},
+  year    = {1979},
+  doi     = {10.2307/2286407}
+}
+
+% Cohen's d: reforco do threshold "medium" (0.5)
+@article{sawilowsky2009effect,
+  title   = {New Effect Size Rules of Thumb},
+  author  = {Sawilowsky, Shlomo S.},
+  journal = {Journal of Modern Applied Statistical Methods},
+  volume  = {8},
+  number  = {2},
+  pages   = {597--599},
+  year    = {2009},
+  doi     = {10.22237/jmasm/1257035100}
+}
+
+% --- Cap 3: hiperparametros (otimizacao + regularizacao) ---
+
+% Adam: lr=0.001 (valor default do paper original)
+@inproceedings{kingma2015adam,
+  title     = {Adam: A Method for Stochastic Optimization},
+  author    = {Kingma, Diederik P. and Ba, Jimmy},
+  booktitle = {Proceedings of the 3rd International Conference on Learning Representations (ICLR)},
+  year      = {2015},
+  url       = {https://arxiv.org/abs/1412.6980}
+}
+
+% Dropout p=0.5: ref classica de Srivastava
+@article{srivastava2014dropout,
+  title   = {Dropout: A Simple Way to Prevent Neural Networks from Overfitting},
+  author  = {Srivastava, Nitish and Hinton, Geoffrey and Krizhevsky, Alex and Sutskever, Ilya and Salakhutdinov, Ruslan},
+  journal = {Journal of Machine Learning Research},
+  volume  = {15},
+  number  = {56},
+  pages   = {1929--1958},
+  year    = {2014}
+}
+
+% Early stopping com patience
+@incollection{prechelt1998early,
+  title     = {Early Stopping --- But When?},
+  author    = {Prechelt, Lutz},
+  booktitle = {Neural Networks: Tricks of the Trade},
+  editor    = {Orr, Genevieve B. and M{\"u}ller, Klaus-Robert},
+  publisher = {Springer},
+  series    = {Lecture Notes in Computer Science},
+  volume    = {1524},
+  pages     = {55--69},
+  year      = {1998},
+  doi       = {10.1007/3-540-49430-8_3}
+}
+
+% Batch size pequeno: ref para batch_size=32 em ambiente CPU
+@misc{masters2018batch,
+  title         = {Revisiting Small Batch Training for Deep Neural Networks},
+  author        = {Masters, Dominic and Luschi, Carlo},
+  year          = {2018},
+  eprint        = {1804.07612},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.LG}
+}
+
+% --- Cap 2/3: GNNs, oversmoothing, pooling ---
+
+% Oversmoothing: limite teorico para 3 camadas
+@inproceedings{li2018deeper,
+  title     = {Deeper Insights into Graph Convolutional Networks for Semi-Supervised Learning},
+  author    = {Li, Qimai and Han, Zhichao and Wu, Xiao-Ming},
+  booktitle = {Proceedings of the 32nd AAAI Conference on Artificial Intelligence (AAAI)},
+  pages     = {3538--3545},
+  year      = {2018},
+  doi       = {10.1609/aaai.v32i1.11604}
+}
+
+% Global mean pool vs add/max: Xu et al. (GIN)
+@inproceedings{xu2019gin,
+  title     = {How Powerful are Graph Neural Networks?},
+  author    = {Xu, Keyulu and Hu, Weihua and Leskovec, Jure and Jegelka, Stefanie},
+  booktitle = {Proceedings of the 7th International Conference on Learning Representations (ICLR)},
+  year      = {2019},
+  url       = {https://arxiv.org/abs/1810.00826}
+}
+
+% --- Cap 3/4: heavy-tail em redes sociais ---
+
+% Power-law em redes sociais: Barabasi & Albert classico
+@article{barabasi1999emergence,
+  title   = {Emergence of Scaling in Random Networks},
+  author  = {Barab{\'a}si, Albert-L{\'a}szl{\'o} and Albert, R{\'e}ka},
+  journal = {Science},
+  volume  = {286},
+  number  = {5439},
+  pages   = {509--512},
+  year    = {1999},
+  doi     = {10.1126/science.286.5439.509}
+}
+
+% Power-law: ajuste estatistico (justifica usar KS para rejeitar lognormal)
+@article{clauset2009powerlaw,
+  title   = {Power-Law Distributions in Empirical Data},
+  author  = {Clauset, Aaron and Shalizi, Cosma Rohilla and Newman, Mark E. J.},
+  journal = {SIAM Review},
+  volume  = {51},
+  number  = {4},
+  pages   = {661--703},
+  year    = {2009},
+  doi     = {10.1137/070710111}
+}
+
+% --- Cap 1/2: echo chambers e vies de confirmacao ---
+
+@article{delvicario2016spreading,
+  title   = {The Spreading of Misinformation Online},
+  author  = {Del Vicario, Michela and Bessi, Alessandro and Zollo, Fabiana and Petroni, Fabio and Scala, Antonio and Caldarelli, Guido and Stanley, H. Eugene and Quattrociocchi, Walter},
+  journal = {Proceedings of the National Academy of Sciences (PNAS)},
+  volume  = {113},
+  number  = {3},
+  pages   = {554--559},
+  year    = {2016},
+  doi     = {10.1073/pnas.1517441113}
+}
+
+@article{bakshy2015exposure,
+  title   = {Exposure to ideologically diverse news and opinion on Facebook},
+  author  = {Bakshy, Eytan and Messing, Solomon and Adamic, Lada A.},
+  journal = {Science},
+  volume  = {348},
+  number  = {6239},
+  pages   = {1130--1132},
+  year    = {2015},
+  doi     = {10.1126/science.aaa1160}
+}
+
+% --- Cap 2: Sentence-BERT multilingue (modelo usado: paraphrase-multilingual-mpnet-base-v2) ---
+
+% --- Refs canonicas para Cap 2 (lotes 1 e 2) ---
+
+@article{watts1998smallworld,
+  title   = {Collective dynamics of `small-world' networks},
+  author  = {Watts, Duncan J. and Strogatz, Steven H.},
+  journal = {Nature},
+  volume  = {393},
+  number  = {6684},
+  pages   = {440--442},
+  year    = {1998},
+  doi     = {10.1038/30918}
+}
+
+@inproceedings{mikolov2013word2vec,
+  title         = {Efficient Estimation of Word Representations in Vector Space},
+  author        = {Mikolov, Tomas and Chen, Kai and Corrado, Greg and Dean, Jeffrey},
+  booktitle     = {International Conference on Learning Representations (ICLR), Workshop Track},
+  year          = {2013},
+  url           = {https://arxiv.org/abs/1301.3781}
+}
+
+@inproceedings{vaswani2017attention,
+  title     = {Attention Is All You Need},
+  author    = {Vaswani, Ashish and Shazeer, Noam and Parmar, Niki and Uszkoreit, Jakob and Jones, Llion and Gomez, Aidan N. and Kaiser, {\L}ukasz and Polosukhin, Illia},
+  booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
+  pages     = {5998--6008},
+  year      = {2017}
+}
+
+@article{allcott2017socialmedia,
+  title   = {Social Media and Fake News in the 2016 Election},
+  author  = {Allcott, Hunt and Gentzkow, Matthew},
+  journal = {Journal of Economic Perspectives},
+  volume  = {31},
+  number  = {2},
+  pages   = {211--236},
+  year    = {2017},
+  doi     = {10.1257/jep.31.2.211}
+}
+
+@article{tandoc2018defining,
+  title   = {Defining ``Fake News'': A typology of scholarly definitions},
+  author  = {Tandoc Jr., Edson C. and Lim, Zheng Wei and Ling, Richard},
+  journal = {Digital Journalism},
+  volume  = {6},
+  number  = {2},
+  pages   = {137--153},
+  year    = {2018},
+  doi     = {10.1080/21670811.2017.1360143}
+}
+
+@article{bronstein2017geometric,
+  title   = {Geometric Deep Learning: Going beyond {Euclidean} data},
+  author  = {Bronstein, Michael M. and Bruna, Joan and LeCun, Yann and Szlam, Arthur and Vandergheynst, Pierre},
+  journal = {IEEE Signal Processing Magazine},
+  volume  = {34},
+  number  = {4},
+  pages   = {18--42},
+  year    = {2017},
+  doi     = {10.1109/MSP.2017.2693418}
+}
+
+% --- Refs canonicas para Cap 2 (lote 3) ---
+
+@article{demsar2006statistical,
+  title   = {Statistical Comparisons of Classifiers over Multiple Data Sets},
+  author  = {Dem{\v{s}}ar, Janez},
+  journal = {Journal of Machine Learning Research},
+  volume  = {7},
+  pages   = {1--30},
+  year    = {2006}
+}
+
+@article{mcpherson2001birds,
+  title   = {Birds of a Feather: Homophily in Social Networks},
+  author  = {McPherson, Miller and Smith-Lovin, Lynn and Cook, James M.},
+  journal = {Annual Review of Sociology},
+  volume  = {27},
+  pages   = {415--444},
+  year    = {2001},
+  doi     = {10.1146/annurev.soc.27.1.415}
+}
+
+@article{yuan2022explainability,
+  title   = {Explainability in Graph Neural Networks: A Taxonomic Survey},
+  author  = {Yuan, Hao and Yu, Haiyang and Gui, Shurui and Ji, Shuiwang},
+  journal = {IEEE Transactions on Pattern Analysis and Machine Intelligence},
+  volume  = {45},
+  number  = {5},
+  pages   = {5782--5799},
+  year    = {2023},
+  doi     = {10.1109/TPAMI.2022.3204236}
+}
+
+@inproceedings{reimers2020multilingual,
+  title     = {Making Monolingual Sentence Embeddings Multilingual using Knowledge Distillation},
+  author    = {Reimers, Nils and Gurevych, Iryna},
+  booktitle = {Proceedings of the 2020 Conference on Empirical Methods in Natural Language Processing (EMNLP)},
+  pages     = {4512--4525},
+  year      = {2020},
+  doi       = {10.18653/v1/2020.emnlp-main.365}
 }
