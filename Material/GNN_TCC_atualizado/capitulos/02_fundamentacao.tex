@@ -108,6 +108,21 @@ cap\'itulos posteriores, s\~ao:
   \emph{viralidade lateral} t\'ipica em cada n\'ivel.
 \end{itemize}
 
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.92\textwidth]{Imagens/propagation_example.pdf}
+  \caption{Exemplos reais de \'arvores de propaga\c{c}\~ao extra\'idos dos
+           conjuntos UPFD PolitiFact (linha superior) e GossipCop (linha
+           inferior). O n\'o raiz (mais escuro) representa a publica\c{c}\~ao
+           original; os demais n\'os representam intera\c{c}\~oes
+           subsequentes (reposts, respostas). Em ambos os datasets, exemplos
+           falsos (vermelho) e verdadeiros (azul) apresentam estruturas
+           superficialmente similares em tamanho --- evidenciando que o
+           n\'umero de n\'os isolado n\~ao \'e discriminante, motiva\c{c}\~ao
+           central para o uso de GNNs neste trabalho.}
+  \label{fig:propagation_example}
+\end{figure}
+
 Redes sociais reais apresentam padr\~oes estruturais que as distinguem
 de grafos aleat\'orios cl\'assicos. Watts e
 Strogatz~\cite{watts1998smallworld} demonstraram empiricamente o
@@ -264,6 +279,15 @@ limita\c{c}\~ao estrutural que ser\'a explorada em
 mesmo vetor de \emph{features} de entrada, a GCN colapsa para uma
 fun\c{c}\~ao apenas do grau.
 
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.85\textwidth]{Imagens/gcn_architecture.pdf}
+  \caption{Arquitetura da GCN utilizada neste trabalho: três camadas GCNConv
+           (768→64, 64→64, 64→64) com ativação ReLU, seguidas de Global
+           Mean Pool, Dropout (0,5) e classificador linear (64→2).}
+  \label{fig:gcn_architecture}
+\end{figure}
+
 \subsection{Graph Attention Networks (GAT)}
 \label{sec:gat}
 
@@ -293,6 +317,16 @@ em ganho consistente sobre a GCN (\S\ref{sec:cross_dataset}): em
 \'arvores rasas e estreitas, a maior parte da informa\c{c}\~ao
 encontra-se no grau do n\'o raiz, n\'umero que a GCN extrai t\~ao bem
 quanto a GAT.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.85\textwidth]{Imagens/gat_architecture.pdf}
+  \caption{Arquitetura da GAT utilizada neste trabalho: três camadas GATConv
+           com atenção \emph{softmax} multi-cabeça (camadas 1 e 2: 4 cabeças,
+           concat=False; camada 3: 1 cabeça), seguidas de Global Mean Pool,
+           Dropout (0,5) e classificador linear (64→2).}
+  \label{fig:gat_architecture}
+\end{figure}
 
 \subsection{GraphSAGE}
 \label{sec:sage}
@@ -324,6 +358,16 @@ mistura, \'e o que torna a GraphSAGE particularmente apta a explorar
 sinal estrutural quando esse sinal est\'a concentrado em um \'unico
 n\'o (a raiz da \'arvore). \'E essa propriedade que explica seu
 desempenho superior em UPFD-GossipCop sem texto (\S\ref{sec:topo_sem_texto}).
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.85\textwidth]{Imagens/sage_architecture.pdf}
+  \caption{Arquitetura da GraphSAGE utilizada neste trabalho: três camadas
+           SAGEConv com agregação por média ($W_l \cdot h + W_r \cdot h_{\mathcal{N}}$,
+           indutivo), seguidas de Global Mean Pool, Dropout (0,5) e
+           classificador linear (64→2).}
+  \label{fig:sage_architecture}
+\end{figure}
 
 % ------------------------------------------------------------
 \section{Degenera\c{c}\~ao do GCN com \emph{features} homog\^eneas}
