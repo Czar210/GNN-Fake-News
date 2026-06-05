@@ -17,6 +17,8 @@
 \usetikzlibrary{shapes.geometric, arrows, positioning, shapes.misc}
 \usepackage{float}
 \usepackage{enumitem}
+\usepackage{lmodern}                       % fonte escalavel (necessaria p/ microtype)
+\usepackage[final, babel=true, expansion=true, protrusion=true]{microtype}
 
 % Cores das c\'elulas para a Tabela~\ref{tab:sintese_resultados}
 \definecolor{cgood}{RGB}{198, 239, 206}  % verde claro (F1 >= 0.80)
@@ -40,93 +42,83 @@
 
 
 \begin{resumo}
-A detec\c{c}\~ao de fake news em redes sociais e tradicionalmente abordada por
-processamento de linguagem natural (PLN), mas essa estrat\'egia perde
-robustez frente a (i) modelos generativos capazes de produzir texto
-gramaticalmente impec\'avel e (ii) postagens em idiomas n\~ao cobertos por
-modelos pre-treinados. Este trabalho investiga em que condi\c{c}\~oes a
-\textbf{topologia da propaga\c{c}\~ao} -- o padr\~ao com que uma not\'icia se
-espalha pela rede -- pode complementar ou substituir a an\'alise textual.
+A detec\c{c}\~ao de fake news em redes sociais \'e tradicionalmente
+abordada por processamento de linguagem natural (PLN), mas essa
+estrat\'egia perde robustez frente a modelos generativos capazes de
+produzir texto gramaticalmente impec\'avel e a postagens em idiomas
+n\~ao cobertos por modelos pr\'e-treinados. Este trabalho investiga em
+que condi\c{c}\~oes a \textbf{topologia da propaga\c{c}\~ao}, o padr\~ao
+com que uma not\'icia se espalha pela rede, pode complementar ou
+substituir a an\'alise textual. Tr\^es perguntas de pesquisa orientam o
+trabalho: (RQ1) topologia carrega sinal discriminante acima do texto
+da raiz da \'arvore de propaga\c{c}\~ao? (RQ2) sob quais condi\c{c}\~oes
+estruturais? (RQ3) \'e vi\'avel detectar fake news \emph{apenas} pela
+topologia?
 
-Partimos de tr\^es perguntas de pesquisa: (RQ1) topologia carrega sinal
-discriminante acima do que o texto da raiz da \'arvore de propaga\c{c}\~ao
-fornece? (RQ2) sob quais condi\c{c}\~oes estruturais? (RQ3) \'e vi\'avel
-detectar fake news \emph{apenas} pela topologia, em cen\'arios de texto
-indispon\'ivel ou multil\'ingue?
-
-Realizamos ablation sistem\'atica em tr\^es datasets (FakeNewsNet PolitiFact,
-UPFD-PolitiFact, UPFD-GossipCop), comparando arquiteturas GCN, GAT e
-GraphSAGE com tr\^es variantes de \emph{features} estruturais
-($[is\_root]$, $[is\_root, grau\_norm]$, $[is\_root, grau\_norm, pos]$).
-Os experimentos s\~ao validados com k-fold pareado, teste $t$ pareado
+Realizamos ablation sistem\'atica em tr\^es \emph{datasets} (FakeNewsNet
+PolitiFact, UPFD-PolitiFact, UPFD-GossipCop), comparando GCN, GAT e
+GraphSAGE com tr\^es variantes de \emph{features} estruturais. Os
+experimentos s\~ao validados com k-fold pareado, teste $t$ pareado
 (\texttt{ttest\_rel}) e tamanho de efeito de Cohen ($d$).
 
-Os achados centrais s\~ao bilaterais. \textbf{Positivo}: GraphSAGE com apenas
-duas \emph{features} estruturais por n\'o atinge F1-macro = $0{,}810$ em
-UPFD-GossipCop \emph{sem usar texto algum} (10 \emph{seeds}, $\sigma = 0{,}002$).
-\textbf{Negativo}: a mesma arquitetura colapsa em UPFD-PolitiFact
-(F1 $\approx 0{,}33$, abaixo da chance de 0{,}50). A causa estrutural \'e
-identificada via Cohen's $d$: GossipCop apresenta diferen\c{c}a entre fake
-e real de $d = +1{,}53$ no \emph{branching factor} das cascatas; PolitiFact
-n\~ao alcan\c{c}a sequer um efeito m\'edio em nenhuma m\'etrica avaliada
-($|d| < 0{,}5$, com m\'aximo de $|d|=0{,}25$ em \texttt{num\_nodes}). A tese central -- formulada de forma
-falsific\'avel -- \'e que modelos topol\'ogicos requerem diferen\c{c}a
-estrutural entre classes da ordem de magnitude de um efeito m\'edio de
-Cohen ($|d| \geq 0{,}5$) para serem efetivos.
+Os achados centrais s\~ao bilaterais. \textbf{Positivo}: GraphSAGE com
+apenas duas \emph{features} estruturais por n\'o atinge F1-macro $=
+0{,}810$ em UPFD-GossipCop \emph{sem usar texto algum} (10 \emph{seeds},
+$\sigma = 0{,}002$). \textbf{Negativo}: a mesma arquitetura colapsa em
+UPFD-PolitiFact (F1 $\approx 0{,}33$, abaixo da chance). A causa
+estrutural \'e identificada via Cohen's $d$: GossipCop apresenta $d =
++1{,}53$ no \emph{branching factor} das cascatas; PolitiFact n\~ao
+alcan\c{c}a efeito m\'edio em nenhuma m\'etrica avaliada ($|d| < 0{,}5$).
+A tese central, deliberadamente falsific\'avel, \'e que modelos
+topol\'ogicos requerem $|d| \geq 0{,}5$ em pelo menos uma m\'etrica de
+cascata para serem efetivos. Como evid\^encia complementar para a parte
+(b) da RQ3, o classificador estrutural produz, sobre subconjuntos
+monol\'ingues de um \emph{snapshot} acad\^emico do Bluesky,
+distribui\c{c}\~oes de \emph{score} estatisticamente equivalentes entre
+portugu\^es e ingl\^es ($d = -0{,}057$). Os pesos persistidos no
+Hugging Face Hub e a ferramenta web que integra os classificadores
+est\~ao documentados no Ap\^endice~\ref{ap:aplicacao}.
 
-Como complemento experimental para a parte (b) da RQ3, aplicamos o
-classificador estrutural sobre subconjuntos monol\'ingues de um
-\emph{snapshot} acad\^emico do Bluesky e confirmamos que sua
-distribui\c{c}\~ao de \emph{score} \'e estatisticamente equivalente entre
-portugu\^es e ingl\^es ($d = -0{,}057$), o que sustenta a propriedade de
-independ\^encia lingu\'istica do mecanismo. Os pesos persistidos no
-Hugging Face Hub e a ferramenta web (FastAPI + Next.js) que integra os
-classificadores est\~ao documentados no Ap\^endice~\ref{ap:aplicacao}.
-
-\textbf{Palavras-chave}: Fake news. Graph Neural Networks. UPFD. FakeNewsNet.
-Bluesky. Cohen's d. Encodings posicionais.
+\textbf{Palavras-chave}: Fake news. Graph Neural Networks. UPFD.
+FakeNewsNet. Bluesky. Cohen's d. Encodings posicionais.
 \end{resumo}
 
 \begin{resumo}[Abstract]
 \begin{otherlanguage*}{english}
 Fake-news detection in social media is traditionally tackled by Natural
 Language Processing (NLP), but this strategy loses robustness against
-(i) generative models capable of producing grammatically impeccable text
-and (ii) posts in languages not covered by pre-trained models. This work
-investigates under which conditions \textbf{propagation topology} -- the
-pattern by which news spreads through the network -- can complement or
-replace textual analysis.
+generative models capable of producing grammatically impeccable text
+and against posts in languages not covered by pre-trained models. This
+work investigates under which conditions \textbf{propagation topology},
+the pattern by which news spreads through the network, can complement
+or replace textual analysis. Three research questions guide the work:
+(RQ1) does topology carry discriminative signal beyond the root-text
+of the propagation tree? (RQ2) under which structural conditions?
+(RQ3) is it feasible to detect fake news \emph{using topology only}?
 
-We pose three research questions: (RQ1) does topology carry discriminative
-signal beyond what the root-text of the propagation tree provides? (RQ2)
-under which structural conditions? (RQ3) is it feasible to detect fake news
-\emph{using topology only}, in scenarios with unavailable or multilingual
-text?
-
-We perform a systematic ablation on three datasets (FakeNewsNet PolitiFact,
-UPFD-PolitiFact, UPFD-GossipCop), comparing GCN, GAT and GraphSAGE under
-three structural feature variants. Experiments are validated with paired
-k-fold, paired \texttt{ttest\_rel}, and Cohen's $d$ effect size.
+We perform a systematic ablation on three datasets (FakeNewsNet
+PolitiFact, UPFD-PolitiFact, UPFD-GossipCop), comparing GCN, GAT and
+GraphSAGE under three structural feature variants. Experiments are
+validated with paired k-fold, paired \texttt{ttest\_rel}, and Cohen's
+$d$ effect size.
 
 Findings are bilateral. \textbf{Positive}: GraphSAGE with only two
-per-node structural features achieves F1-macro = $0{.}810$ on UPFD-GossipCop
-\emph{without using text at all} (10 seeds, $\sigma = 0{.}002$).
-\textbf{Negative}: the same architecture collapses on UPFD-PolitiFact
-(F1 $\approx 0{.}33$, below the chance level of 0{.}50). The structural
+per-node structural features achieves F1-macro $= 0{.}810$ on
+UPFD-GossipCop \emph{without using text at all} (10 seeds, $\sigma =
+0{.}002$). \textbf{Negative}: the same architecture collapses on
+UPFD-PolitiFact (F1 $\approx 0{.}33$, below chance). The structural
 cause is identified via Cohen's $d$: GossipCop shows a fake-vs-real
-difference of $d = +1{.}53$ on cascade branching factor; PolitiFact does
-not reach even a medium-effect size on any evaluated metric
-($|d| < 0{.}5$, with maximum $|d|=0{.}25$ on \texttt{num\_nodes}). Our central -- and falsifiable -- thesis is that topological
-models require class-wise structural differences of at least a Cohen
-medium-effect magnitude ($|d| \geq 0{.}5$) to be effective.
-
-As complementary evidence for RQ3 part (b), we apply the structural
-classifier on monolingual subsets of an academic Bluesky snapshot and
-confirm that its score distribution is statistically equivalent between
-Portuguese and English ($d = -0{.}057$), supporting the linguistic
-independence of the mechanism. Persisted weights on the Hugging Face Hub
-and the web application (FastAPI + Next.js) integrating the classifiers
-are documented in Appendix~\ref{ap:aplicacao}.
+difference of $d = +1{.}53$ on cascade branching factor; PolitiFact
+does not reach a medium-effect size on any evaluated metric ($|d| <
+0{.}5$). Our central and deliberately falsifiable thesis is that
+topological models require $|d| \geq 0{.}5$ on at least one cascade
+metric to be effective. As complementary evidence for RQ3 part (b),
+the structural classifier produces, over monolingual subsets of an
+academic Bluesky snapshot, statistically equivalent score
+distributions between Portuguese and English ($d = -0{.}057$).
+Persisted weights on the Hugging Face Hub and the web application
+integrating the classifiers are documented in
+Appendix~\ref{ap:aplicacao}.
 
 \textbf{Keywords}: Fake news. Graph Neural Networks. UPFD. FakeNewsNet.
 Bluesky. Cohen's d. Positional encodings.
