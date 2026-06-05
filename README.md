@@ -10,43 +10,57 @@ Investigamos sob quais condições a **topologia da propagação** de uma notíc
 - **RQ2** — Sob quais condições estruturais?
 - **RQ3** — É viável detectar *fake news* **só** com topologia, em cenários sem texto explorável (multilíngue, deletado, informal)?
 
-A resposta é **bilateral** e essa é a contribuição central:
+A resposta é **bilateral** — essa é a contribuição central:
 
-- **Positivo**: GraphSAGE com 2 *features* estruturais por nó (sem texto) atinge **F1 = 0,810** em UPFD-GossipCop (10 *seeds*, σ=0,002).
+- **Positivo**: GraphSAGE com 2 *features* estruturais por nó (sem texto) atinge **F1 = 0,810** em UPFD-GossipCop (10 *seeds*, σ = 0,002).
 - **Negativo**: a mesma arquitetura colapsa em UPFD-PolitiFact (F1 ≈ 0,33, abaixo da chance).
 
 A diferença é explicada pelo Cohen's $d$ entre fake e real: $+1{,}53$ em *branching factor* no GossipCop, $|d| < 0{,}5$ em todas as métricas do PolitiFact. Base da **tese central falsificável**: modelos topológicos exigem $|d| \geq 0{,}5$ em pelo menos uma métrica de cascata para serem efetivos.
 
-**Estado em 2026-06-04**: pipeline experimental completo (Fases 1–9), TCC redigido por inteiro (97 páginas, 76 referências), apêndices A–C+E preenchidos, pré-textuais ABNT incluídos (folha de aprovação, lista de figuras/tabelas/siglas).
-
 ## 🏗️ Estrutura do repositório
+
+Pastas e arquivos **versionados no Git** (o que está no clone):
 
 ```
 GNN Fake News/
-├── Training/
+├── Training/                    # código de pesquisa
 │   ├── 01_BlueSky_Pipe/         # coleta + grafos Bluesky (legado)
 │   ├── 02_UPFD_Benchmark/       # experimentos preliminares (legado)
 │   └── 03_Mega_Research/        # pipeline principal — 30+ scripts numerados
-├── Execution/                   # artefatos gerados (gitignored, regeneráveis)
-│   ├── results/                 # CSVs, relatórios, figuras por fase
-│   ├── weights/                 # modelos persistidos (LogReg, RF, SAGE)
-│   └── scripts/                 # utilitários ad-hoc
 ├── Material/
-│   ├── GNN_TCC_atualizado/      # CANON do TCC (LaTeX + .bib + figuras)
-│   ├── politifact/, gossipcop/  # UPFD raw + processed
-│   ├── politifact_pyg/, gossipcop_pyg/
-│   ├── LIAR/, upfd_raw/         # datasets auxiliares
+│   ├── GNN_TCC_atualizado/      # CANON do TCC (LaTeX + .bib + .bst + main.pdf)
+│   ├── gossipcop_pyg/           # UPFD-GossipCop em formato PyTorch Geometric
+│   ├── politifact_pyg/          # UPFD-PolitiFact idem
+│   ├── upfd_raw/                # ponteiros pros datasets (arquivos grandes ignorados)
+│   └── LIAR/                    # dataset auxiliar usado em ensaios iniciais
+├── Execution/
+│   ├── results/                 # estrutura de pastas por fase (CSVs/PNGs ignorados)
+│   ├── scripts/                 # utilitários ad-hoc
+│   └── weights/metadata.json    # ponteiro dos pesos (binários ignorados)
 ├── Interface/                   # ferramenta web demonstrativa
-│   ├── frontend/                # Next.js + FastAPI (regra dual)
-│   └── supabase/                # backend opcional
-├── dados_bluesky/               # ~6 GB do Bluesky (gitignored)
-├── Photos/orientador_fase9/     # material que foi apresentado ao orientador
-├── Tests/                       # testes do código
+│   ├── frontend/                # Next.js + FastAPI (regra dual textual×topológico)
+│   └── supabase/                # backend opcional para histórico
+├── Photos/orientador_fase9/     # material apresentado ao orientador na rodada Fase 9
 ├── FATOS_TCC.md                 # fonte da verdade — todo número do TCC ancorado
 ├── PENDENCIAS_TCC.md            # decisões em aberto e mudanças planejadas
-├── REVISAO_CARA_DE_IA.md        # auditoria adversarial dos .tex
-├── PROMPT_IA_TCC.md             # prompt pra orientar sessões de IA assistente
-└── GUIA_COAUTORES_TCC.md        # divisão de trabalho entre coautores
+├── GUIA_COAUTORES_TCC.md        # divisão de trabalho entre os 3 coautores
+├── requirements.txt             # deps Python principais
+├── requirements.api.txt         # deps específicas da ferramenta web
+├── Dockerfile.api, Dockerfile.web, docker-compose.yml
+├── iniciar_tcc.bat              # launcher Windows da ferramenta web (Truth GNN Analytics)
+└── LICENSE
+```
+
+Pastas e arquivos **gerados/baixados** (gitignored, não viajam no clone):
+
+```
+.venv/, node_modules/                              # ambientes / deps instaladas
+dados_bluesky/                                     # ~6 GB do snapshot Bluesky
+Material/{gossipcop,politifact}/                   # CSVs brutos do FakeNewsNet
+Material/upfd_raw/*.pkl                            # .pkl pesados do UPFD
+Execution/results/**/*.{csv,png,html}              # outputs experimentais
+Execution/weights/*.{pth,pkl}                      # pesos persistidos dos modelos
+Material/GNN_TCC_atualizado/*.{aux,bbl,toc,...}    # caches LaTeX
 ```
 
 A documentação canônica dos scripts está em [Training/03_Mega_Research/PIPELINE.md](Training/03_Mega_Research/PIPELINE.md).
@@ -89,12 +103,12 @@ Validados em UPFD-GossipCop *test set*, $N = 3.826$ grafos:
 ### 1. Ambiente
 
 ```bash
+python -m venv .venv
+.venv\Scripts\activate    # Windows  (Linux/mac: source .venv/bin/activate)
 pip install -r requirements.txt
 ```
 
-Recomendado em `venv` ou `conda`. PyTorch e PyG têm *wheels* específicos — ver seção abaixo.
-
-### 1b. PyTorch + PyTorch Geometric
+PyTorch + PyTorch Geometric têm *wheels* específicos por plataforma:
 
 ```bash
 # CPU-only (reproduz o TCC)
@@ -141,7 +155,7 @@ for nome, gid in ids.items():
 "
 ```
 
-> ⚠️ GossipCop com `feature='bert'` (768 dim) precisa de ~1,8 GB de RAM. Em CPU/Windows pode estourar OOM — usar `feature='content'` (310 dim), que é mais leve e equivalente para os experimentos topológicos.
+> ⚠️ GossipCop com `feature='bert'` (768 dim) precisa de ~1,8 GB de RAM. Em CPU/Windows pode estourar OOM — usar `feature='content'` (310 dim), que é mais leve e equivalente para os experimentos topológicos. Foi essa a variante adotada no TCC, declarada em §4.3.
 
 **Bluesky** (~6 GB) — *snapshot* acadêmico de [Failla & Rossetti (PLOS ONE, 2024)](https://doi.org/10.1371/journal.pone.0310330), 168.463 posts em 11 *feeds*. **Sem labels** *fake/real* — usado apenas no Apêndice E (aplicação demonstrativa). O dataset processado pelos autores está publicado em [huggingface.co/datasets/Zaras210/bluesky-fake-news-dataset](https://huggingface.co/datasets/Zaras210/bluesky-fake-news-dataset).
 
@@ -208,6 +222,22 @@ python 30_cascatas_profundas.py                    # bootstrap CI por profundida
 python 31_anotar_figuras_cap4.py                   # opcional: overlay de destaque
 ```
 
+### 4. Ferramenta web (opcional)
+
+A aplicação que combina os três modelos via regra dual fica em `Interface/`. No Windows há um launcher:
+
+```cmd
+iniciar_tcc.bat
+```
+
+Ou via Docker:
+
+```bash
+docker-compose up
+```
+
+API (FastAPI) em `http://localhost:8000`, frontend (Next.js) em `http://localhost:3000`.
+
 ## 📐 Reprodutibilidade — caveats honestos
 
 Os experimentos usam `random_state=42` em todo lugar (`StratifiedKFold`, RF/LogReg do *scikit-learn*, `torch.manual_seed`/`np.random.seed`/`random.seed` nos loops dos GNNs). Os resultados reportados em cada `relatorio.txt` **são reproduzíveis no mesmo ambiente**.
@@ -231,7 +261,7 @@ pdflatex -interaction=nonstopmode main.tex
 pdflatex -interaction=nonstopmode main.tex
 ```
 
-O `.bst` (`abntex2-alf.bst`) e um *stub* mínimo de `abntex2.cls` acompanham o repositório para compilação em ambientes sem o pacote oficial `abntex2` instalado. PDF resultante: ~97 páginas.
+O `.bst` (`abntex2-alf.bst`) e um *stub* mínimo de `abntex2.cls` acompanham o repositório para compilação em ambientes sem o pacote oficial `abntex2` instalado. PDF resultante: ~96 páginas, 76 referências.
 
 ## 📑 Documentos de controle
 
@@ -239,11 +269,9 @@ O `.bst` (`abntex2-alf.bst`) e um *stub* mínimo de `abntex2.cls` acompanham o r
 |---|---|
 | [FATOS_TCC.md](FATOS_TCC.md) | Fonte da verdade — todo número do TCC ancorado com status (✅/⚠️/❓) |
 | [PENDENCIAS_TCC.md](PENDENCIAS_TCC.md) | Decisões em aberto e mudanças planejadas mas não executadas |
-| [REVISAO_CARA_DE_IA.md](REVISAO_CARA_DE_IA.md) | Auditoria adversarial dos `.tex` por *workflow* `achar → verificar` |
-| [PROMPT_IA_TCC.md](PROMPT_IA_TCC.md) | Prompt para orientar nova sessão de IA assistente |
 | [GUIA_COAUTORES_TCC.md](GUIA_COAUTORES_TCC.md) | Divisão de trabalho entre os 3 coautores |
 | [Training/03_Mega_Research/PIPELINE.md](Training/03_Mega_Research/PIPELINE.md) | Documentação canônica dos 30+ scripts |
 
 ## 📝 Licença
 
-Código sob [LICENSE](LICENSE). O dataset Bluesky processado segue a licença do *snapshot* original de Failla & Rossetti (2024); os pesos dos modelos serão publicados sob CC-BY-4.0 quando subidos ao Hugging Face Hub.
+Código sob [LICENSE](LICENSE). O dataset Bluesky processado pelos autores está disponível no [Hugging Face Hub](https://huggingface.co/datasets/Zaras210/bluesky-fake-news-dataset); os pesos dos modelos ficam em `Execution/weights/` do repositório (sob a mesma licença do trabalho).
