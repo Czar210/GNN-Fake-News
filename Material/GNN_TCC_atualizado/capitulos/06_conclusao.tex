@@ -15,7 +15,7 @@ exclu\'idas.
 \section{S\'intese dos achados por pergunta de pesquisa}
 \label{sec:sintese}
 
-\paragraph{RQ1 --- a topologia carrega sinal acima do que o texto da raiz
+\paragraph{RQ1: a topologia carrega sinal acima do que o texto da raiz
 j\'a fornece?} A resposta depende do \emph{dataset} e do regime de
 \emph{features}. No FakeNewsNet, o texto da raiz isoladamente j\'a satura
 o sinal: o \emph{baseline} LogReg-BERT atinge F1-macro =
@@ -41,7 +41,7 @@ chance ($0{,}50$ em problema balanceado), e as outras duas arquiteturas
 testadas no mesmo regime ficam pouco acima ($0{,}362$ para GCN; $0{,}380$
 para GAT), todas em colapso equivalente.
 
-\paragraph{RQ2 --- sob quais condi\c{c}\~oes estruturais?} A resposta foi
+\paragraph{RQ2: sob quais condi\c{c}\~oes estruturais?} A resposta foi
 operacionalizada via tamanho de efeito de Cohen ($d$) entre as classes
 em m\'etricas de cascata (\S\ref{sec:porque} e
 Tabela~\ref{tab:cohens_d}). O UPFD-GossipCop apresenta $\mathbf{d =
@@ -68,7 +68,7 @@ $0{,}2 < |d| < 0{,}5$ no qual uma arquitetura GNN atinja desempenho
 significativamente acima do \emph{baseline} textual e do RF tabular
 constituiria contra-evid\^encia direta.
 
-\paragraph{RQ3 --- \'e vi\'avel detectar fake news apenas pela topologia,
+\paragraph{RQ3: \'e vi\'avel detectar fake news apenas pela topologia,
 em cen\'arios sem texto explor\'avel?} A resposta se divide nas duas partes embutidas na pergunta. Quanto \`a parte (a), vi\'avel sem texto algum?, a Tabela~\ref{tab:topologia_sem_texto} mostra que sim, mas
 \emph{condicional} \`a condi\c{c}\~ao da RQ2: SAGE com duas dimens\~oes
 estruturais por n\'o ($\texttt{is\_root}$, $\texttt{grau\_norm}$) atinge
@@ -76,7 +76,7 @@ F1 = $0{,}810$ em GossipCop, sem nenhum acesso ao conte\'udo textual da
 not\'icia. Quanto \`a parte (b), indiferente ao idioma do post?, a \S\ref{sec:multilingual} aplicou o RF estrutural
 sobre subconjuntos monol\'ingues do Bluesky e encontrou $\mathbf{d =
 -0{,}057}$ entre portugu\^es e ingl\^es (efeito desprez\'ivel) e
-$\mathbf{d = -0{,}468}$ entre alem\~ao e ingl\^es (efeito m\'edio)
+$\mathbf{d = -0{,}468}$ entre alem\~ao e ingl\^es (efeito pequeno, no topo da faixa)
 (Tabela~\ref{tab:rq3_multilingual}). Como o classificador estrutural
 \emph{n\~ao processa texto}, seu mecanismo \'e arquiteturalmente
 independente do idioma; a diverg\^encia DE \emph{vs.} EN n\~ao p\^ode
@@ -115,11 +115,11 @@ prop\~oe como contribui\c{c}\~ao prim\'aria.
 Uma evid\^encia complementar refor\c{c}a a leitura. A
 \S\ref{sec:estrat_outliers} mostrou que, mesmo no UPFD-GossipCop (onde
 o modelo \emph{funciona}), h\'a subgrupos extremos em que a regra
-estrutural aprendida pelo SAGE se inverte sistematicamente: dos 31 grafos
-do subgrupo \texttt{fake\_contido} (\emph{fakes} com grau de raiz no
-percentil 5 inferior), o SAGE acerta \textbf{zero}; dos 60 grafos do
-subgrupo \texttt{real\_viral} (\emph{reais} com grau de raiz no
-percentil 95 superior), acerta apenas $43\%$, desempenho abaixo da
+estrutural aprendida pelo SAGE falha de forma concentrada: dos $31$
+grafos do subgrupo \texttt{fake\_contido} (\emph{fakes} com grau de raiz
+no percentil $5$ inferior), o SAGE acerta \textbf{zero}; dos $60$ grafos
+do subgrupo \texttt{real\_viral} (\emph{reais} com grau de raiz no
+percentil $95$ superior), acerta apenas $43\%$, desempenho abaixo da
 chance (Tabela~\ref{tab:outliers}). Esses subgrupos demarcam o
 \emph{limite operacional} do mecanismo topol\'ogico: ele depende de
 que a regra ``\emph{fake} = cascata maior'' valha, e erra justamente

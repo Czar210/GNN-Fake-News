@@ -73,13 +73,14 @@ Tabela~\ref{tab:datasets} resume tamanho, fonte e papel de cada um.
 \small
 \begin{tabular}{lrrll}
 \toprule
-\textbf{Dataset} & \textbf{N grafos} & \textbf{N classes} & \textbf{Fonte} & \textbf{Papel} \\
+\textbf{Dataset} & \textbf{Tamanho} & \textbf{N classes} & \textbf{Fonte} & \textbf{Papel} \\
 \midrule
-FakeNewsNet PolitiFact   & $\sim$754   & 2 (50/50)   & \cite{shu2020fakenewsnet}      & Treino + valida\c{c}\~ao \\
-UPFD-PolitiFact          & $\sim$314   & 2 (50/50)   & \cite{dou2021upfd}             & Cross-dataset \\
-UPFD-GossipCop           & $\sim$5{.}464 & 2 (50/50) & \cite{dou2021upfd}             & Cross-dataset \\
-Bluesky (acad\^emico)    & 168{.}463   & --          & \cite{failla2024bluesky}       & Aplica\c{c}\~ao (sem \emph{labels}) \\
+FakeNewsNet PolitiFact   & $\sim$754 grafos   & 2 (50/50)   & \cite{shu2020fakenewsnet}      & Treino + valida\c{c}\~ao \\
+UPFD-PolitiFact          & $\sim$314 grafos   & 2 (50/50)   & \cite{dou2021upfd}             & Cross-dataset \\
+UPFD-GossipCop           & $\sim$5{.}464 grafos & 2 (50/50) & \cite{dou2021upfd}             & Cross-dataset \\
+Bluesky (acad\^emico)    & 168{.}463 \emph{posts}\textsuperscript{$\dagger$}   & --          & \cite{failla2024bluesky}       & Aplica\c{c}\~ao (sem \emph{labels}) \\
 \bottomrule
+\multicolumn{5}{l}{\footnotesize \textsuperscript{$\dagger$}Posts individuais; cada um pode ser raiz de uma cascata de propaga\c{c}\~ao constru\'ida em \S\ref{sec:construcao_fnn}.}\\
 \end{tabular}
 \end{table}
 
@@ -107,8 +108,9 @@ como tendo propagado a not\'icia.
 A topologia em estrela (e n\~ao em \'arvore com profundidade) \'e
 imposta pelo formato do CSV bruto, que fornece apenas uma lista plana de
 \texttt{tweet\_ids} por not\'icia, sem rela\c{c}\~ao de parentesco entre
-\emph{retweets} e sem \emph{timestamps} (caveat j\'a discutido em
-\S\ref{sec:datasets}). Aplicam-se dois filtros: o m\'inimo de dois
+\emph{retweets} e sem \emph{timestamps}: limita\c{c}\~ao herdada
+diretamente do reposit\'orio KaiDMML~\cite{shu2020fakenewsnet}, n\~ao
+mitig\'avel sem coleta complementar via API. Aplicam-se dois filtros: o m\'inimo de dois
 \emph{tweets} de propaga\c{c}\~ao por not\'icia (descarta cascatas
 degeneradas, sem o que o grafo de propaga\c{c}\~ao seria reduzido a um
 \'unico n\'o) e o m\'aximo de 100 n\'os por grafo. A distribui\c{c}\~ao
@@ -184,9 +186,9 @@ com pesos de aresta aprendidos via mecanismo de aten\c{c}\~ao; e o
 GraphSAGE (\cite{hamilton2017graphsage}), com agrega\c{c}\~ao indutiva por
 m\'edia dos vizinhos. Todas as tr\^es s\~ao implementadas no \emph{PyTorch
 Geometric}~\cite{fey2019pyg} e compartilham a mesma arquitetura agregada:
-tr\^es camadas convolucionais --- limite cl\'assico para evitar o
+tr\^es camadas convolucionais (limite cl\'assico para evitar o
 \emph{oversmoothing} demonstrado por Li, Han e
-Wu~\cite{li2018deeper} em GCNs profundas ---, com 64 canais ocultos
+Wu~\cite{li2018deeper} em GCNs profundas), com 64 canais ocultos
 por camada, seguidas de \emph{global mean pool} sobre os n\'os
 (invariante a permuta\c{c}\~ao de v\'ertices, opera\c{c}\~ao padr\~ao da
 fam\'ilia agregadora discutida por Xu et al.~\cite{xu2019gin}),
@@ -204,12 +206,18 @@ recomenda\c{c}\~ao de Prechelt~\cite{prechelt1998early}. Os demais
 hiperpar\^ametros, incluindo as poucas diferen\c{c}as entre as
 arquiteturas, est\~ao na Tabela~\ref{tab:hyperparams}.
 
-\textit{Para o UPFD, o vetor de \emph{features} de entrada de cada n\'o
-\'e o vetor pr\'e-computado fornecido pelo dataset (variante
-\texttt{profile}, com 10 dimens\~oes); para o FakeNewsNet, o vetor \'e o
-de 771 dimens\~oes descrito em \S\ref{sec:construcao_fnn}; para os
-experimentos de topologia pura da \S\ref{sec:topo_sem_texto}, ambos os
-\emph{datasets} t\^em suas \emph{features} substitu\'idas por
+\textit{O vetor de \emph{features} de entrada de cada n\'o varia
+conforme o experimento. No benchmark \emph{cross-dataset} de
+\S\ref{sec:cross_dataset} sobre o UPFD, utilizamos a variante
+\texttt{content} (310 dimens\~oes, combina\c{c}\~ao \emph{spaCy} +
+\emph{profile}) por restri\c{c}\~ao de mem\'oria RAM ao densificar a
+matriz esparsa de GossipCop em ambiente Windows/CPU: a variante
+\texttt{bert} (768 dimens\~oes) reportada em \cite{dou2021upfd}
+estoura mem\'oria nessa configura\c{c}\~ao. No FakeNewsNet, o vetor \'e
+o de 771 dimens\~oes descrito em \S\ref{sec:construcao_fnn}
+(\emph{embedding} BERT do t\'itulo $+$ codifica\c{c}\~oes posicionais).
+Nos experimentos de topologia pura da \S\ref{sec:topo_sem_texto},
+ambos os \emph{datasets} t\^em suas \emph{features} substitu\'idas por
 \texttt{[is\_root, grau\_norm]} (dimens\~ao 2).}
 
 \begin{table}[H]\centering
@@ -446,8 +454,7 @@ e reportamos m\'edia e desvio-padr\~ao.
 
 Terceiro, reconhecemos as limita\c{c}\~oes ao determinismo: operadores
 \texttt{scatter} e \texttt{gather} do PyTorch Geometric n\~ao possuem
-\emph{kernel} determin\'istico em GPU
-\cite{ying2019gnnexplainer}\footnote{Refer\^encia da nota: a documenta\c{c}\~ao
+\emph{kernel} determin\'istico em GPU\footnote{Refer\^encia da nota: a documenta\c{c}\~ao
 oficial do PyTorch sobre reprodutibilidade
 (\url{https://pytorch.org/docs/stable/notes/randomness.html}).}, e
 diferen\c{c}as de arquitetura de CPU ou de vers\~ao de bibliotecas

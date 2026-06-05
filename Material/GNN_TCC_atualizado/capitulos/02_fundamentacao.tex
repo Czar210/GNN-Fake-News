@@ -13,7 +13,7 @@
 \section{Detec\c{c}\~ao de fake news: panorama}
 \label{sec:panorama}
 
-\emph{Fake news} \'e termo de uso amplo cuja precisa\c{c}\~ao
+\emph{Fake news} \'e termo de uso amplo cuja defini\c{c}\~ao
 acad\^emica est\'a longe de ser consensual. A revis\~ao sistem\'atica
 de Tandoc et al.~\cite{tandoc2018defining} catalogou seis acep\c{c}\~oes
 distintas em uso na literatura (s\'atira, par\'odia, fabrica\c{c}\~ao,
@@ -21,9 +21,9 @@ manipula\c{c}\~ao, propaganda e publicidade disfar\c{c}ada de not\'icia)
 organizadas em duas dimens\~oes: \emph{facticidade} (qu\~ao
 verific\'avel \'e o conte\'udo) e \emph{inten\c{c}\~ao de enganar} (qu\~ao
 deliberada \'e a falsidade). Para fins deste trabalho, adotamos como
-foco a categoria de \emph{fabrica\c{c}\~ao} --- conte\'udo apresentado
+foco a categoria de \emph{fabrica\c{c}\~ao} (conte\'udo apresentado
 sob forma jornal\'istica que \'e factualmente falso e cuja inten\c{c}\~ao
-\'e enganar ---, modalidade que tamb\'em concentra a aten\c{c}\~ao da
+\'e enganar), modalidade que tamb\'em concentra a aten\c{c}\~ao da
 literatura computacional de detec\c{c}\~ao~\cite{pmc_overviewfakenews,
 ieee_fakenewslandscape}. A delimita\c{c}\~ao importa porque exclui do
 escopo s\'atira e par\'odia, cuja detec\c{c}\~ao envolve modelagem de
@@ -60,14 +60,13 @@ diretamente a topologia com que a not\'icia se espalha pela rede:
 
 Trabalhos recentes convergem para a hipot\'ese de que \emph{nenhuma
 das tr\^es abordagens isoladas \'e robusta}, e que estrat\'egias
-\emph{h\'ibridas} --- combinando texto e topologia, ou texto e contexto
-social --- tendem a superar variantes puras
-\cite{mdpi_bidirectionalgcn, pmc_multimodalfakenews}. \'E nesse
-diagn\'ostico de complementaridade que se insere o presente trabalho:
-diferentemente de propor uma nova arquitetura h\'ibrida, investigamos
-\emph{quando} cada componente do h\'ibrido carrega sinal informativo,
-e formalizamos o crit\'erio mensur\'avel que decide o caso (Cap\'itulo
-\ref{cap:resultados}, \S\ref{sec:porque}).
+\emph{h\'ibridas} (combinando texto e topologia, ou texto e contexto
+social) tendem a superar variantes puras
+\cite{mdpi_bidirectionalgcn, pmc_multimodalfakenews}. O diagn\'ostico
+de complementaridade abre uma quest\~ao operacional --- \emph{quando}
+cada componente do h\'ibrido carrega sinal informativo? --- que
+formalizamos por meio do crit\'erio mensur\'avel apresentado no
+Cap\'itulo~\ref{cap:resultados}, \S\ref{sec:porque}.
 
 % ------------------------------------------------------------
 \section{Grafos e redes sociais}
@@ -91,9 +90,9 @@ o n\'o raiz representa a publica\c{c}\~ao original (\emph{post},
 subsequente (\emph{repost}, \emph{retweet}, \emph{reply}); cada aresta
 representa a rela\c{c}\~ao de filia\c{c}\~ao causal entre uma
 intera\c{c}\~ao e a publica\c{c}\~ao que a originou. As m\'etricas
-estruturais que descrevem essa \'arvore --- e que servem de
+estruturais que descrevem essa \'arvore, e que servem de
 \emph{features} estruturais ao classificador topol\'ogico discutido em
-cap\'itulos posteriores --- s\~ao:
+cap\'itulos posteriores, s\~ao:
 
 \begin{itemize}
 \item \texttt{num\_nodes} (n\'umero total de v\'ertices, incluindo a
@@ -159,7 +158,7 @@ contudo, o BERT padr\~ao \'e ineficiente: produz um vetor por
 \emph{token}, e a tradi\c{c}\~ao de derivar um vetor de senten\c{c}a
 via m\'edia dos \emph{tokens} ou via vetor do \emph{token} de
 \emph{classification head} produz representa\c{c}\~oes de qualidade
-inferior \`a estado-da-arte para tarefas de similaridade sem\^antica
+inferior \`as do estado da arte para tarefas de similaridade sem\^antica
 \cite{reimers2019sbert}. Reimers e Gurevych propuseram, ent\~ao, o
 \emph{Sentence-BERT} (SBERT)~\cite{reimers2019sbert}, que adapta o BERT
 via \emph{fine-tuning} em arquitetura \emph{siamesa} com objetivo
@@ -190,8 +189,8 @@ sa\'ida \'e de $768$ dimens\~oes; sua adapta\c{c}\~ao ao
 Redes Neurais Convolucionais e Redes Neurais Recorrentes operam,
 respectivamente, sobre dom\'inios euclidianos com grade regular
 (imagens) e sequ\^encias ordenadas (texto). A maioria dos dados
-estruturados que importam para problemas pr\'aticos --- redes sociais,
-mol\'eculas, redes de cita\c{c}\~ao, malhas de superf\'icie --- vive em
+estruturados que importam para problemas pr\'aticos (redes sociais,
+mol\'eculas, redes de cita\c{c}\~ao, malhas de superf\'icie) vive em
 dom\'inios n\~ao-euclidianos onde \emph{n\~ao} h\'a ordena\c{c}\~ao
 can\^onica entre vizinhos nem grade regular. \emph{Geometric Deep
 Learning}~\cite{bronstein2017geometric} \'e o termo abrangente que
@@ -214,7 +213,7 @@ h_v^{(l+1)} = \mathrm{UPDATE}\!\left( h_v^{(l)},\;
 onde $\mathrm{AGGREGATE}$ deve ser \emph{permuta\c{c}\~ao-invariante}
 (soma, m\'edia, m\'aximo) para que a sa\'ida n\~ao dependa da ordem
 arbitr\'aria de enumera\c{c}\~ao dos vizinhos. As arquiteturas avaliadas
-neste trabalho --- GCN, GAT e GraphSAGE --- diferem precisamente na
+neste trabalho (GCN, GAT e GraphSAGE) diferem precisamente na
 escolha das fun\c{c}\~oes $\mathrm{AGGREGATE}$ e $\mathrm{UPDATE}$. A
 expressividade comparada da fam\'ilia foi formalmente caracterizada
 por Xu et al.~\cite{xu2019gin}, que mostraram que GNNs com
@@ -320,8 +319,8 @@ sinal nodal e o sinal de vizinhan\c{c}a.
 Em redes pequenas como as \'arvores de propaga\c{c}\~ao deste trabalho,
 a vantagem indutiva original n\~ao se manifesta (todos os grafos cabem
 em mem\'oria e n\~ao h\'a custo de amostragem a economizar), mas a
-distin\c{c}\~ao arquitetural --- a concatena\c{c}\~ao em vez de
-mistura --- \'e o que torna a GraphSAGE particularmente apta a explorar
+distin\c{c}\~ao arquitetural, a concatena\c{c}\~ao em vez de
+mistura, \'e o que torna a GraphSAGE particularmente apta a explorar
 sinal estrutural quando esse sinal est\'a concentrado em um \'unico
 n\'o (a raiz da \'arvore). \'E essa propriedade que explica seu
 desempenho superior em UPFD-GossipCop sem texto (\S\ref{sec:topo_sem_texto}).
@@ -333,10 +332,10 @@ desempenho superior em UPFD-GossipCop sem texto (\S\ref{sec:topo_sem_texto}).
 A regra de propaga\c{c}\~ao da GCN (Equa\c{c}\~ao~\ref{eq:gcn}) \'e
 um operador linear sobre $H^{(l)}$ seguido por uma n\~ao-linearidade.
 Quando \emph{todos} os n\'os do grafo recebem o mesmo vetor de
-\emph{features} de entrada --- caso degenerado mas n\~ao patol\'ogico
+\emph{features} de entrada (caso degenerado mas n\~ao patol\'ogico
 em aplica\c{c}\~oes pr\'aticas, em particular naquelas em que o vetor
 nodal \'e replicado a partir de um \'unico atributo global da
-inst\^ancia --- a primeira camada da GCN se reduz a uma fun\c{c}\~ao
+inst\^ancia), a primeira camada da GCN se reduz a uma fun\c{c}\~ao
 apenas do grau de cada n\'o. A demonstra\c{c}\~ao \'e simples e o
 resultado tem implica\c{c}\~ao direta sobre o desenho de
 \emph{features} para cascatas de propaga\c{c}\~ao.
@@ -373,7 +372,7 @@ classificador de grafo recebe uma m\'edia dos m\'ultiplos escalares
 $\tilde{A}\mathbf{1}_N$ vezes o mesmo $x^{T} W$: grafos cuja
 \emph{distribui\c{c}\~ao de grau} \'e similar produzem
 representa\c{c}\~oes muito pr\'oximas, e a discrimina\c{c}\~ao entre
-eles resta condicionada a essas estat\'isticas de grau ---
+eles resta condicionada a essas estat\'isticas de grau,
 informa\c{c}\~ao muito empobrecida em rela\c{c}\~ao \`a estrutura
 completa da \'arvore. O fen\^omeno \'e parente do \emph{oversmoothing}
 caracterizado por Li, Han e Wu~\cite{li2018deeper} para GCNs
@@ -385,7 +384,7 @@ funcional sobre cascatas de propaga\c{c}\~ao em que a \emph{feature}
 nodal natural \'e o \emph{embedding} BERT do t\'itulo da not\'icia
 (id\^entico para todos os n\'os de um mesmo grafo, por
 constru\c{c}\~ao), \'e necess\'ario \emph{adicionar} \emph{features}
-posicionais que tornem os n\'os distingu\'iveis --- \emph{features}
+posicionais que tornem os n\'os distingu\'iveis, \emph{features}
 detalhadas a seguir, em \S\ref{sec:encodings}, e cuja necessidade
 empiricamente confirmada \'e o objeto de \S\ref{sec:topo_sem_texto}.
 
@@ -408,14 +407,21 @@ features} reportada na literatura~\cite{arxiv_topologicalfeatures}:
   camada da Equa\c{c}\~ao~\ref{eq:degeneracao} produza ao menos dois
   vetores nodais distintos.
 
-\item[{\texttt{grau\_norm} $\in [0, 1]$.}] Definido como
-  $\deg(v) / \deg_{\max}$, onde $\deg_{\max}$ \'e o grau m\'aximo
-  observado no \emph{batch} de treinamento. Codifica diretamente o
-  \emph{branching factor} local --- a m\'etrica que, por
-  \S\ref{sec:porque}, carrega a maior parte do sinal discriminativo em
-  UPFD-GossipCop. A normaliza\c{c}\~ao pelo m\'aximo do \emph{batch}
-  evita que valores absolutos contaminem a generaliza\c{c}\~ao para
-  grafos de tamanhos diferentes.
+\item[{\texttt{grau\_norm} $\in [0, 1]$.}] Codifica a magnitude do
+  entorno do n\'o em uma faixa fixa, evitando que cascatas de tamanhos
+  muito diferentes contaminem a generaliza\c{c}\~ao. A
+  defini\c{c}\~ao adotada varia conforme a constru\c{c}\~ao do grafo
+  no \emph{pipeline}: para \emph{features} topol\'ogicas puras em UPFD
+  (\S\ref{sec:topo_sem_texto}), usa-se $\deg(v) / \deg_{\max}^{(G)}$,
+  onde $\deg_{\max}^{(G)}$ \'e o grau m\'aximo \emph{daquele grafo}, de
+  modo que a magnitude resultante seja invariante \`a escala absoluta
+  da cascata; para grafos do FakeNewsNet, que s\~ao em estrela rasa por
+  constru\c{c}\~ao (\S\ref{sec:construcao_fnn}), o valor codificado \'e
+  $N/N_{\max}^{\mathrm{global}}$ \emph{na raiz} (com 0 nos filhos), onde
+  $N$ \'e o n\'umero de n\'os do grafo e $N_{\max}^{\mathrm{global}} =
+  100$ \'e o cap aplicado. Em ambos os casos, a \emph{feature} captura
+  a magnitude relativa da cascata que vir\'a a ser explorada pelas
+  camadas seguintes da GNN.
 
 \item[{\texttt{pos} $\in [0, 1]$.}] Definido pela ordem de visita\c{c}\~ao
   em \emph{busca em largura} (\emph{breadth-first search}, BFS) a
@@ -435,7 +441,7 @@ combina\c{c}\~ao das tr\^es produz o vetor de $771$ dimens\~oes
 (\emph{embedding} BERT de $768$ + 3 codifica\c{c}\~oes posicionais)
 descrito no Cap\'itulo~\ref{cap:metodologia}.
 
-A ablation sistem\'atica de quais subconjuntos dessas codifica\c{c}\~oes
+A \emph{ablation} sistem\'atica de quais subconjuntos dessas codifica\c{c}\~oes
 s\~ao necess\'arios para recuperar performance ap\'os a
 degenera\c{c}\~ao \'e o objeto experimental de
 \S\ref{sec:topo_sem_texto}, e responde formalmente \`a parte (a) da
@@ -452,7 +458,7 @@ mesma profundidade.
 
 A explicabilidade em redes neurais profundas \'e uma quest\~ao de
 pesquisa ativa, e em GNNs adquire particularidade adicional: o objeto
-sobre o qual o modelo opera --- o grafo --- tem dimensionalidade
+sobre o qual o modelo opera, o grafo, tem dimensionalidade
 vari\'avel entre inst\^ancias, e as t\'ecnicas cl\'assicas
 desenvolvidas para imagens (\emph{saliency maps}) ou texto
 (\emph{attention rollout}) n\~ao se transferem diretamente. A
@@ -520,9 +526,9 @@ escolha adotada em \S\ref{sec:folds}.
 arquiteturas sobre o mesmo \emph{dataset}, o teste $t$ pareado
 recebe as $k$ diferen\c{c}as fold-a-fold ($\Delta_i = m_i^{(A)} -
 m_i^{(B)}$, onde $m^{(A)}$ \'e a m\'etrica do modelo $A$) e testa a
-hip\'otese nula $H_0: \mathbb{E}[\Delta] = 0$. O pareamento --- isto
+hip\'otese nula $H_0: \mathbb{E}[\Delta] = 0$. O pareamento (isto
 \'e, exigir que ambos os modelos sejam avaliados sobre exatamente os
-mesmos \emph{folds} --- elimina a varia\c{c}\~ao entre \emph{folds}
+mesmos \emph{folds}) elimina a varia\c{c}\~ao entre \emph{folds}
 da estima\c{c}\~ao, recuperando poder estat\'istico em rela\c{c}\~ao ao
 teste $t$ independente. \'E o instrumento principal adotado no
 protocolo da \S\ref{sec:protocolo}.
@@ -555,9 +561,9 @@ $\geq 0{,}8$      & grande \\
 \end{table}
 
 \emph{Bootstrap pareado}. Quando o pareamento por \emph{fold} n\~ao
-\'e poss\'ivel --- caso de \emph{subsets} definidos \emph{post-hoc}
+\'e poss\'ivel (caso de \emph{subsets} definidos \emph{post-hoc}
 sobre um \'unico conjunto de teste, como os recortes por profundidade
-da cascata em \S\ref{sec:estrat_cascatas} ---, o intervalo de
+da cascata em \S\ref{sec:estrat_cascatas}), o intervalo de
 confian\c{c}a sobre a diferen\c{c}a $\Delta$ \'e estimado por
 \emph{bootstrap pareado}~\cite{efron1993bootstrap}: a cada uma de
 $n_{\mathrm{boot}}$ reamostragens com reposi\c{c}\~ao do \emph{subset},
@@ -591,7 +597,7 @@ das tr\^es dimens\~oes (conte\'udo, contexto, propaga\c{c}\~ao) j\'a
 discutidas na \S\ref{sec:panorama}. Ambos os \emph{surveys}
 identificam, como lacuna recorrente, a aus\^encia de \emph{benchmarks}
 de aplicabilidade que indiquem \emph{quando} cada fam\'ilia funciona
-e quando colapsa --- lacuna que motiva o diagn\'ostico proposto neste
+e quando colapsa, lacuna que motiva o diagn\'ostico proposto neste
 trabalho.
 
 % ------------------------------------------------------------
@@ -606,8 +612,8 @@ Twitter, usando uma combina\c{c}\~ao de convolu\c{c}\~ao em grafo e
 \emph{baselines} textuais. A linha continuou com o BiGCN de Bian et
 al.~\cite{bian2020bigcn}, que opera bidirecionalmente sobre a \'arvore
 de propaga\c{c}\~ao (\emph{top-down} e \emph{bottom-up}) e adiciona
-\emph{features} de conte\'udo de cada n\'o. Variantes posteriores ---
-sintetizadas em \cite{mdpi_bidirectionalgcn} --- exploraram
+\emph{features} de conte\'udo de cada n\'o. Variantes posteriores,
+sintetizadas em \cite{mdpi_bidirectionalgcn}, exploraram
 aten\c{c}\~ao, agrega\c{c}\~ao temporal e codifica\c{c}\~oes adicionais.
 
 O \emph{benchmark} de refer\^encia para a linha \'e o UPFD de Dou et
@@ -617,9 +623,9 @@ FakeNewsNet-GossipCop, com curadoria de Shu et al.~\cite{shu2020fakenewsnet})
 em formato de grafo padronizado, com quatro variantes de
 \emph{features} nodais (\texttt{profile}, \texttt{spacy},
 \texttt{content}, \texttt{bert}) e \emph{splits} train/val/test fixos.
-Os tr\^es \emph{datasets} sobre os quais este trabalho opera --- nosso
+Os tr\^es \emph{datasets} sobre os quais este trabalho opera (nosso
 FakeNewsNet constru\'ido independentemente, e o UPFD nas duas
-variantes oficiais --- s\~ao precisamente os que esses trabalhos
+variantes oficiais) s\~ao precisamente os que esses trabalhos
 consagram.
 
 A nossa configura\c{c}\~ao foge da literatura em tr\^es pontos
@@ -656,7 +662,7 @@ classificador \emph{topol\'ogico} (que n\~ao processa texto) produz
 distribui\c{c}\~oes de \emph{score} estatisticamente equivalentes entre
 portugu\^es e ingl\^es sobre um \emph{snapshot} multil\'ingue do
 Bluesky (\S\ref{sec:multilingual}). Isso n\~ao constitui uma proposta
-de m\'etodo multil\'ingue --- a precis\~ao classificat\'oria em
+de m\'etodo multil\'ingue: a precis\~ao classificat\'oria em
 portugu\^es n\~ao foi medida, dado que o Bluesky n\~ao possui
 \emph{ground truth}. \'E, antes, evid\^encia de que o sinal estrutural
 \emph{transcende} o idioma, propriedade desej\'avel para m\'etodos
@@ -725,8 +731,8 @@ Neural de Grafos. Avalia tr\^es arquiteturas can\^onicas (GCN, GAT,
 GraphSAGE) sob \emph{ablation} sistem\'atica das \emph{features} nodais
 e dos \emph{datasets} dispon\'iveis, e prop\~oe como contribui\c{c}\~ao
 prim\'aria um \emph{diagn\'ostico de aplicabilidade}: um crit\'erio
-mensur\'avel --- diferen\c{c}a estrutural entre classes da ordem de
-$|d| \geq 0{,}5$ em pelo menos uma m\'etrica de cascata --- que decide,
+mensur\'avel, diferen\c{c}a estrutural entre classes da ordem de
+$|d| \geq 0{,}5$ em pelo menos uma m\'etrica de cascata, que decide,
 \emph{antes do treinamento}, se h\'a chance de o paradigma topol\'ogico
 funcionar em um dom\'inio dado. O crit\'erio \'e deliberadamente
 \emph{falsific\'avel}: a apresenta\c{c}\~ao de um \emph{dataset} com

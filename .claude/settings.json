@@ -6,7 +6,9 @@
       "Bash(pdflatex -interaction=nonstopmode main.tex)",
       "Bash(bibtex main *)",
       "Read(//tmp/**)",
-      "Bash(cd \"c:/Users/cesar/Documents/GitHub/GNN Fake News/Material/GNN_TCC_atualizado\" && pdflatex -interaction=nonstopmode main.tex > /tmp/p.log 2>&1; grep -E \"Output written|^!\" /tmp/p.log | head -5; grep -E \"Warning: Reference|Warning: Citation\" /tmp/p.log | grep -v sibila2025 | head -5)"
+      "Bash(cd \"c:/Users/cesar/Documents/GitHub/GNN Fake News/Material/GNN_TCC_atualizado\" && pdflatex -interaction=nonstopmode main.tex > /tmp/p.log 2>&1; grep -E \"Output written|^!\" /tmp/p.log | head -5; grep -E \"Warning: Reference|Warning: Citation\" /tmp/p.log | grep -v sibila2025 | head -5)",
+      "Bash(grep -n \"Forest plot\\\\|limiar de efeito\\\\|ficam abaixo\\\\|m\\\\\\\\\\\\\\\\'aximo.*0\\\\|F17\" capitulos/04_resultados.tex)",
+      "Bash(grep -n \"duas m\\\\\\\\\\\\\\\\'etricas\\\\|num\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\_nodes.*branching\\\\|width\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\_max.*depth\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\_max\\\\|tabela amplia\\\\|cinco m\\\\\\\\\\\\\\\\'etricas\" capitulos/04_resultados.tex)"
     ]
   }
 }

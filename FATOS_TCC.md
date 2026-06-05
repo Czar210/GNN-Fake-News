@@ -320,7 +320,7 @@ os scripts 28/29/30 nesta sessão.
 | Fato | Valor | Fonte | Status |
 |---|---|---|---|
 | PT vs EN — Cohen's d | −0.057 (desprezível) | 📊 T11 | ✅ |
-| DE vs EN — Cohen's d | −0.468 (médio) | 📊 T11 | ✅ |
+| DE vs EN — Cohen's d | −0.468 (pequeno, topo da faixa, próximo do limiar médio 0,5) | 📊 T11 | ✅ |
 | PT vs DE — Cohen's d | +0.739 (médio-grande) | 📊 T11 | ✅ |
 | N por idioma | EN 132.312 / DE 9.686 / PT 2.661 | 📊 T11 | ✅ |
 

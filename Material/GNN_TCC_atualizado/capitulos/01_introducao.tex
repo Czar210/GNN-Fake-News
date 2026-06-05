@@ -23,17 +23,19 @@ fen\^omeno: no Brasil, ``rem\'edios milagrosos'' sem respaldo
 cient\'ifico foram promovidos em larga escala; nos Estados Unidos,
 relat\'orio dos \emph{Centers for Disease Control and Prevention}
 documentou que parcela substancial de adultos entrevistados aderiu a
-pr\'aticas de risco --- uso inadequado de desinfetantes e alvejantes
-como prote\c{c}\~ao contra o v\'irus --- motivada por narrativas falsas
+pr\'aticas de risco (uso inadequado de desinfetantes e alvejantes
+como prote\c{c}\~ao contra o v\'irus) motivada por narrativas falsas
 \cite{gharpure2020cdc}. O padr\~ao subjacente a esses epis\'odios n\~ao
-\'e fortuito: not\'icias falsas se propagam de forma sistematicamente
-mais ampla, mais r\'apida e mais profunda do que not\'icias verdadeiras
-nas redes sociais \cite{vosoughi2018spread}, em parte porque os
-algoritmos das plataformas amplificam conte\'udo de alta intera\c{c}\~ao
-independentemente de sua veracidade \cite{bakshy2015exposure}, e em
-parte porque o vi\'es de confirma\c{c}\~ao do leitor, refor\c{c}ado por
-\emph{echo chambers}, torna o compartilhamento mais r\'apido que a
-verifica\c{c}\~ao \cite{delvicario2016spreading}.
+\'e fortuito: estudos quantitativos sobre redes sociais reportam
+diferen\c{c}as sistem\'aticas na din\^amica de difus\~ao entre
+conte\'udo falso e verdadeiro (desde o alcance bruto at\'e a
+velocidade m\'edia de propaga\c{c}\~ao~\cite{vosoughi2018spread}),
+diferen\c{c}as que se explicam, em parte, pelos algoritmos das
+plataformas, que amplificam conte\'udo de alta intera\c{c}\~ao
+independentemente de sua veracidade~\cite{bakshy2015exposure}, e em
+parte pelo vi\'es de confirma\c{c}\~ao do leitor, refor\c{c}ado por
+\emph{echo chambers}, que torna o compartilhamento mais r\'apido que a
+verifica\c{c}\~ao~\cite{delvicario2016spreading}.
 
 A escala em que esses fen\^omenos ocorrem inviabiliza a verifica\c{c}\~ao
 manual. O volume de postagens em redes sociais opera em regime de
@@ -44,14 +46,14 @@ acess\'orio, mas uma necessidade. A abordagem tradicional, baseada
 em Processamento de Linguagem Natural (PLN), tem limites bem
 estabelecidos: depende da qualidade textual dos exemplos rotulados,
 falha diante de textos com alta sofistica\c{c}\~ao lingu\'istica
-\cite{pmc_overviewfakenews, mdpi_cnn_llm_nlp}, e --- a limita\c{c}\~ao
-estruturalmente mais importante --- \'e atravessada pela ascens\~ao
-recente de modelos generativos capazes de produzir texto
-gramaticalmente impec\'avel em escala industrial \cite{arxiv_llmfakenews}.
-\'E plaus\'ivel, embora ainda n\~ao demonstrado em larga escala, que a
-detec\c{c}\~ao baseada \emph{exclusivamente} no texto perca robustez
-\`a medida que o conte\'udo gerado por LLMs se torne indistingu\'ivel
-do humano.
+\cite{pmc_overviewfakenews, mdpi_cnn_llm_nlp}, e (a limita\c{c}\~ao
+estruturalmente mais importante) \'e atravessada pela ascens\~ao
+recente de modelos generativos de l\'ingua natural que apagam, no
+plano lingu\'istico de superf\'icie, a fronteira entre texto humano e
+texto sintetizado~\cite{arxiv_llmfakenews}. \'E plaus\'ivel, embora
+ainda n\~ao demonstrado em larga escala, que a detec\c{c}\~ao baseada
+\emph{exclusivamente} no texto perca robustez \`a medida que essa
+fronteira se desfaz.
 
 % ------------------------------------------------------------
 \section{Motiva\c{c}\~ao}
@@ -62,13 +64,13 @@ n\~ao se distingue apenas pelo conte\'udo, mas tamb\'em pelo
 \emph{padr\~ao com que se espalha pela rede}: quem compartilha o qu\^e,
 para quem, e em qual ordem temporal. Essa observa\c{c}\~ao deu origem
 \`a aplica\c{c}\~ao de Redes Neurais de Grafos (\emph{Graph Neural
-Networks} --- GNNs) ao problema, partindo de Monti et
+Networks}, GNNs) ao problema, partindo de Monti et
 al.~\cite{monti2019fakenews} e consolidando-se em uma fam\'ilia de
 trabalhos que tratam a \'arvore de propaga\c{c}\~ao como objeto
 classific\'avel~\cite{dou2021upfd, bian2020bigcn, mdpi_bidirectionalgcn,
 pmc_gnnsurveyfakenews}. O ganho conceitual \'e claro: o sinal estrutural
 n\~ao depende do idioma do texto, n\~ao \'e degradado por par\'afrase ou
-sin\^onimo, e em princ\'ipio resiste a textos gerados por LLM ---
+sin\^onimo, e em princ\'ipio resiste a textos gerados por LLM,
 desde que a topologia da propaga\c{c}\~ao, ela mesma, preserve
 diferen\c{c}as discrimin\'aveis entre conte\'udo falso e verdadeiro.
 
@@ -78,11 +80,10 @@ resultados positivos em \emph{datasets} espec\'ificos; reporta
 parcialmente os casos em que o paradigma \emph{n\~ao} funciona; e
 oferece poucos crit\'erios mensur\'aveis, a priori, sobre quando
 empregar arquiteturas topol\'ogicas e quando recorrer ao texto. \'E
-nesse vazio que o presente trabalho se posiciona: o objeto de
-investiga\c{c}\~ao n\~ao \'e propor uma nova arquitetura GNN, e sim
-\textbf{caracterizar as condi\c{c}\~oes estruturais sob as quais o
-paradigma topol\'ogico \'e aplic\'avel}, com igual peso evidencial para
-os resultados positivos e negativos observados.
+nesse vazio que o presente trabalho se posiciona: \textbf{caracterizar
+as condi\c{c}\~oes estruturais sob as quais o paradigma topol\'ogico
+\'e aplic\'avel}, com igual peso evidencial para os resultados
+positivos e negativos observados.
 
 A Figura~\ref{fig:user_journey} ilustra, em alto n\'ivel, o caminho
 percorrido por uma not\'icia candidata desde a sua entrada at\'e o
@@ -148,7 +149,7 @@ sinaliza confian\c{c}a do par.}
 \label{sec:rqs}
 
 O trabalho organiza-se em torno de tr\^es perguntas de pesquisa,
-respondidas em \S\ref{cap:resultados}:
+respondidas no Cap\'itulo~\ref{cap:resultados}:
 
 \begin{description}
 \item[RQ1.] A topologia da propaga\c{c}\~ao carrega sinal discriminante

@@ -27,10 +27,10 @@ intermedi\'ario e colapso.
 \section{\emph{Baselines} textuais sobre BERT da raiz}
 \label{sec:baseline_textual}
 
-Antes de avaliar qualquer arquitetura de grafos, \'e preciso estabelecer
-o \emph{teto} textual do problema: qual desempenho dois classificadores
-cl\'assicos atingem quando recebem apenas a representa\c{c}\~ao BERT do
-t\'itulo da not\'icia, sem nenhuma informa\c{c}\~ao topol\'ogica. Os
+O \emph{teto} textual do problema \'e o desempenho que dois
+classificadores cl\'assicos atingem quando recebem apenas a
+representa\c{c}\~ao BERT do t\'itulo da not\'icia, sem nenhuma
+informa\c{c}\~ao topol\'ogica. Os
 resultados desse experimento sobre o FakeNewsNet est\~ao na
 Tabela~\ref{tab:baseline_textual_fnn}.
 
@@ -64,7 +64,7 @@ Not\'icias falsas tendem, na literatura de detec\c{c}\~ao em redes
 sociais, a viralizar mais que not\'icias verdadeiras e gerar cascatas
 maiores. Essa correla\c{c}\~ao cria um \emph{confound} trivial: o
 desempenho que se atribui a uma GNN pode, em \'ultima inst\^ancia, n\~ao
-estar capturando estrutura sutil alguma --- pode estar apenas reproduzindo
+estar capturando estrutura sutil alguma: pode estar apenas reproduzindo
 o atalho ``\emph{fake} = grafo maior''. Para test\'a-lo diretamente,
 treinamos um \emph{Random Forest} (\S\ref{sec:baselines}) no FakeNewsNet
 alimentado \emph{apenas} com a \emph{feature} \texttt{num\_nodes}. O
@@ -75,7 +75,7 @@ limiar de $0{,}65$ que adotar\'iamos \emph{a priori} como sinal de
 n\~ao \emph{explica} o sinal capturado pelos modelos posteriores: h\'a
 ru\'ido demais na correla\c{c}\~ao entre tamanho e veracidade para que um
 classificador trivial dela extraia valor preditivo. O ganho que se
-observa nas GNNs vem, portanto, de outras fontes --- textuais, no caso do
+observa nas GNNs vem, portanto, de outras fontes: textuais, no caso do
 FNN; estruturais multi-hop, no caso do UPFD-GossipCop (cuja
 decomposi\c{c}\~ao por profundidade da cascata \'e quantificada em
 \S\ref{sec:estratificacao}).
@@ -86,10 +86,10 @@ decomposi\c{c}\~ao por profundidade da cascata \'e quantificada em
 \section{Cross-dataset UPFD: nossos resultados \emph{versus} literatura}
 \label{sec:cross_dataset}
 
-Antes de discutir os experimentos centrais sobre topologia, importa
-\emph{calibrar} a implementa\c{c}\~ao deste trabalho contra a literatura:
-nossos n\'umeros, sob diferen\c{c}as conhecidas e declaradas de
-configura\c{c}\~ao, est\~ao no envelope dos publicados? A
+Os n\'umeros deste trabalho s\'o sustentam os achados sobre topologia se
+estiverem \emph{calibrados} contra a literatura: sob diferen\c{c}as
+conhecidas e declaradas de configura\c{c}\~ao, eles est\~ao no envelope
+dos publicados? A
 Tabela~\ref{tab:cross_dataset_upfd} reporta o desempenho das tr\^es
 arquiteturas GNN nas duas variantes do UPFD; a
 Tabela~\ref{tab:upfd_vs_publicado} confronta esses mesmos valores com
@@ -102,7 +102,7 @@ O contraste entre os dois dom\'inios j\'a est\'a presente aqui: no
 UPFD-GossipCop as tr\^es arquiteturas convergem para F1-macro em torno
 de $0{,}94$, pr\'oximas do \emph{baseline} textual ($0{,}954$); no
 UPFD-PolitiFact, os modelos espalham-se entre $0{,}69$ (GAT) e $0{,}82$
-(SAGE), com o pr\'oprio LogReg-BERT atingindo $0{,}84$ --- isto \'e, no
+(SAGE), com o pr\'oprio LogReg-BERT atingindo $0{,}84$, isto \'e, no
 PolitiFact a varia\c{c}\~ao entre arquiteturas \'e muito maior, e
 nenhuma supera o \emph{baseline} textual em margem significativa. No
 confronto direto com Dou et al., o nosso UPFD-PolitiFact fica em torno
@@ -123,7 +123,7 @@ especificada no artigo; (iii) reportamos F1-macro enquanto Dou et al.\
 reportam acur\'acia. O prop\'osito da compara\c{c}\~ao n\~ao \'e
 \emph{ranking} competitivo com a literatura, mas \emph{calibra\c{c}\~ao}:
 verificar que nosso \emph{pipeline}, com diferen\c{c}as conhecidas e
-declaradas, est\'a \emph{no envelope} dos valores publicados ---
+declaradas, est\'a \emph{no envelope} dos valores publicados:
 condi\c{c}\~ao necess\'aria para que os achados subsequentes deste
 cap\'itulo sejam tomados como informativos sobre o problema, e n\~ao
 como artefatos de implementa\c{c}\~ao defeituosa.
@@ -134,8 +134,8 @@ como artefatos de implementa\c{c}\~ao defeituosa.
 \section{Topologia sem texto: o achado central (RQ3, parte a)}
 \label{sec:topo_sem_texto}
 
-A pergunta operacional desta se\c{c}\~ao --- e o achado mais central
-do trabalho --- \'e a seguinte: \emph{\'e poss\'ivel treinar uma GNN
+A pergunta operacional desta se\c{c}\~ao, e o achado mais central
+do trabalho, \'e a seguinte: \emph{\'e poss\'ivel treinar uma GNN
 para detectar fake news sem fornecer texto a ela, apenas com sinal
 estrutural sobre o grafo de propaga\c{c}\~ao?} Para responder,
 substitu\'imos as \emph{features} nodais por um vetor de apenas duas
@@ -192,9 +192,9 @@ no \emph{branching factor}, \S\ref{sec:porque}), conduzindo o otimizador
 ao mesmo \'optimo independentemente da semente; (c) o \emph{split}
 treino/valida\c{c}\~ao/teste do UPFD \'e fixo, isolando completamente a
 fonte de varia\c{c}\~ao do \emph{dataset}. Como controle negativo, a
-mesma arquitetura SAGE aplicada ao UPFD-PolitiFact (onde Cohen's $d$
-\'e desprez\'ivel em todas as m\'etricas) produz $\sigma \approx
-0{,}05$, ordem de grandeza maior; isto \'e, o $\sigma$ baixo \'e
+mesma arquitetura SAGE aplicada ao UPFD-PolitiFact (onde nenhum
+Cohen's $d$ atinge efeito m\'edio) produz $\sigma \approx
+0{,}009$, cerca de quatro vezes maior; isto \'e, o $\sigma$ baixo \'e
 fun\c{c}\~ao do \emph{dataset}, n\~ao de \emph{bug} de semente.
 
 % (Bloco original continua abaixo, mantido como conteudo arquivado)
@@ -266,10 +266,11 @@ do limiar de efeito \emph{pequeno} ($|d| < 0{,}2$ pela escala de Cohen).
 Conclu\'imos, portanto, que a diferen\c{c}a entre PT e EN \'e
 \emph{estatisticamente detect\'avel mas praticamente irrelevante}. O par
 alem\~ao \emph{versus} ingl\^es, em contraste, exibe $d = -0{,}468$
-(efeito m\'edio): posts em alem\~ao apresentam \emph{score} topol\'ogico
+(pequeno, no topo da faixa, pr\'oximo do limiar de efeito m\'edio
+$|d|=0{,}5$): posts em alem\~ao apresentam \emph{score} topol\'ogico
 sistematicamente mais baixo (m\'edia $0{,}26$, contra $0{,}40$ do
 ingl\^es). O par PT \emph{versus} DE apresenta $d = +0{,}739$
-(medio-grande), consistente com os pares anteriores: PT est\'a mais
+(m\'edio-grande), consistente com os pares anteriores: PT est\'a mais
 pr\'oximo de EN do que de DE.
 
 A interpreta\c{c}\~ao da diverg\^encia DE \emph{versus} EN exige
@@ -307,11 +308,11 @@ topol\'ogicos depende drasticamente do \emph{dataset}. A causa
 estrutural dessa depend\^encia pode ser quantificada antes mesmo de
 qualquer treinamento, atrav\'es do tamanho de efeito de Cohen ($d$)
 entre as classes \emph{fake} e \emph{real} nas m\'etricas de cascata.
-A Tabela~\ref{tab:cohens_d} reporta $d$ sobre cinco m\'etricas
-estruturais (\texttt{num\_nodes}, \texttt{num\_edges},
-\texttt{depth\_max}, \texttt{width\_max}, \texttt{branching\_avg})
-nos tr\^es \emph{datasets}; a Figura~\ref{fig:forest_plot} mostra os
-mesmos valores em \emph{forest plot} com os limiares de Cohen
+A Tabela~\ref{tab:cohens_d} reporta $d$ nas duas m\'etricas de maior
+efeito (\texttt{num\_nodes} e \texttt{branching\_avg}) nos tr\^es
+\emph{datasets}; a Figura~\ref{fig:forest_plot} amplia a an\'alise para
+quatro m\'etricas (acrescentando \texttt{width\_max} e
+\texttt{depth\_max}) em \emph{forest plot} com os limiares de Cohen
 sobrepostos.
 
 \input{Imagens/tabelas/T5_cohens_d_estrutural}
@@ -322,8 +323,8 @@ sobrepostos.
 m\'etrica estrutural, em cada \emph{dataset}. Linhas pontilhadas indicam
 limiares de Cohen (0.2 / 0.5 / 0.8). UPFD-GossipCop apresenta efeito
 \emph{grande} ($d$=+1.53) em \emph{branching factor}; UPFD-PolitiFact
-e FakeNewsNet ficam abaixo do limiar de efeito \emph{pequeno}
-($|d|<0.2$).}
+e FakeNewsNet ficam abaixo do limiar de efeito \emph{m\'edio}
+($|d|<0{,}5$); o m\'aximo \'e $|d|\approx0{,}25$.}
 \label{fig:forest_plot}
 \end{figure}
 
@@ -341,13 +342,13 @@ matematicamente id\^enticos porque, em grafo-estrela, o
 apenas o n\'o raiz \'e n\~ao-folha.
 
 Um padr\~ao transversal merece registro: nas tr\^es bases, a m\'etrica
-\texttt{depth\_max} concentra os menores tamanhos de efeito --- $d =
+\texttt{depth\_max} concentra os menores tamanhos de efeito: $d =
 0{,}00$ no FNN, $d = -0{,}17$ no UPFD-PolitiFact e $d = -0{,}07$ no
 UPFD-GossipCop. Em palavras, em \emph{nenhum} dos tr\^es \emph{datasets}
 not\'icias falsas se propagam de forma mais profunda que verdadeiras.
 O que distingue \emph{fake} de \emph{real} em UPFD-GossipCop, quando
-distingue, \'e a \emph{extens\~ao horizontal} da difus\~ao --- largura,
-ramifica\c{c}\~ao e n\'umero total de participantes --- \emph{n\~ao} o
+distingue, \'e a \emph{extens\~ao horizontal} da difus\~ao (largura,
+ramifica\c{c}\~ao e n\'umero total de participantes), \emph{n\~ao} o
 alongamento vertical das cadeias de recompartilhamento. Esta
 assimetria entre eixos tem consequ\^encia direta sobre quais
 \emph{features} concentram sinal: \texttt{branching\_avg} e
@@ -372,11 +373,9 @@ qualquer arquitetura, n\~ao apenas SAGE, colapsa sob essa condi\c{c}\~ao.
 A tese central deste trabalho est\'a operacionalizada nesse fen\^omeno:
 \emph{modelos topol\'ogicos exigem diferen\c{c}a estrutural entre classes
 da ordem de magnitude de um efeito m\'edio de Cohen ($|d| \geq 0{,}5$) em
-pelo menos uma m\'etrica de cascata para serem efetivos.} A tese \'e
-deliberadamente \textbf{falsific\'avel}: a apresenta\c{c}\~ao de um
-\emph{dataset} com $0{,}2 < |d| < 0{,}5$ no qual uma arquitetura GNN
-atinja desempenho significativamente acima do baseline textual e do
-RF tabular constituiria contra-evid\^encia direta.
+pelo menos uma m\'etrica de cascata para serem efetivos.} Sua
+formula\c{c}\~ao deliberadamente falsific\'avel e o crit\'erio de
+contra-evid\^encia est\~ao em \S\ref{sec:posicionamento}.
 
 % ============================================================
 % \S 4.6 -- Concordancia textual x topologico (RQ1)
@@ -385,8 +384,8 @@ RF tabular constituiria contra-evid\^encia direta.
 \label{sec:concordancia}
 
 A pergunta interessante a respeito do classificador textual e do
-topol\'ogico tomados em conjunto n\~ao \'e qual dos dois \'e melhor ---
-isso j\'a foi respondido em \S\ref{sec:cross_dataset} --- mas
+topol\'ogico tomados em conjunto n\~ao \'e qual dos dois \'e melhor
+(isso j\'a foi respondido em \S\ref{sec:cross_dataset}), mas
 \emph{onde os dois discordam e quem acerta nas discord\^ancias}. Para
 respond\^e-la, aplicamos os dois classificadores aos $3.826$ grafos
 do \emph{test set} do UPFD-GossipCop e cruzamos suas predi\c{c}\~oes.
@@ -408,7 +407,7 @@ indicam concord\^ancia em FAKE (canto inferior-esquerdo) e em REAL
 
 Tomados isoladamente, o textual atinge F1-macro de $0{,}954$ e o
 topol\'ogico, $0{,}753$, conforme reportado na
-Tabela~\ref{tab:cross_dataset_upfd}. A taxa de concord\^ancia agregada \'e de
+Tabela~\ref{tab:concordancia_gossipcop}. A taxa de concord\^ancia agregada \'e de
 $75{,}9\%$ (Cohen's $\kappa = 0{,}518$, concord\^ancia moderada). Quando
 ambos concordam, o F1 conjunto \'e de $0{,}966$, pr\'oximo do
 m\'aximo te\'orico. Quando discordam, o textual mant\'em F1 de
@@ -441,8 +440,8 @@ Esse comportamento de invers\~ao \emph{justifica} a regra dual
 apresentada a seguir, n\~ao a contradiz: o topol\'ogico s\'o \'e
 confi\'avel quando concorda com o textual; quando discorda, est\'a
 sinalizando precisamente o subconjunto em que sua regra estrutural falha
-por constru\c{c}\~ao. A regra adotada na ferramenta web ---
-Equa\c{c}\~ao~(\ref{eq:regra_dual}) e Figura~\ref{fig:fluxograma_dual} ---
+por constru\c{c}\~ao. A regra adotada na ferramenta web,
+Equa\c{c}\~ao~(\ref{eq:regra_dual}) e Figura~\ref{fig:fluxograma_dual},
 encarna essa l\'ogica: pesos iguais quando os dois concordam, peso 4 vezes
 maior para o textual quando discordam.
 
@@ -504,7 +503,7 @@ para conclus\~ao firme.
 
 A interpreta\c{c}\~ao desta assimetria \'e que o SAGE estrutural aprendeu
 uma heur\'istica diferenciada para cada classe: para \emph{detectar
-fake}, ele se conv\^em em olhar quase exclusivamente o entorno imediato
+fake}, ele se det\'em quase exclusivamente no entorno imediato
 da raiz (consistente com o sinal de \emph{branching factor} alto que
 caracteriza fake news na agrega\c{c}\~ao da \S\ref{sec:porque}); para
 \emph{confirmar real}, sobretudo em cascatas grandes, ele precisa
@@ -565,9 +564,9 @@ monotonicamente com a profundidade da cascata.
 \subsection{Distribui\c{c}\~ao estrutural: \emph{heavy-tail} mais agressivo que lognormal}
 \label{sec:estrat_distribuicao}
 
-Antes de aplicar qualquer estratifica\c{c}\~ao por percentil ou \emph{z-score},
-\'e preciso determinar qual fam\'ilia de distribui\c{c}\~oes descreve
-adequadamente as m\'etricas estruturais do \emph{test set}. A
+A escolha entre estratificar por percentil ou por \emph{z-score} depende
+de qual fam\'ilia de distribui\c{c}\~oes descreve adequadamente as
+m\'etricas estruturais do \emph{test set}. A
 Figura~\ref{fig:distribuicao_log} ajusta uma distribui\c{c}\~ao lognormal
 a cada uma das tr\^es m\'etricas (\texttt{num\_nodes},
 \texttt{depth\_max}, \texttt{branching\_avg}) e submete o ajuste a teste
@@ -691,7 +690,7 @@ de classes do subgrupo -- caracter\'istico de \texttt{real\_viral} (linha
 
 A \S\ref{sec:concordancia} descreveu narrativamente a invers\~ao
 distributiva do classificador estrutural: no subconjunto de
-discord\^ancia com o textual, o SAGE atingia $F1 = 0{,}085$ ---
+discord\^ancia com o textual, o SAGE atingia $F1 = 0{,}085$:
 \emph{abaixo} do n\'ivel da chance. Aqui esse efeito aparece
 quantificado, subgrupo a subgrupo. Os seis subgrupos s\~ao todos
 derivados de cortes em percentis emp\'iricos do pr\'oprio \emph{test}:
@@ -711,11 +710,9 @@ exatos da regra implicitamente aprendida pelo classificador
 estrutural (``\emph{fake} $=$ cascata grande, \emph{real} $=$ cascata
 pequena''): \emph{fakes} contidas violam o primeiro la\c{c}o da regra,
 \emph{reais} virais violam o segundo, e o modelo erra precisamente nesses
-violadores. N\~ao se trata de degrada\c{c}\~ao gradual; trata-se de
-\emph{invers\~ao distributiva}: a rela\c{c}\~ao entre estrutura e
-classe est\'a aproximadamente espelhada no subconjunto extremo em
-rela\c{c}\~ao ao que prevalece no treinamento. O terceiro achado oferece
-o contraponto positivo: em \texttt{cauda\_alta\_n} ($N = 192$ grafos
+violadores. \'E a \emph{invers\~ao distributiva} j\'a descrita em
+\S\ref{sec:concordancia}, agora localizada nos dois subgrupos que a
+produzem. O terceiro achado oferece o contraponto positivo: em \texttt{cauda\_alta\_n} ($N = 192$ grafos
 com \texttt{num\_nodes} acima do $p95$), o SAGE atinge $0{,}823$
 contra $0{,}547$ do RF, \emph{gap} de aproximadamente $28$ pontos
 percentuais absolutos. Quando a topologia oferece estrutura suficiente,
@@ -726,9 +723,9 @@ a assimetria $0{,}8/0{,}2$ da regra dual (\S\ref{sec:concordancia}):
 quando o classificador estrutural discorda do textual, est\'a
 sinalizando que possivelmente caiu em um dos subgrupos onde sua regra
 falha; pesar quatro vezes mais o textual nesse regime \'e
-inst\^ancia\c{c}\~ao direta do diagn\'ostico aqui constru\'ido. A
+instancia\c{c}\~ao direta do diagn\'ostico aqui constru\'ido. A
 caracteriza\c{c}\~ao expl\'icita dos subgrupos onde o modelo erra
-sistematicamente tamb\'em \'e ins\^umo direto para a discuss\~ao de
+sistematicamente tamb\'em \'e insumo direto para a discuss\~ao de
 limita\c{c}\~oes (Cap\'itulo~\ref{cap:conclusao},
 \S\ref{sec:limitacoes}) e para o desenho da interface da ferramenta
 web descrita no Ap\^endice~\ref{ap:aplicacao}, em que predi\c{c}\~oes
@@ -740,12 +737,10 @@ nesses subgrupos podem ser sinalizadas como ``requer revis\~ao humana''.
 
 A terceira lente \'e \emph{ordinal}: estratifica o \emph{test set} por
 profundidade da cascata e mede separadamente o desempenho do RF
-tabular e do SAGE estrutural em cada estrato. Antes da
-estratifica\c{c}\~ao em si, contudo, vale verificar se h\'a cascatas
-profundas suficientes no \emph{dataset} para que essa lente fa\c{c}a
-sentido. A Figura~\ref{fig:distribuicao_profundidade} responde a essa
-pergunta preliminar mostrando a distribui\c{c}\~ao da profundidade
-m\'axima no \emph{test}.
+tabular e do SAGE estrutural em cada estrato. Essa lente s\'o faz
+sentido se houver cascatas profundas suficientes no \emph{dataset}: a
+Figura~\ref{fig:distribuicao_profundidade} mostra a distribui\c{c}\~ao
+da profundidade m\'axima no \emph{test}.
 
 \begin{figure}[H]\centering
 \includegraphics[width=0.98\linewidth]{Imagens/F28_distribuicao_profundidade.png}
@@ -843,13 +838,14 @@ A estratifica\c{c}\~ao agregou tr\^es contribui\c{c}\~oes ao trabalho. Primeira:
 confirmou numericamente, com $N$s expl\'icitos e
 acur\'acias nominais, a invers\~ao distributiva que a
 \S\ref{sec:concordancia} havia descrito apenas em forma
-narrativa: o SAGE n\~ao apenas erra em \texttt{fake\_contido} e
-\texttt{real\_viral}: erra de modo sistematicamente \emph{invertido}.
+narrativa, localizando-a especificamente em \texttt{fake\_contido}
+($N=31$, acur\'acia $0{,}000$) e em \texttt{real\_viral} ($N=60$,
+acur\'acia $0{,}433$).
 Segunda: demonstrou que o $F1 = 0{,}810$ agregado do SAGE em
 UPFD-GossipCop n\~ao se distribui uniformemente: o \emph{gap} sobre o
 RF tabular cresce de $+0{,}060$ no agregado para $+0{,}213$ em
 cascatas com \texttt{depth}$\geq 5$, com IC \emph{bootstrap} que
-n\~ao cruza zero. Terceira: caracterizou expl\'icitamente os subgrupos
+n\~ao cruza zero. Terceira: caracterizou explicitamente os subgrupos
 em que o modelo falha, fornecendo material direto para a
 discuss\~ao de limita\c{c}\~oes (\S\ref{sec:limitacoes}) e para o
 desenho da interface da aplica\c{c}\~ao demonstrativa
