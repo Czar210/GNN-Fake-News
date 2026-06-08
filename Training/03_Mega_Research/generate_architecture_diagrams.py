@@ -326,7 +326,9 @@ for key in ('gcn', 'gat', 'sage'):
                 facecolor=fig.get_facecolor())
     fig.savefig(base + '.svg', format='svg', bbox_inches='tight',
                 facecolor=fig.get_facecolor())
+    fig.savefig(base + '.pdf', format='pdf', bbox_inches='tight',
+                facecolor=fig.get_facecolor())
     plt.close(fig)
-    print(f'OK -> diagrams/{key}_architecture.{{png,svg}}')
+    print(f'OK -> diagrams/{key}_architecture.{{png,svg,pdf}}')
 
 print('\nPronto! Arquivos em:', OUTPUT_DIR)
