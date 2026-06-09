@@ -17,75 +17,77 @@ documentos de controle do trabalho.
 \label{sec:ap_training}
 
 Subdivide-se em tr\^es fases hist\'oricas, das quais a relevante para
-a vers\~ao final \'e \texttt{Training/03\_Mega\_Research/}. Os
-diret\'orios \texttt{01\_BlueSky\_Pipe/} e \texttt{02\_UPFD\_Benchmark/}
+a vers\~ao final \'e \path{Training/03_Mega_Research/}. Os
+diret\'orios \path{01_BlueSky_Pipe/} e \path{02_UPFD_Benchmark/}
 correspondem a itera\c{c}\~oes anteriores do \emph{pipeline} e s\~ao
 mantidos para refer\^encia hist\'orica; suas funcionalidades est\~ao
 consolidadas, em forma refatorada, em
-\texttt{03\_Mega\_Research/}.
+\path{03_Mega_Research/}.
 
-A pasta \texttt{Training/03\_Mega\_Research/} cont\'em $30$
+A pasta \path{Training/03_Mega_Research/} cont\'em $30$
 \emph{scripts} numerados de \texttt{00} a \texttt{32} (com sufixos
 \texttt{27b}, \texttt{27c}, \texttt{31}), organizados pelo papel no
 \emph{pipeline}:
 
+\begin{sloppypar}
 \begin{description}\setlength{\itemsep}{2pt}
-\item[Constru\c{c}\~ao de grafos:] \texttt{00\_construir\_grafos\_fakenewsnet.py},
-\texttt{01\_baixar\_dataset\_hf.py}, \texttt{02\_construir\_grafos\_bluesky.py}.
+\item[Constru\c{c}\~ao de grafos:] \path{00_construir_grafos_fakenewsnet.py},
+\path{01_baixar_dataset_hf.py}, \path{02_construir_grafos_bluesky.py}.
 
 \item[Treinamento e benchmark de arquiteturas:]
-\texttt{03\_treinar\_gat.py}, \texttt{04\_comparar\_gcn\_gat.py},
-\texttt{05\_treinar\_sage.py}, \texttt{06\_comparar\_gcn\_gat\_sage.py},
-\texttt{07\_upfd\_benchmark\_triplo.py},
-\texttt{13\_benchmark\_upfd\_oficial.py}.
+\path{03_treinar_gat.py}, \path{04_comparar_gcn_gat.py},
+\path{05_treinar_sage.py}, \path{06_comparar_gcn_gat_sage.py},
+\path{07_upfd_benchmark_triplo.py},
+\path{13_benchmark_upfd_oficial.py}.
 
-\item[Avalia\c{c}\~ao estat\'istica:] \texttt{09\_teste\_significancia.py}
-(\texttt{ttest\_rel} pareado por \emph{fold}); \texttt{15\_analise\_estrutural.py}
+\item[Avalia\c{c}\~ao estat\'istica:] \path{09_teste_significancia.py}
+(\texttt{ttest\_rel} pareado por \emph{fold}); \path{15_analise_estrutural.py}
 (Cohen's $d$, T5/F17).
 
-\item[\emph{Baselines} e diagn\'osticos:] \texttt{10\_baseline\_textual.py}
-(LogReg-BERT e RF, T1), \texttt{11\_diagnostico\_confound.py}
-(RF sobre \texttt{num\_nodes}), \texttt{20\_textual\_vs\_topologico.py}
+\item[\emph{Baselines} e diagn\'osticos:] \path{10_baseline_textual.py}
+(LogReg-BERT e RF, T1), \path{11_diagnostico_confound.py}
+(RF sobre \texttt{num\_nodes}), \path{20_textual_vs_topologico.py}
 (concord\^ancia, T6/F3).
 
 \item[\emph{Ablation} de \emph{features}:]
-\texttt{12\_ablation\_intra\_encoding.py},
-\texttt{14\_topologia\_sem\_texto.py} (T4/F18, achado central).
+\path{12_ablation_intra_encoding.py},
+\path{14_topologia_sem_texto.py} (T4/F18, achado central).
 
-\item[Explicabilidade:] \texttt{16\_gnn\_explainer\_upfd.py} (F19, F12).
+\item[Explicabilidade:] \path{16_gnn_explainer_upfd.py} (F19, F12).
 
-\item[Persist\^encia de modelos:] \texttt{17\_persistir\_modelos\_finais.py}
+\item[Persist\^encia de modelos:] \path{17_persistir_modelos_finais.py}
 (salva LogReg-BERT, RF estrutural e SAGE estrutural em
-\texttt{Execution/weights/}).
+\path{Execution/weights/}).
 
-\item[Bluesky:] \texttt{18\_analise\_bluesky\_crossfeed.py},
-\texttt{19\_aplicar\_modelo\_bluesky.py},
-\texttt{22\_concordancia\_bluesky.py},
-\texttt{23\_visualizar\_threads\_bluesky.py},
-\texttt{26\_rq3\_multilingual.py} (T11/F14).
+\item[Bluesky:] \path{18_analise_bluesky_crossfeed.py},
+\path{19_aplicar_modelo_bluesky.py},
+\path{22_concordancia_bluesky.py},
+\path{23_visualizar_threads_bluesky.py},
+\path{26_rq3_multilingual.py} (T11/F14).
 
 \item[Consolida\c{c}\~ao e publica\c{c}\~ao:]
-\texttt{21\_bloco\_vs\_mini.py} (T7/F4),
-\texttt{24\_consolidar\_tcc.py} (gera o
-\texttt{INDICE.md}), \texttt{25\_publicar\_huggingface.py},
-\texttt{27\_figuras\_comparativas.py},
-\texttt{27b\_repintar\_figuras\_orientador.py} (paleta sem\^antica),
-\texttt{27c\_matrizes\_confusao\_mono.py} (F33--F35).
+\path{21_bloco_vs_mini.py} (T7/F4),
+\path{24_consolidar_tcc.py} (gera o
+\path{INDICE.md}), \path{25_publicar_huggingface.py},
+\path{27_figuras_comparativas.py},
+\path{27b_repintar_figuras_orientador.py} (paleta sem\^antica),
+\path{27c_matrizes_confusao_mono.py} (F33--F35).
 
 \item[\emph{Fase 9}, estratifica\c{c}\~ao do erro:]
-\texttt{28\_distribuicao\_e\_estratificacao.py} (F25--F27),
-\texttt{29\_outliers.py} (T12/F29/F30),
-\texttt{30\_cascatas\_profundas.py} (T13/F28/F31/F32).
+\path{28_distribuicao_e_estratificacao.py} (F25--F27),
+\path{29_outliers.py} (T12/F29/F30),
+\path{30_cascatas_profundas.py} (T13/F28/F31/F32).
 
-\item[Anota\c{c}\~ao de figuras:] \texttt{31\_anotar\_figuras\_cap4.py}
+\item[Anota\c{c}\~ao de figuras:] \path{31_anotar_figuras_cap4.py}
 (sobrep\~oe c\'irculos+texto em PNGs para vers\~oes destacadas em
-\texttt{Imagens/anotadas/}).
+\path{Imagens/anotadas/}).
 \end{description}
+\end{sloppypar}
 
 Os \emph{scripts} de defini\c{c}\~ao de arquitetura
-(\texttt{gcn\_model.py}, \texttt{gat\_model.py}, \texttt{sage\_model.py})
-e o utilit\'ario \texttt{gerar\_folds.py} ficam na raiz de
-\texttt{03\_Mega\_Research/}.
+(\path{gcn_model.py}, \path{gat_model.py}, \path{sage_model.py})
+e o utilit\'ario \path{gerar_folds.py} ficam na raiz de
+\path{03_Mega_Research/}.
 
 % ============================================================
 \section{\texttt{Execution/} --- artefatos persistidos}
@@ -95,14 +97,14 @@ e o utilit\'ario \texttt{gerar\_folds.py} ficam na raiz de
 \item[\texttt{Execution/weights/}] Pesos persistidos dos tr\^es
 classificadores finais empregados no Ap\^endice~\ref{ap:aplicacao}
 (LogReg-BERT, RF estrutural e SAGE estrutural), produzidos por
-\texttt{17\_persistir\_modelos\_finais.py}. Os tamanhos t\'ipicos
+\path{17_persistir_modelos_finais.py}. Os tamanhos t\'ipicos
 constam da Tabela~\ref{tab:hp_ambiente}.
 
 \item[\texttt{Execution/results/}] Sa\'idas tabulares (CSVs) e arquivos
 de relat\'orio (TXT) de cada experimento. Cada \emph{script} de
-\texttt{03\_Mega\_Research/} grava aqui o conjunto de m\'etricas
+\path{03_Mega_Research/} grava aqui o conjunto de m\'etricas
 brutas que alimenta as tabelas e figuras do trabalho. A
-\texttt{figuras\_tcc/} subdiret\'orio cont\'em c\'opias finais das
+\path{figuras_tcc/} subdiret\'orio cont\'em c\'opias finais das
 figuras incorporadas no TCC.
 
 \item[\texttt{Execution/scripts/}] Utilit\'arios de orquestra\c{c}\~ao
@@ -126,7 +128,7 @@ ensaios iniciais; n\~ao integrado \`a vers\~ao final.
 
 \item[\texttt{Material/GNN\_TCC\_atualizado/}] \textbf{Fonte canonica
 deste TCC}: arquivos \texttt{.tex}, \texttt{.bib}, figuras e tabelas.
-A compila\c{c}\~ao ocorre nesta pasta. O \texttt{abntex2-alf.bst}
+A compila\c{c}\~ao ocorre nesta pasta. O \path{abntex2-alf.bst}
 e o \emph{stub} \texttt{abntex2.cls} acompanham o reposit\'orio para
 garantir compila\c{c}\~ao em ambientes sem o pacote \texttt{abntex2}
 instalado.
@@ -187,7 +189,7 @@ assist\^encia automatizada.
 Sob o ambiente documentado no Ap\^endice~\ref{ap:hiperparametros}
 (Python 3.12, PyTorch 2.10 + CPU, semente universal 42), a execu\c{c}\~ao
 sequencial dos \emph{scripts} numerados em
-\texttt{Training/03\_Mega\_Research/} regenera, na ordem, todos os
+\path{Training/03_Mega_Research/} regenera, na ordem, todos os
 artefatos catalogados no Ap\^endice~\ref{ap:indice}. A reprodu\c{c}\~ao
 n\~ao \'e \emph{bit-exact} entre m\'aquinas distintas devido ao
 n\~ao-determinismo de \texttt{scatter}/\texttt{gather} do

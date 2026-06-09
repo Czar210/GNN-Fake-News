@@ -23,20 +23,20 @@ Lista de tabelas).
 \toprule
 \textbf{ID} & \textbf{Conte\'udo} & \textbf{Aparece em} & \textbf{Script gerador} \\
 \midrule
-T1  & \emph{Baseline} textual (LogReg-BERT, RF-BERT) sobre o FakeNewsNet & §\ref{sec:baseline_textual} & \texttt{09\_baselines\_textuais.py} \\
-T2  & Signific\^ancia entre arquiteturas no FNN \emph{posfull} (\texttt{ttest\_rel}) & §\ref{sec:cross_dataset} & \texttt{12\_signif\_archs.py} \\
-T3  & \emph{Cross-dataset} UPFD: GCN/GAT/SAGE em PolitiFact e GossipCop & §\ref{sec:cross_dataset} & \texttt{13\_cross\_dataset.py} \\
-T4  & Topologia \emph{sem} texto --- achado central & §\ref{sec:topo_sem_texto} & \texttt{14\_topo\_sem\_texto.py} \\
-T5  & Cohen's $d$ estrutural entre \emph{fake} e \emph{real} por m\'etrica & §\ref{sec:porque} & \texttt{15\_cohens\_d.py} \\
-T6  & Concord\^ancia textual $\times$ topol\'ogico em UPFD-GossipCop & §\ref{sec:concordancia} & \texttt{20\_concordancia.py} \\
-T7  & Decis\~ao bloco \'unico \emph{versus} \emph{mini} (\emph{deploy}) & Ap.~\ref{ap:aplicacao} & \texttt{21\_bloco\_vs\_mini.py} \\
-T8  & Bluesky: \emph{ranking} de \emph{feeds} por \emph{score} estrutural & Ap.~\ref{ap:aplicacao} (§\ref{sec:ap_bsky_inferencia}) & \texttt{18\_bluesky\_inferencia.py} \\
-T9  & Bluesky: concord\^ancia por bin de tamanho da cascata & Ap.~\ref{ap:aplicacao} & \texttt{22\_bluesky\_concord.py} \\
-T10 & UPFD: nossos resultados \emph{versus} valores publicados em \cite{dou2021upfd} & §\ref{sec:cross_dataset} & \texttt{13\_cross\_dataset.py} \\
-T11 & RQ3 multil\'ingue: $d$ entre PT/EN/DE no Bluesky & §\ref{sec:multilingual} & \texttt{19\_rq3\_multilingual.py} \\
-T12 & Acur\'acia em 6 subgrupos extremos definidos \emph{post-hoc} & §\ref{sec:estrat_outliers} & \texttt{29\_outliers.py} \\
-T13 & \emph{Gap} F1(SAGE)$-$F1(RF) por recortes de profundidade & §\ref{sec:estrat_cascatas} & \texttt{30\_gap\_profundidade.py} \\
-T14 & S\'intese de resultados (\emph{dataset} $\times$ modelo) & §\ref{cap:resultados} (abertura) & \texttt{24\_consolidar\_tcc.py} \\
+T1  & \emph{Baseline} textual (LogReg-BERT, RF-BERT) sobre o FakeNewsNet & §\ref{sec:baseline_textual} & \path{09_baselines_textuais.py} \\
+T2  & Signific\^ancia entre arquiteturas no FNN \emph{posfull} (\texttt{ttest\_rel}) & §\ref{sec:cross_dataset} & \path{12_signif_archs.py} \\
+T3  & \emph{Cross-dataset} UPFD: GCN/GAT/SAGE em PolitiFact e GossipCop & §\ref{sec:cross_dataset} & \path{13_cross_dataset.py} \\
+T4  & Topologia \emph{sem} texto --- achado central & §\ref{sec:topo_sem_texto} & \path{14_topo_sem_texto.py} \\
+T5  & Cohen's $d$ estrutural entre \emph{fake} e \emph{real} por m\'etrica & §\ref{sec:porque} & \path{15_cohens_d.py} \\
+T6  & Concord\^ancia textual $\times$ topol\'ogico em UPFD-GossipCop & §\ref{sec:concordancia} & \path{20_concordancia.py} \\
+T7  & Decis\~ao bloco \'unico \emph{versus} \emph{mini} (\emph{deploy}) & Ap.~\ref{ap:aplicacao} & \path{21_bloco_vs_mini.py} \\
+T8  & Bluesky: \emph{ranking} de \emph{feeds} por \emph{score} estrutural & Ap.~\ref{ap:aplicacao} (§\ref{sec:ap_bsky_inferencia}) & \path{18_bluesky_inferencia.py} \\
+T9  & Bluesky: concord\^ancia por bin de tamanho da cascata & Ap.~\ref{ap:aplicacao} & \path{22_bluesky_concord.py} \\
+T10 & UPFD: nossos resultados \emph{versus} valores publicados em \cite{dou2021upfd} & §\ref{sec:cross_dataset} & \path{13_cross_dataset.py} \\
+T11 & RQ3 multil\'ingue: $d$ entre PT/EN/DE no Bluesky & §\ref{sec:multilingual} & \path{19_rq3_multilingual.py} \\
+T12 & Acur\'acia em 6 subgrupos extremos definidos \emph{post-hoc} & §\ref{sec:estrat_outliers} & \path{29_outliers.py} \\
+T13 & \emph{Gap} F1(SAGE)$-$F1(RF) por recortes de profundidade & §\ref{sec:estrat_cascatas} & \path{30_gap_profundidade.py} \\
+T14 & S\'intese de resultados (\emph{dataset} $\times$ modelo) & §\ref{cap:resultados} (abertura) & \path{24_consolidar_tcc.py} \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -45,16 +45,25 @@ T14 & S\'intese de resultados (\emph{dataset} $\times$ modelo) & §\ref{cap:resu
 \section{Figuras}
 \label{sec:ap_figuras}
 
-\begin{table}[H]\centering
+\footnotesize
+\begin{longtable}{p{1cm}p{6.5cm}p{2.6cm}p{2.2cm}}
 \caption{Figuras geradas pelo trabalho. Identificadores F1--F35
 correspondem aos arquivos persistidos em \texttt{Imagens/} do
-reposit\'orio.}
-\label{tab:indice_figuras}
-\small
-\begin{tabular}{p{1cm}p{6.5cm}p{2.6cm}p{2.2cm}}
-\toprule
+reposit\'orio.}\label{tab:indice_figuras}\\
+\hline
 \textbf{ID} & \textbf{Conte\'udo} & \textbf{Aparece em} & \textbf{Script} \\
-\midrule
+\hline
+\endfirsthead
+\multicolumn{4}{l}{\footnotesize \emph{(continuação da Tabela~\ref{tab:indice_figuras})}}\\[2pt]
+\hline
+\textbf{ID} & \textbf{Conte\'udo} & \textbf{Aparece em} & \textbf{Script} \\
+\hline
+\endhead
+\hline
+\multicolumn{4}{r}{\footnotesize \emph{(continua na pr\'oxima p\'agina)}}
+\endfoot
+\hline
+\endlastfoot
 F1  & Separabilidade Cohen's $d$ por m\'etrica e \emph{dataset} & --- (n\~ao referenciada na vers\~ao final) & \texttt{15} \\
 F2  & Distribui\c{c}\~oes \emph{fake} \emph{vs} \emph{real} por m\'etrica & --- (idem) & \texttt{15} \\
 F3  & \emph{Scatter score} textual $\times$ topol\'ogico, UPFD-GossipCop & §\ref{sec:concordancia} & \texttt{20} \\
@@ -87,9 +96,7 @@ F32 & \emph{Gap} F1(SAGE)$-$F1(RF) com IC \emph{bootstrap} & §\ref{sec:estrat_c
 F33 & Matriz de confus\~ao LogReg-BERT (FNN) & --- (mat\'eria suplementar) & \texttt{27c} \\
 F34 & Matriz de confus\~ao RF estrutural (UPFD-GossipCop \emph{test}) & --- & \texttt{27c} \\
 F35 & Matriz de confus\~ao SAGE estrutural (UPFD-GossipCop \emph{test}) & --- & \texttt{27c} \\
-\bottomrule
-\end{tabular}
-\end{table}
+\end{longtable}
 
 \paragraph{Figuras n\~ao referenciadas no corpo principal.} Os artefatos
 marcados como ``---'' na coluna ``Aparece em'' foram gerados pelo
@@ -108,7 +115,7 @@ gr\'aficos selecionados para o texto.
 \label{sec:ap_scripts}
 
 A numera\c{c}\~ao \texttt{NN\_*.py} acima refere-se aos \emph{scripts}
-em \texttt{Training/03\_Mega\_Research/} do reposit\'orio, descritos
+em \path{Training/03_Mega_Research/} do reposit\'orio, descritos
 em maior detalhe no Ap\^endice~\ref{ap:repo}. A execu\c{c}\~ao
 sequencial dos \emph{scripts} \texttt{00} a \texttt{32}, sob o ambiente
 documentado no Ap\^endice~\ref{ap:hiperparametros}, regenera todos os

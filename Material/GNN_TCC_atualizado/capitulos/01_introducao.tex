@@ -41,8 +41,7 @@ A escala em que esses fen\^omenos ocorrem inviabiliza a verifica\c{c}\~ao
 manual. O volume de postagens em redes sociais opera em regime de
 \emph{Big Data}, com fluxos massivos em tempo real; produzir uma mentira
 \'e instant\^aneo, desmenti-la \'e lento e custoso. Modelos
-computacionais de detec\c{c}\~ao tornam-se, portanto, n\~ao um
-acess\'orio, mas uma necessidade. A abordagem tradicional, baseada
+computacionais de detec\c{c}\~ao tornam-se, portanto, uma necessidade t\'ecnica. A abordagem tradicional, baseada
 em Processamento de Linguagem Natural (PLN), tem limites bem
 estabelecidos: depende da qualidade textual dos exemplos rotulados,
 falha diante de textos com alta sofistica\c{c}\~ao lingu\'istica
@@ -74,8 +73,7 @@ sin\^onimo, e em princ\'ipio resiste a textos gerados por LLM,
 desde que a topologia da propaga\c{c}\~ao, ela mesma, preserve
 diferen\c{c}as discrimin\'aveis entre conte\'udo falso e verdadeiro.
 
-\emph{Sob quais condi\c{c}\~oes essa premissa se sustenta} \'e uma
-pergunta menos respondida do que parece. A literatura tende a reportar
+A literatura topol\'ogica tende a reportar
 resultados positivos em \emph{datasets} espec\'ificos; reporta
 parcialmente os casos em que o paradigma \emph{n\~ao} funciona; e
 oferece poucos crit\'erios mensur\'aveis, a priori, sobre quando
@@ -159,7 +157,7 @@ respondidas no Cap\'itulo~\ref{cap:resultados}:
 
 \item[RQ2.] Caso a resposta a RQ1 dependa do dom\'inio, \emph{sob quais
   condi\c{c}\~oes estruturais} o paradigma topol\'ogico \'e efetivo?
-  Operacionalizamos essa pergunta atrav\'es do tamanho de efeito de
+  Essa pergunta \'e operacionalizada atrav\'es do tamanho de efeito de
   Cohen~\cite{cohen1988statistical} entre as classes \emph{fake} e
   \emph{real} em m\'etricas de cascata.
 
@@ -175,42 +173,42 @@ respondidas no Cap\'itulo~\ref{cap:resultados}:
 \section{Contribui\c{c}\~oes}
 \label{sec:contribuicoes}
 
-Apresentamos quatro contribui\c{c}\~oes, em ordem decrescente de
+S\~ao apresentadas quatro contribui\c{c}\~oes, em ordem decrescente de
 import\^ancia:
 
 \begin{enumerate}[label=(\alph*)]
 \item \textbf{Ablation sistem\'atica de codifica\c{c}\~oes posicionais
-  contra a degenera\c{c}\~ao do GCN.} Demonstramos, com prova
+  contra a degenera\c{c}\~ao do GCN.} Demonstra-se, com prova
   matem\'atica em \S\ref{sec:degeneracao} e ablation em
   \S\ref{sec:topo_sem_texto}, que a GCN cl\'assica
   \cite{kipf2017gcn} degenera quando alimentada com \emph{features}
-  nodais homog\^eneas, e caracterizamos quais combina\c{c}\~oes de
+  nodais homog\^eneas; s\~ao caracterizadas as combina\c{c}\~oes de
   codifica\c{c}\~oes posicionais nodais (\texttt{is\_root},
-  \texttt{grau\_norm}, \texttt{pos}) recuperam capacidade discriminativa
+  \texttt{grau\_norm}, \texttt{pos}) que recuperam capacidade discriminativa
   em cada \emph{dataset}.
 
 \item \textbf{Diagn\'ostico bilateral da aplicabilidade topol\'ogica.}
-  Mostramos, em prot\'ocolo de \emph{k-fold} pareado validado por teste
+  Verifica-se, em prot\'ocolo de \emph{k-fold} pareado validado por teste
   $t$ pareado e tamanho de efeito de Cohen, que o paradigma topol\'ogico
   \emph{funciona} em UPFD-GossipCop (GraphSAGE estrutural atinge
   $F1 = 0{,}810 \pm 0{,}002$ \emph{sem usar texto algum}) e
   \emph{colapsa} em UPFD-PolitiFact (a mesma arquitetura alcan\c{c}a
   $F1 \approx 0{,}33$, abaixo da chance). A explica\c{c}\~ao estrutural
   do contraste, derivada \emph{a priori} a partir do Cohen's $d$ entre
-  as classes (\S\ref{sec:porque}), sustenta a tese central do trabalho
-  --- \emph{modelos topol\'ogicos exigem diferen\c{c}a estrutural entre
+  as classes (\S\ref{sec:porque}), sustenta a tese central do trabalho:
+  \emph{modelos topol\'ogicos exigem diferen\c{c}a estrutural entre
   classes da ordem de $|d| \geq 0{,}5$ em pelo menos uma m\'etrica de
-  cascata para serem efetivos} --- formulada de maneira deliberadamente
+  cascata para serem efetivos}. Essa tese \'e formulada de maneira deliberadamente
   \emph{falsific\'avel}.
 
 \item \textbf{An\'alise de concord\^ancia textual--topol\'ogico e regra
-  dual derivada \emph{post-hoc}.} Caracterizamos numericamente os
+  dual derivada \emph{post-hoc}.} Caracterizam-se numericamente os
   subgrupos em que o classificador estrutural \emph{inverte}
   sistematicamente sua predi\c{c}\~ao em rela\c{c}\~ao ao textual
   (subgrupos \texttt{real\_viral} e \texttt{fake\_contido} da
-  \S\ref{sec:estrat_outliers}) e derivamos, a partir dessa
+  \S\ref{sec:estrat_outliers}); deriva-se, a partir dessa
   caracteriza\c{c}\~ao, uma regra de combina\c{c}\~ao com pesos
-  assim\'etricos --- registrada explicitamente como heur\'istica
+  assim\'etricos, registrada explicitamente como heur\'istica
   \emph{post-hoc}, n\~ao como decis\~ao metodol\'ogica a priori
   (\S\ref{sec:concordancia}).
 
@@ -224,7 +222,6 @@ import\^ancia:
   (sem r\'otulos) e est\'a documentada no Ap\^endice~\ref{ap:aplicacao}.
 \end{enumerate}
 
-\'E pertinente registrar o que este trabalho \emph{n\~ao} prop\~oe.
 N\~ao h\'a aqui uma nova arquitetura de Rede Neural de Grafos, nem
 proposta de \emph{benchmark} novo. A contribui\c{c}\~ao prim\'aria \'e
 diagn\'ostica: um crit\'erio mensur\'avel para decidir, \emph{antes de

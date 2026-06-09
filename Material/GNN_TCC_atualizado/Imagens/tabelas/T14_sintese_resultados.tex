@@ -6,7 +6,7 @@
 %                  \definecolor{cmed}{RGB}{255, 235, 156}  (amarelo claro)
 %                  \definecolor{cbad}{RGB}{255, 199, 206}  (vermelho claro)
 \begin{table}[H]\centering
-\caption{S\'intese de resultados: F1-macro por (\emph{dataset} $\times$ modelo). C\'elulas verdes indicam desempenho forte ($\geq 0{,}80$); amarelas, m\'edio ($0{,}60$--$0{,}79$); vermelhas, colapso ($<0{,}60$). Negrito marca o melhor modelo de cada \emph{dataset}. O contraste entre UPFD-GossipCop (todas as linhas verdes) e UPFD-PolitiFact com features estruturais puras (linha inteira em vermelho) e' o achado central do trabalho.}
+\caption[S\'intese de resultados: F1-macro por \emph{dataset} $\times$ modelo]{S\'intese de resultados: F1-macro por (\emph{dataset} $\times$ modelo). C\'elulas verdes indicam desempenho forte ($\geq 0{,}80$); amarelas, m\'edio ($0{,}60$--$0{,}79$); vermelhas, colapso ($<0{,}60$). Negrito marca o melhor modelo de cada \emph{dataset}. O contraste entre UPFD-GossipCop (todas as linhas verdes) e UPFD-PolitiFact com features estruturais puras (linha inteira em vermelho) e' o achado central do trabalho.}
 \label{tab:sintese_resultados}
 \small
 \setlength{\tabcolsep}{6pt}
@@ -37,7 +37,7 @@ SAGE {\scriptsize[\texttt{is\_root}, \texttt{grau\_norm}]}         & \cellcolor{
 \midrule
 GCN/GAT/SAGE publicado & --     & 0{,}846\textsuperscript{$\dagger$} & 0{,}971\textsuperscript{$\dagger$} & T10 \\
 \bottomrule
-\multicolumn{5}{l}{\scriptsize \textsuperscript{$\dagger$}\,Acur\'acia reportada por Dou et al.\ com \emph{feature} \texttt{bert} (768d); nosso F1-macro com \texttt{content} (310d). N\~ao bit-exact, indicativo apenas.} \\
-\multicolumn{5}{l}{\scriptsize ``Melhor da coluna'' aplicado dentro de cada bloco; o negrito da linha SAGE em UPFD-PolitiFact destaca o caso de colapso (n\~ao um \emph{melhor}).}
+\multicolumn{5}{p{14cm}}{\scriptsize \textsuperscript{$\dagger$}\,Acur\'acia reportada por Dou et al.\ com \emph{feature} \texttt{bert} (768d); nosso F1-macro com \texttt{content} (310d). N\~ao bit-exact, indicativo apenas.} \\
+\multicolumn{5}{p{14cm}}{\scriptsize ``Melhor da coluna'' aplicado dentro de cada bloco; o negrito da linha SAGE em UPFD-PolitiFact destaca o caso de colapso (n\~ao um \emph{melhor}).}
 \end{tabular}
 \end{table}

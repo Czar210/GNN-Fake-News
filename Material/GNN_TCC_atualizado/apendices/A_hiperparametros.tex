@@ -66,9 +66,9 @@ LogReg-BERT-t\'itulo & \multicolumn{1}{p{6.5cm}}{\texttt{LogisticRegression(C=1.
 \addlinespace
 LogReg-BERT-\emph{content} & \multicolumn{1}{p{6.5cm}}{Idem acima, sobre a \emph{feature} \texttt{content} do UPFD (310 dimens\~oes).} & §\ref{sec:cross_dataset} \\
 \addlinespace
-Random Forest BERT-t\'itulo & \multicolumn{1}{p{6.5cm}}{\texttt{RandomForestClassifier(n\_estimators=200, max\_depth=None, min\_samples\_split=2, random\_state=42)}.} & §\ref{sec:baseline_textual} \\
+Random Forest BERT-t\'itulo & \multicolumn{1}{p{6.5cm}}{\path{RandomForestClassifier(n_estimators=200, max_depth=None, min_samples_split=2, random_state=42)}.} & §\ref{sec:baseline_textual} \\
 \addlinespace
-Random Forest estrutural & \multicolumn{1}{p{6.5cm}}{\texttt{RandomForestClassifier(n\_estimators=200, max\_depth=10, min\_samples\_leaf=5, random\_state=42)}; entrada $=$ \texttt{[num\_nodes, grau\_root]}.} & §\ref{sec:concordancia} \\
+Random Forest estrutural & \multicolumn{1}{p{6.5cm}}{\path{RandomForestClassifier(n_estimators=200, max_depth=10, min_samples_leaf=5, random_state=42)}; entrada $=$ \texttt{[num\_nodes, grau\_root]}.} & §\ref{sec:concordancia} \\
 \addlinespace
 Random Forest \emph{confound} & \multicolumn{1}{p{6.5cm}}{Idem acima; entrada $=$ apenas \texttt{num\_nodes} ($1$ dimens\~ao).} & §\ref{sec:confound} \\
 \bottomrule
@@ -83,7 +83,7 @@ Random Forest \emph{confound} & \multicolumn{1}{p{6.5cm}}{Idem acima; entrada $=
 \caption{Par\^ametros do protocolo estat\'istico adotado.}
 \label{tab:hp_protocolo}
 \small
-\begin{tabular}{ll}
+\begin{tabular}{lp{8.5cm}}
 \toprule
 \textbf{Par\^ametro} & \textbf{Valor / refer\^encia} \\
 \midrule
@@ -110,19 +110,19 @@ Crit\'erio de decis\~ao final              & F1-macro (m\'edia sobre \emph{folds
 FakeNewsNet (script \texttt{00\_construir\_grafos\_fakenewsnet.py}).}
 \label{tab:hp_fnn}
 \small
-\begin{tabular}{ll}
+\begin{tabular}{lp{8.5cm}}
 \toprule
 \textbf{Par\^ametro} & \textbf{Valor} \\
 \midrule
 Fonte dos CSVs                       & Reposit\'orio KaiDMML/FakeNewsNet \cite{shu2020fakenewsnet} \\
 M\'inimo de \emph{tweets} por not\'icia & 2 (descarta cascatas degeneradas) \\
 M\'aximo de n\'os por grafo          & 100 (trunca 50\% dos grafos, ver \S\ref{sec:construcao_fnn}) \\
-Modelo de \emph{embedding} textual   & \texttt{paraphrase-multilingual-mpnet-base-v2} \cite{reimers2020multilingual} \\
+Modelo de \emph{embedding} textual   & \path{paraphrase-multilingual-mpnet-base-v2} \cite{reimers2020multilingual} \\
 \quad Dimens\~oes do vetor textual   & 768 \\
 \quad Cache de \emph{embeddings}     & ativado (em disco) \\
 Codifica\c{c}\~oes posicionais       & \texttt{[is\_root, grau\_norm, pos]} (3 dimens\~oes) \\
 Vari\^ancias geradas                  & \texttt{posfull}, \texttt{posmin}, \texttt{posgrau} (\S\ref{sec:construcao_fnn}) \\
-Asser\c{c}\~ao de sanidade            & \texttt{x.unique(dim=0).shape[0] >= min(num\_nos, 3)} \\
+Asser\c{c}\~ao de sanidade            & \path{x.unique(dim=0).shape[0] >= min(num_nos, 3)} \\
 \bottomrule
 \end{tabular}
 \end{table}

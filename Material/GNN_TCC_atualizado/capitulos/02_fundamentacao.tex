@@ -20,7 +20,7 @@ distintas em uso na literatura (s\'atira, par\'odia, fabrica\c{c}\~ao,
 manipula\c{c}\~ao, propaganda e publicidade disfar\c{c}ada de not\'icia)
 organizadas em duas dimens\~oes: \emph{facticidade} (qu\~ao
 verific\'avel \'e o conte\'udo) e \emph{inten\c{c}\~ao de enganar} (qu\~ao
-deliberada \'e a falsidade). Para fins deste trabalho, adotamos como
+deliberada \'e a falsidade). Para fins deste trabalho, adota-se como
 foco a categoria de \emph{fabrica\c{c}\~ao} (conte\'udo apresentado
 sob forma jornal\'istica que \'e factualmente falso e cuja inten\c{c}\~ao
 \'e enganar), modalidade que tamb\'em concentra a aten\c{c}\~ao da
@@ -63,9 +63,9 @@ das tr\^es abordagens isoladas \'e robusta}, e que estrat\'egias
 \emph{h\'ibridas} (combinando texto e topologia, ou texto e contexto
 social) tendem a superar variantes puras
 \cite{mdpi_bidirectionalgcn, pmc_multimodalfakenews}. O diagn\'ostico
-de complementaridade abre uma quest\~ao operacional --- \emph{quando}
-cada componente do h\'ibrido carrega sinal informativo? --- que
-formalizamos por meio do crit\'erio mensur\'avel apresentado no
+de complementaridade levanta a quest\~ao de quando
+cada componente do h\'ibrido carrega sinal informativo, quest\~ao formalizada
+por meio do crit\'erio mensur\'avel apresentado no
 Cap\'itulo~\ref{cap:resultados}, \S\ref{sec:porque}.
 
 % ------------------------------------------------------------
@@ -235,9 +235,9 @@ por Xu et al.~\cite{xu2019gin}, que mostraram que GNNs com
 agrega\c{c}\~ao injetiva (soma em vez de m\'edia) atingem o limite
 te\'orico equivalente ao teste de isomorfismo de Weisfeiler-Lehman, e
 que agrega\c{c}\~oes por m\'edia ou m\'aximo s\~ao estritamente menos
-expressivas. Como discutiremos em \S\ref{sec:porque}, essa diferen\c{c}a
+expressivas. Conforme discutido em \S\ref{sec:porque}, essa diferen\c{c}a
 te\'orica n\~ao se converte em vantagem pr\'atica neste trabalho: o
-sinal que distingue \emph{fake} de \emph{real} no nosso dom\'inio est\'a
+sinal que distingue \emph{fake} de \emph{real} no dom\'inio estudado est\'a
 em estat\'isticas globais da cascata (\texttt{num\_nodes},
 \emph{branching factor}), \`as quais a m\'edia tem acesso suficiente.
 Todas as tr\^es arquiteturas s\~ao implementadas via
@@ -306,7 +306,7 @@ $h_i^{(l+1)} = \sigma\!\left( \sum_{j \in \mathcal{N}(i)} \alpha_{ij} W h_j \rig
 Em pr\'atica, o mecanismo de aten\c{c}\~ao \'e replicado em $K$
 \emph{cabe\c{c}as} independentes (\emph{multi-head attention}, an\'aloga
 ao Transformer~\cite{vaswani2017attention}), e os resultados s\~ao
-concatenados ou m\'ediados. Neste trabalho utilizamos $K = 4$ cabe\c{c}as
+concatenados ou m\'ediados. Neste trabalho, utilizam-se $K = 4$ cabe\c{c}as
 e a concatena\c{c}\~ao nas camadas intermedi\'arias.
 
 Conceitualmente, a aten\c{c}\~ao permite \`a GAT atribuir pesos
@@ -438,7 +438,7 @@ empiricamente confirmada \'e o objeto de \S\ref{sec:topo_sem_texto}.
 
 Para quebrar a degenera\c{c}\~ao da \S\ref{sec:degeneracao}, basta
 distinguir os n\'os entre si em alguma dimens\~ao adicional ao
-\emph{embedding} BERT comum. Adotamos tr\^es codifica\c{c}\~oes
+\emph{embedding} BERT comum. Adotam-se tr\^es codifica\c{c}\~oes
 posicionais nodais, todas calculadas determin\'isticamente a partir da
 estrutura do grafo, em linha com a estrat\'egia de \emph{topological
 features} reportada na literatura~\cite{arxiv_topologicalfeatures}:
@@ -505,15 +505,13 @@ pesquisa ativa, e em GNNs adquire particularidade adicional: o objeto
 sobre o qual o modelo opera, o grafo, tem dimensionalidade
 vari\'avel entre inst\^ancias, e as t\'ecnicas cl\'assicas
 desenvolvidas para imagens (\emph{saliency maps}) ou texto
-(\emph{attention rollout}) n\~ao se transferem diretamente. A
-literatura tem produzido uma fam\'ilia crescente de m\'etodos
-espec\'ificos para GNNs, sintetizados na revis\~ao taxon\^omica de
-Yuan et al.~\cite{yuan2022explainability}.
+(\emph{attention rollout}) n\~ao se transferem diretamente. Yuan et al.~\cite{yuan2022explainability} sintetizaram em revis\~ao
+taxon\^omica os m\'etodos de explicabilidade espec\'ificos para GNNs.
 
-Adotamos neste trabalho o \emph{GNNExplainer} de Ying et
+Adota-se neste trabalho o \emph{GNNExplainer} de Ying et
 al.~\cite{ying2019gnnexplainer}, o m\'etodo de refer\^encia da fam\'ilia
 \emph{baseada em m\'ascaras}. Dada uma predi\c{c}\~ao espec\'ifica do
-modelo sobre uma inst\^ancia (no nosso caso, sobre um grafo de
+modelo sobre uma inst\^ancia (no caso deste trabalho, sobre um grafo de
 propaga\c{c}\~ao), o objetivo \'e identificar o \emph{subconjunto
 m\'inimo} de arestas e de \emph{features} nodais que, isoladamente,
 preservaria essa predi\c{c}\~ao. O m\'etodo aprende
@@ -551,7 +549,7 @@ exige um protocolo estat\'istico expl\'icito que considere
 varia\c{c}\~ao entre execu\c{c}\~oes (entre \emph{folds} de
 valida\c{c}\~ao, entre \emph{seeds} de inicializa\c{c}\~ao) e
 magnitude pr\'atica das diferen\c{c}as observadas (n\~ao apenas a sua
-signific\^ancia formal). Adotamos quatro instrumentos complementares,
+signific\^ancia formal). Adotam-se quatro instrumentos complementares,
 cujas conven\c{c}\~oes seguem recomenda\c{c}\~oes consolidadas na
 literatura de \emph{benchmarking} em aprendizado de
 m\'aquina~\cite{demsar2006statistical}.
@@ -614,7 +612,7 @@ $n_{\mathrm{boot}}$ reamostragens com reposi\c{c}\~ao do \emph{subset},
 recalcula-se a diferen\c{c}a entre as m\'etricas dos dois modelos
 sobre a amostra reamostrada, e o intervalo de confian\c{c}a 95\% \'e
 o intervalo entre o percentil $2{,}5$ e o percentil $97{,}5$ da
-distribui\c{c}\~ao resultante. Adotamos $n_{\mathrm{boot}} = 2.000$
+distribui\c{c}\~ao resultante. Adota-se $n_{\mathrm{boot}} = 2.000$
 em todos os experimentos. Intervalos cujo limite inferior \'e
 estritamente positivo s\~ao interpretados como evid\^encia de
 diferen\c{c}a real, com a magnitude lida da estimativa pontual.
@@ -667,17 +665,17 @@ FakeNewsNet-GossipCop, com curadoria de Shu et al.~\cite{shu2020fakenewsnet})
 em formato de grafo padronizado, com quatro variantes de
 \emph{features} nodais (\texttt{profile}, \texttt{spacy},
 \texttt{content}, \texttt{bert}) e \emph{splits} train/val/test fixos.
-Os tr\^es \emph{datasets} sobre os quais este trabalho opera (nosso
-FakeNewsNet constru\'ido independentemente, e o UPFD nas duas
+Os tr\^es \emph{datasets} sobre os quais este trabalho opera (o
+FakeNewsNet constru\'ido neste trabalho independentemente, e o UPFD nas duas
 variantes oficiais) s\~ao precisamente os que esses trabalhos
 consagram.
 
-A nossa configura\c{c}\~ao foge da literatura em tr\^es pontos
-declarados, retomados em \S\ref{sec:cross_dataset}: utilizamos a
+A configura\c{c}\~ao adotada neste trabalho foge da literatura em tr\^es pontos
+declarados, retomados em \S\ref{sec:cross_dataset}: utiliza-se a
 \emph{feature} \texttt{content} (310 dimens\~oes) em vez de
 \texttt{bert} (768 dimens\~oes) por restri\c{c}\~ao de mem\'oria CPU,
-adotamos hiperpar\^ametros pr\'oprios em vez dos reportados em
-\cite{dou2021upfd}, e reportamos F1-macro em vez de acur\'acia. A
+adotam-se hiperpar\^ametros pr\'oprios em vez dos reportados em
+\cite{dou2021upfd}, e reporta-se F1-macro em vez de acur\'acia. A
 compara\c{c}\~ao num\'erica com os valores publicados \'e, por essas
 diferen\c{c}as, indicativa e n\~ao replica\c{c}\~ao \emph{bit-exact}.
 
@@ -708,9 +706,9 @@ portugu\^es e ingl\^es sobre um \emph{snapshot} multil\'ingue do
 Bluesky (\S\ref{sec:multilingual}). Isso n\~ao constitui uma proposta
 de m\'etodo multil\'ingue: a precis\~ao classificat\'oria em
 portugu\^es n\~ao foi medida, dado que o Bluesky n\~ao possui
-\emph{ground truth}. \'E, antes, evid\^encia de que o sinal estrutural
-\emph{transcende} o idioma, propriedade desej\'avel para m\'etodos
-h\'ibridos futuros.
+\emph{ground truth}. \'E, antes, evid\^encia de que o sinal estrutural n\~ao \'e degradado por
+fronteiras lingu\'isticas no contexto estudado, propriedade relevante
+para m\'etodos h\'ibridos que operem sobre dados multil\'ingues.
 
 % ------------------------------------------------------------
 \subsection{Trabalhos brasileiros relacionados}
@@ -733,10 +731,10 @@ constitui a contribui\c{c}\~ao central do presente trabalho.
 \subsection{Homofilia e assortatividade em redes}
 \label{sec:homofilia}
 
-A pergunta de pesquisa central deste trabalho --- \emph{sob quais
-condi\c{c}\~oes a topologia da propaga\c{c}\~ao detecta fake news?} ---
-remete a uma quest\~ao cl\'assica em teoria de redes: quando \'e que
-classes de v\'ertices em um grafo se diferenciam por estrutura?
+A pergunta de pesquisa central deste trabalho --- se a topologia da propaga\c{c}\~ao
+detecta fake news e sob quais condi\c{c}\~oes --- remete a uma quest\~ao cl\'assica
+em teoria de redes sobre quando classes de v\'ertices em um grafo
+se diferenciam por estrutura.
 
 McPherson, Smith-Lovin e Cook~\cite{mcpherson2001birds} estabeleceram
 o conceito de \emph{homofilia} (\emph{birds of a feather flock
@@ -757,12 +755,12 @@ efetivas em classifica\c{c}\~ao nodal: em redes pouco assortativas
 representa\c{c}\~oes de classes diferentes em cada camada, degradando
 a discrimina\c{c}\~ao final. Embora o trabalho de Pei trate
 classifica\c{c}\~ao nodal em redes de cita\c{c}\~ao, o mecanismo
-b\'asico se transfere ao nosso problema de classifica\c{c}\~ao de
-grafo: em UPFD-GossipCop, as cascatas das duas classes apresentam
+b\'asico se transfere ao problema de classifica\c{c}\~ao de
+grafo deste trabalho: em UPFD-GossipCop, as cascatas das duas classes apresentam
 perfis estruturais distintos (\emph{branching factor} alto em
 \emph{fake}, baixo em \emph{real}); em UPFD-PolitiFact, n\~ao h\'a
 diferen\c{c}a estrutural correspondente. O Cohen's $d$ entre classes em
-m\'etricas de cascata, que adotamos como operacionaliza\c{c}\~ao da
+m\'etricas de cascata, adotado como operacionaliza\c{c}\~ao da
 tese central (\S\ref{sec:porque}), \'e a vers\~ao concreta dessa
 no\c{c}\~ao de assortatividade adaptada ao n\'ivel de grafo.
 
@@ -784,9 +782,9 @@ $0{,}2 < |d| < 0{,}5$ em que uma arquitetura GNN atinja desempenho
 significativamente acima do \emph{baseline} textual constituiria
 contra-evid\^encia direta.
 
-A limita\c{c}\~ao mais relevante assumida \'e que n\~ao reimplementamos
-o BiGCN~\cite{bian2020bigcn} nem o GCNFN sob nosso protocolo de
-avalia\c{c}\~ao; a compara\c{c}\~ao com esses m\'etodos \'e feita por
+A limita\c{c}\~ao mais relevante assumida \'e que o BiGCN~\cite{bian2020bigcn}
+e o GCNFN n\~ao foram reimplementados sob o protocolo de
+avalia\c{c}\~ao deste trabalho; a compara\c{c}\~ao com esses m\'etodos \'e feita por
 meio dos valores reportados em \cite{dou2021upfd}, com as diferen\c{c}as
 de configura\c{c}\~ao declaradas em \S\ref{sec:cross_dataset}. Essa
 e outras limita\c{c}\~oes do trabalho s\~ao retomadas em

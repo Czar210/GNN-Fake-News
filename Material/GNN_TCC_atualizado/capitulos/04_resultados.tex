@@ -50,7 +50,7 @@ FakeNewsNet, se o ganho que trazem sobre esse teto for estatisticamente
 distingu\'ivel, o que se mostrar\'a, em \S\ref{sec:topo_sem_texto},
 \emph{n\~ao ocorrer}: as arquiteturas GNN com \emph{features} estruturais
 puras sequer alcan\c{c}am 0,55, e mesmo as variantes com texto t\^em
-ganho marginal sobre o LogReg-BERT. Em \S\ref{sec:porque} discutiremos
+ganho marginal sobre o LogReg-BERT. Em \S\ref{sec:porque} discute-se
 por que esse teto textual t\~ao alto e a aus\^encia de ganho topol\'ogico
 no FNN s\~ao coerentes com a tese central do trabalho.
 
@@ -66,11 +66,11 @@ maiores. Essa correla\c{c}\~ao cria um \emph{confound} trivial: o
 desempenho que se atribui a uma GNN pode, em \'ultima inst\^ancia, n\~ao
 estar capturando estrutura sutil alguma: pode estar apenas reproduzindo
 o atalho ``\emph{fake} = grafo maior''. Para test\'a-lo diretamente,
-treinamos um \emph{Random Forest} (\S\ref{sec:baselines}) no FakeNewsNet
+treina-se um \emph{Random Forest} (\S\ref{sec:baselines}) no FakeNewsNet
 alimentado \emph{apenas} com a \emph{feature} \texttt{num\_nodes}. O
 F1-macro resultante \'e de $\approx 0{,}523$, valor pr\'oximo do
 n\'ivel de chance ($0{,}50$ em problema balanceado) e bem abaixo do
-limiar de $0{,}65$ que adotar\'iamos \emph{a priori} como sinal de
+limiar de $0{,}65$ adotado \emph{a priori} como sinal de
 \emph{confound} dominante. Sendo assim, o tamanho do grafo \emph{contribui}, mas
 n\~ao \emph{explica} o sinal capturado pelos modelos posteriores: h\'a
 ru\'ido demais na correla\c{c}\~ao entre tamanho e veracidade para que um
@@ -87,9 +87,9 @@ decomposi\c{c}\~ao por profundidade da cascata \'e quantificada em
 \label{sec:cross_dataset}
 
 Os n\'umeros deste trabalho s\'o sustentam os achados sobre topologia se
-estiverem \emph{calibrados} contra a literatura: sob diferen\c{c}as
-conhecidas e declaradas de configura\c{c}\~ao, eles est\~ao no envelope
-dos publicados? A
+estiverem \emph{calibrados} contra a literatura. Esta se\c{c}\~ao verifica que,
+sob diferen\c{c}as conhecidas e declaradas de configura\c{c}\~ao, os resultados
+obtidos est\~ao no envelope dos valores publicados por Dou et al.~\cite{dou2021upfd}. A
 Tabela~\ref{tab:cross_dataset_upfd} reporta o desempenho das tr\^es
 arquiteturas GNN nas duas variantes do UPFD; a
 Tabela~\ref{tab:upfd_vs_publicado} confronta esses mesmos valores com
@@ -111,18 +111,18 @@ torno de $0{,}94$--$0{,}95$ (vs.\ $0{,}971$ publicado).
 
 Esta compara\c{c}\~ao \'e \emph{aproximada, n\~ao replica\c{c}\~ao
 exata}: as raz\~oes precisam ser declaradas explicitamente. Tr\^es
-diferen\c{c}as deliberadas afastam nossa configura\c{c}\~ao da deles:
-(i) utilizamos a \emph{feature} \texttt{content} (310 dimens\~oes,
+diferen\c{c}as deliberadas afastam a configura\c{c}\~ao deste trabalho da deles:
+(i) utiliza-se a \emph{feature} \texttt{content} (310 dimens\~oes,
 combina\c{c}\~ao de \emph{spaCy} e \emph{profile}) ao inv\'es da
 \emph{feature} \texttt{bert} (768 dimens\~oes), por restri\c{c}\~ao de
 mem\'oria RAM na densifica\c{c}\~ao da matriz esparsa do GossipCop em
-ambiente Windows/CPU; (ii) adotamos hiperpar\^ametros pr\'oprios
+ambiente Windows/CPU; (ii) adotam-se hiperpar\^ametros pr\'oprios
 (\emph{lr} = 0,001, \emph{hidden} = 64, tr\^es camadas), uma vez que a
 configura\c{c}\~ao exata de \cite{dou2021upfd} n\~ao \'e totalmente
-especificada no artigo; (iii) reportamos F1-macro enquanto Dou et al.\
+especificada no artigo; (iii) reporta-se F1-macro enquanto Dou et al.\
 reportam acur\'acia. O prop\'osito da compara\c{c}\~ao n\~ao \'e
 \emph{ranking} competitivo com a literatura, mas \emph{calibra\c{c}\~ao}:
-verificar que nosso \emph{pipeline}, com diferen\c{c}as conhecidas e
+verificar que o \emph{pipeline} deste trabalho, com diferen\c{c}as conhecidas e
 declaradas, est\'a \emph{no envelope} dos valores publicados:
 condi\c{c}\~ao necess\'aria para que os achados subsequentes deste
 cap\'itulo sejam tomados como informativos sobre o problema, e n\~ao
@@ -134,13 +134,13 @@ como artefatos de implementa\c{c}\~ao defeituosa.
 \section{Topologia sem texto: o achado central (RQ3, parte a)}
 \label{sec:topo_sem_texto}
 
-A pergunta operacional desta se\c{c}\~ao, e o achado mais central
-do trabalho, \'e a seguinte: \emph{\'e poss\'ivel treinar uma GNN
-para detectar fake news sem fornecer texto a ela, apenas com sinal
-estrutural sobre o grafo de propaga\c{c}\~ao?} Para responder,
-substitu\'imos as \emph{features} nodais por um vetor de apenas duas
+Esta se\c{c}\~ao reporta o achado central do trabalho: o GraphSAGE
+treinado apenas com duas \emph{features} estruturais por n\'o (sem nenhum texto)
+atinge F1-macro de $0{,}810$ em UPFD-GossipCop, respondendo afirmativamente
+\`a parte~(a) da RQ3. Para tanto,
+substituem-se as \emph{features} nodais por um vetor de apenas duas
 dimens\~oes estruturais (\texttt{[is\_root, grau\_norm]}) em cada um
-dos tr\^es \emph{datasets} e treinamos as tr\^es arquiteturas (GCN,
+dos tr\^es \emph{datasets} e treinam-se as tr\^es arquiteturas (GCN,
 GAT, SAGE). O resultado est\'a sintetizado na
 Tabela~\ref{tab:topologia_sem_texto} e visualizado, em forma de
 \emph{heatmap}, na Figura~\ref{fig:heatmap_topo}.
@@ -263,7 +263,7 @@ qualquer diferen\c{c}a real, por menor que seja sua import\^ancia
 pr\'atica. O tamanho de efeito, m\'etrica que n\~ao se infla com $n$,
 \'e o crit\'erio adequado neste regime; e o efeito est\'a bem abaixo
 do limiar de efeito \emph{pequeno} ($|d| < 0{,}2$ pela escala de Cohen).
-Conclu\'imos, portanto, que a diferen\c{c}a entre PT e EN \'e
+Conclui-se, portanto, que a diferen\c{c}a entre PT e EN \'e
 \emph{estatisticamente detect\'avel mas praticamente irrelevante}. O par
 alem\~ao \emph{versus} ingl\^es, em contraste, exibe $d = -0{,}468$
 (pequeno, no topo da faixa, pr\'oximo do limiar de efeito m\'edio
@@ -304,7 +304,7 @@ idioma, de comunidade, de \emph{shift} de dom\'inio e de amostragem.
 \label{sec:porque}
 
 A \S\ref{sec:topo_sem_texto} mostrou que o desempenho dos modelos
-topol\'ogicos depende drasticamente do \emph{dataset}. A causa
+topol\'ogicos depende fortemente do \emph{dataset}. A causa
 estrutural dessa depend\^encia pode ser quantificada antes mesmo de
 qualquer treinamento, atrav\'es do tamanho de efeito de Cohen ($d$)
 entre as classes \emph{fake} e \emph{real} nas m\'etricas de cascata.
@@ -341,7 +341,7 @@ matematicamente id\^enticos porque, em grafo-estrela, o
 \emph{branching} m\'edio coincide com \texttt{num\_nodes}$-1$, dado que
 apenas o n\'o raiz \'e n\~ao-folha.
 
-Um padr\~ao transversal merece registro: nas tr\^es bases, a m\'etrica
+Nas tr\^es bases, a m\'etrica
 \texttt{depth\_max} concentra os menores tamanhos de efeito: $d =
 0{,}00$ no FNN, $d = -0{,}17$ no UPFD-PolitiFact e $d = -0{,}07$ no
 UPFD-GossipCop. Em palavras, em \emph{nenhum} dos tr\^es \emph{datasets}
@@ -383,11 +383,11 @@ contra-evid\^encia est\~ao em \S\ref{sec:posicionamento}.
 \section{Concord\^ancia textual \texorpdfstring{$\times$}{x} topol\'ogico (RQ1)}
 \label{sec:concordancia}
 
-A pergunta interessante a respeito do classificador textual e do
-topol\'ogico tomados em conjunto n\~ao \'e qual dos dois \'e melhor
-(isso j\'a foi respondido em \S\ref{sec:cross_dataset}), mas
-\emph{onde os dois discordam e quem acerta nas discord\^ancias}. Para
-respond\^e-la, aplicamos os dois classificadores aos $3.826$ grafos
+A an\'alise complementar do classificador textual e do
+topol\'ogico tomados em conjunto foca n\~ao no desempenho individual
+de cada um (respondido em \S\ref{sec:cross_dataset}), mas nos casos em que
+discordam e em qual acerta nas discord\^ancias. Para
+respond\^e-la, aplicam-se os dois classificadores aos $3.826$ grafos
 do \emph{test set} do UPFD-GossipCop e cruzamos suas predi\c{c}\~oes.
 A Tabela~\ref{tab:concordancia_gossipcop} reporta as taxas agregadas;
 a Figura~\ref{fig:scatter_concordancia} mostra a distribui\c{c}\~ao
@@ -414,7 +414,7 @@ m\'aximo te\'orico. Quando discordam, o textual mant\'em F1 de
 $0{,}914$, mas o topol\'ogico cai a $\boldsymbol{0{,}085}$.
 
 Esse valor de $0{,}085$ merece interpreta\c{c}\~ao cuidadosa. Ele est\'a
-\emph{substancialmente abaixo} de duas refer\^encias: do n\'ivel de
+abaixo de duas refer\^encias: do n\'ivel de
 chance ($\approx 0{,}50$ em problema balanceado) e da predi\c{c}\~ao
 puramente majorit\'aria ($\approx 0{,}33$). No subconjunto de
 discord\^ancia, portanto, o classificador topol\'ogico erra abaixo do
@@ -470,7 +470,7 @@ topol\'ogico, derivada \emph{post-hoc} dos resultados de
 
 Mostrar que o SAGE estrutural atinge $F1 = 0{,}810$ no UPFD-GossipCop
 n\~ao explica \emph{qual sinal} o modelo est\'a usando para decidir.
-Para abrir essa caixa-preta, aplicamos o GNNExplainer
+Para abrir essa caixa-preta, aplica-se o GNNExplainer
 \cite{ying2019gnnexplainer} sobre $20$ grafos do \emph{test set},
 estratificados em quatro c\'elulas (classe \texorpdfstring{$\times$}{x}
 tamanho da cascata), e agregamos a massa de import\^ancia atribu\'ida
@@ -591,7 +591,7 @@ tipicamente leis de pot\^encia ou variantes \emph{power-law-like}
 metodol\'ogica \'e direta: \emph{z-score} como crit\'erio de outlier
 seria mal-definido neste regime, porque a m\'edia e o desvio-padr\~ao
 amostrais s\~ao dominados por poucos pontos da cauda e n\~ao
-caracterizam o ``centro'' da distribui\c{c}\~ao. Adotamos, portanto,
+caracterizam o ``centro'' da distribui\c{c}\~ao. Adota-se, portanto,
 \textbf{percentil emp\'irico} (p5/p95 sobre o pr\'oprio \emph{test}) como
 defini\c{c}\~ao de extremo em todas as an\'alises desta se\c{c}\~ao, e
 \emph{plots} envolvendo \texttt{num\_nodes} usam eixo logar\'itmico em
@@ -752,7 +752,7 @@ estendendo-se at\'e 9 \emph{hops}. Contraria a premissa comum de que UPFD
 \label{fig:distribuicao_profundidade}
 \end{figure}
 
-Confirmada a heterogeneidade, prosseguimos com a estratifica\c{c}\~ao.
+Confirmada a heterogeneidade, prossegue-se com a estratifica\c{c}\~ao.
 A Tabela~\ref{tab:gap_profundidade} reporta o $F1$-macro do RF tabular
 e do SAGE estrutural acumulado em tr\^es \emph{subsets} de profundidade
 crescente, com intervalos de confian\c{c}a \emph{bootstrap}; a
@@ -820,9 +820,8 @@ acessando informa\c{c}\~ao que o tabular n\~ao consegue representar.
 que se materializa numericamente no \emph{gap} crescente da
 Figura~\ref{fig:f1_por_depth}.
 
-Vale uma distin\c{c}\~ao terminol\'ogica: a observa\c{c}\~ao
-de que ``UPFD-GossipCop oficial possui $30\%$ de grafos com
-\texttt{depth} $\geq 3$'' contradiz a leitura simplificada de que
+A observa\c{c}\~ao de que o UPFD-GossipCop oficial possui $30\%$ de grafos com
+\texttt{depth} $\geq 3$ contradiz a leitura simplificada de que
 ``UPFD \'e tudo estrela''. Esta segunda formula\c{c}\~ao, que
 encontramos em discuss\~oes preliminares deste trabalho, \emph{n\~ao se aplica}
 ao \emph{dataset} oficial de Dou et
@@ -857,7 +856,7 @@ desenho da interface da aplica\c{c}\~ao demonstrativa
 \section{Painel mestre dos achados}
 \label{sec:painel_mestre}
 
-Para encerrar o cap\'itulo, condensamos em uma \'unica figura o conjunto
+Para encerrar o cap\'itulo, condensa-se em uma \'unica figura o conjunto
 de F1-macro produzidos pelos experimentos das se\c{c}\~oes anteriores,
 de modo a permitir tanto a compara\c{c}\~ao \emph{entre dom\'inios}
 (fixando o tipo de modelo) quanto \emph{entre tipos de modelo}

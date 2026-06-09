@@ -70,7 +70,7 @@ Tabela~\ref{tab:datasets} resume tamanho, fonte e papel de cada um.
 \begin{table}[H]\centering
 \caption{Datasets utilizados, com tamanho, fonte e papel no trabalho.}
 \label{tab:datasets}
-\small
+\resizebox{\linewidth}{!}{%
 \begin{tabular}{lrrll}
 \toprule
 \textbf{Dataset} & \textbf{Tamanho} & \textbf{N classes} & \textbf{Fonte} & \textbf{Papel} \\
@@ -81,7 +81,8 @@ UPFD-GossipCop           & $\sim$5{.}464 grafos & 2 (50/50) & \cite{dou2021upfd}
 Bluesky (acad\^emico)    & 168{.}463 \emph{posts}\textsuperscript{$\dagger$}   & --          & \cite{failla2024bluesky}       & Aplica\c{c}\~ao (sem \emph{labels}) \\
 \bottomrule
 \multicolumn{5}{l}{\footnotesize \textsuperscript{$\dagger$}Posts individuais; cada um pode ser raiz de uma cascata de propaga\c{c}\~ao constru\'ida em \S\ref{sec:construcao_fnn}.}\\
-\end{tabular}
+\end{tabular}%
+}
 \end{table}
 
 % Para cada dataset, 1 paragrafo: o que e, quem coletou, quantos grafos,
@@ -93,7 +94,7 @@ Bluesky (acad\^emico)    & 168{.}463 \emph{posts}\textsuperscript{$\dagger$}   &
 \label{sec:construcao_fnn}
 
 A constru\c{c}\~ao dos grafos do FakeNewsNet \'e realizada pelo \emph{script}
-\texttt{00\_construir\_grafos\_fakenewsnet.py}. O \emph{script} efetua o
+\path{00_construir_grafos_fakenewsnet.py}. O \emph{script} efetua o
 \emph{download} direto dos CSVs do reposit\'orio oficial do KaiDMML
 \cite{shu2020fakenewsnet}, gera o \emph{embedding} textual do t\'itulo de
 cada not\'icia via \emph{Sentence-BERT} multil\'ingue (modelo
@@ -152,10 +153,10 @@ descrito em \S\ref{sec:degeneracao}.
 \section{Folds compartilhados}
 \label{sec:folds}
 
-O \emph{script} \texttt{gerar\_folds.py} instancia
-\texttt{StratifiedKFold(n\_splits=10, shuffle=True, random\_state=42)} do
+O \emph{script} \path{gerar_folds.py} instancia
+\path{StratifiedKFold(n_splits=10, shuffle=True, random_state=42)} do
 \emph{scikit-learn} sobre os 754 grafos do FakeNewsNet e persiste os
-\'indices em \texttt{data/folds\_fnn.pt}. A escolha de $k=10$ segue
+\'indices em \path{data/folds_fnn.pt}. A escolha de $k=10$ segue
 recomenda\c{c}\~ao cl\'assica de Kohavi~\cite{kohavi1995cv} como
 compromisso entre vi\'es e vari\^ancia da estimativa da m\'etrica em
 \emph{datasets} de tamanho moderado. Esse arquivo \'e gerado
@@ -166,7 +167,7 @@ que reportam compara\c{c}\~oes pareadas: o baseline textual
 GNN, entre outros.
 
 O teste \emph{t} pareado
-(\texttt{scipy.stats.ttest\_rel}) que usamos para comparar dois modelos
+(\path{scipy.stats.ttest_rel}) utilizado para comparar dois modelos
 exige que cada par de m\'etricas comparado tenha sido obtido sobre os
 \emph{mesmos exemplos}. Caso contr\'ario, a varia\c{c}\~ao entre folds se
 mistura \`a diferen\c{c}a entre modelos, reduzindo o poder do teste e
@@ -208,7 +209,7 @@ arquiteturas, est\~ao na Tabela~\ref{tab:hyperparams}.
 
 \textit{O vetor de \emph{features} de entrada de cada n\'o varia
 conforme o experimento. No benchmark \emph{cross-dataset} de
-\S\ref{sec:cross_dataset} sobre o UPFD, utilizamos a variante
+\S\ref{sec:cross_dataset} sobre o UPFD, utiliza-se a variante
 \texttt{content} (310 dimens\~oes, combina\c{c}\~ao \emph{spaCy} +
 \emph{profile}) por restri\c{c}\~ao de mem\'oria RAM ao densificar a
 matriz esparsa de GossipCop em ambiente Windows/CPU: a variante
@@ -278,7 +279,7 @@ O segundo \'e um classificador puramente \emph{estrutural tabular}: um
 \emph{Random Forest} com 200 \'arvores, treinado sobre apenas duas
 \emph{features} agregadas por grafo: o n\'umero total de n\'os
 (\texttt{num\_nodes}) e o grau do n\'o raiz (\texttt{grau\_root}). Esse
-modelo encarna o \emph{confound trivial} da detec\c{c}\~ao de fake news em
+modelo representa o \emph{confound trivial} da detec\c{c}\~ao de fake news em
 redes: a observa\c{c}\~ao recorrente de que not\'icias falsas tendem a
 viralizar mais, gerando cascatas maiores. Se um \emph{Random Forest}
 alimentado apenas com tamanho e grau atinge um F1 pr\'oximo do da GNN, o
@@ -300,13 +301,13 @@ balanceados em torno de $50\%/50\%$ entre as classes
 acur\'acia, mas com a vantagem de permanecer significativo caso futuros
 \emph{datasets} apresentem desequil\'ibrio, por exemplo com a classe
 \emph{fake} em minoria. A literatura UPFD~\cite{dou2021upfd}
-reporta acur\'acia; usamos F1-macro para alinhar com pr\'aticas mais
+reporta acur\'acia; usa-se F1-macro para alinhar com pr\'aticas mais
 recentes em classifica\c{c}\~ao bin\'aria desbalanceada e marcamos
 expressamente a diferen\c{c}a quando confrontamos com valores publicados
 (Tabela~\ref{tab:upfd_vs_publicado}).
 
-Para comparar dois modelos sob o mesmo \emph{dataset}, utilizamos o
-\emph{teste t pareado} (\texttt{scipy.stats.ttest\_rel}) sobre os
+Para comparar dois modelos sob o mesmo \emph{dataset}, utiliza-se o
+\emph{teste t pareado} (\path{scipy.stats.ttest_rel}) sobre os
 \emph{folds} compartilhados de \S\ref{sec:folds}. O pareamento tem
 duas implica\c{c}\~oes pr\'aticas: a varia\c{c}\~ao entre \emph{folds}
 \'e cancelada (cada \emph{fold} contribui com uma diferen\c{c}a entre
@@ -319,7 +320,7 @@ definido sobre o conjunto de teste \'unico, recorremos ao \emph{bootstrap}
 pareado descrito em \S\ref{sec:metod_estratificacao}.
 
 Para a an\'alise descritiva de separabilidade estrutural entre fake e
-real (\S\ref{sec:porque}), reportamos o \emph{tamanho de efeito de Cohen}
+real (\S\ref{sec:porque}), reporta-se o \emph{tamanho de efeito de Cohen}
 ($d$), conforme defini\c{c}\~ao cl\'assica de
 \cite{cohen1988statistical}, com refinamentos da escala discutidos por
 Sawilowsky~\cite{sawilowsky2009effect}. A escala interpretativa adotada
@@ -349,14 +350,14 @@ entre execu\c{c}\~oes.
 O F1-macro agregado mede \emph{quanto} um modelo acerta, n\~ao \emph{onde}
 ele acerta. Para responder a essa segunda quest\~ao, relevante para a
 caracteriza\c{c}\~ao de regimes em que cada modelo falha ou prospera,
-adotamos tr\^es t\'ecnicas complementares aplicadas sobre o
+adotam-se tr\^es t\'ecnicas complementares aplicadas sobre o
 \emph{test set} do UPFD-GossipCop, em conjunto detalhadas em
 \S\ref{sec:estratificacao}.
 
 A primeira \'e uma \emph{regress\~ao localmente ponderada} (LOWESS) de
 $P(\text{acerto} \mid m)$ em fun\c{c}\~ao de cada m\'etrica estrutural $m$,
 segundo a formula\c{c}\~ao de Cleveland~\cite{cleveland1979lowess}.
-Implementamo-la via \emph{rolling mean} de janela proporcional ($10\%$
+Implementa-se via \emph{rolling mean} de janela proporcional ($10\%$
 da amostra ordenada, com m\'inimo absoluto de 30 observa\c{c}\~oes),
 evitando a depend\^encia de \texttt{statsmodels}. A vantagem sobre o
 \emph{binning} discreto \'e dupla: visualiza-se continuamente a varia\c{c}\~ao
@@ -368,8 +369,8 @@ emp\'irico} (p5/p95) sobre o pr\'oprio \emph{test set}, em vez de
 limiares baseados em \emph{z-score}. A escolha \'e justificada pela forma
 das distribui\c{c}\~oes: m\'etricas de cascata em redes sociais s\~ao
 \emph{heavy-tail}, com cauda mais agressiva do que a lognormal,
-regime amplamente reportado na literatura
-\cite{barabasi1999emergence, clauset2009powerlaw}. Nesse cen\'ario, a
+regime documentado por Barab\'asi e Albert~\cite{barabasi1999emergence}
+e Clauset et al.~\cite{clauset2009powerlaw} como caracter\'istico de redes sociais. Nesse cen\'ario, a
 m\'edia n\~ao \'e robusta, o desvio-padr\~ao \'e inflado por poucos
 casos extremos, e crit\'erios baseados em $\sigma$ tornam-se
 mal-definidos. O percentil emp\'irico \'e invariante \`a forma
@@ -394,8 +395,8 @@ tabular em recortes de profundidade da cascata. O \emph{bootstrap} \'e o substit
 Para inspecionar o que a arquitetura SAGE estrutural efetivamente aprende
 do grafo de propaga\c{c}\~ao, recorremos ao \emph{GNNExplainer}
 \cite{ying2019gnnexplainer}, implementado em
-\texttt{torch\_geometric.explain.Explainer} com algoritmo
-\texttt{GNNExplainer(epochs=200)} e \texttt{edge\_mask\_type="object"}, em
+\path{torch_geometric.explain.Explainer} com algoritmo
+\path{GNNExplainer(epochs=200)} e \path{edge_mask_type="object"}, em
 modo de classifica\c{c}\~ao multi-classe sobre o grafo inteiro. O
 GNNExplainer aprende uma m\'ascara sobre as arestas do grafo que maximiza
 a informa\c{c}\~ao m\'utua entre a sub-rede mascarada e a predi\c{c}\~ao do
@@ -419,7 +420,7 @@ classifica\c{c}\~ao aprendido pelo modelo.
 \label{sec:dual}
 
 Para a aplica\c{c}\~ao pr\'atica documentada no
-Ap\^endice~\ref{ap:aplicacao}, combinamos o classificador textual
+Ap\^endice~\ref{ap:aplicacao}, combinam-se o classificador textual
 (LogReg-BERT) e o classificador topol\'ogico (RF estrutural) por meio de
 uma regra de combina\c{c}\~ao heur\'istica. Essa regra \textbf{n\~ao \'e uma decis\~ao metodol\'ogica a
 priori}: trata-se de uma heur\'istica derivada \emph{post-hoc}, ou seja,
@@ -444,13 +445,13 @@ foram conduzidos em \textbf{ambiente CPU} (Intel \emph{Raptor Lake}, 16
 GPU em nenhum momento do treinamento ou da avalia\c{c}\~ao.
 
 Segundo, todas as fontes de aleatoriedade s\~ao semeadas com o valor 42:
-\texttt{torch.manual\_seed}, \texttt{numpy.random.seed},
-\texttt{random.seed}, \texttt{StratifiedKFold(random\_state=42)} e os
-construtores dos classificadores do \emph{scikit-learn} (\texttt{n\_jobs=-1}
+\path{torch.manual_seed}, \path{numpy.random.seed},
+\path{random.seed}, \path{StratifiedKFold(random_state=42)} e os
+construtores dos classificadores do \emph{scikit-learn} (\path{n_jobs=-1}
 \'e adotado para o RF, sem efeito sobre determinismo). Para os
-experimentos sens\'iveis \`a inicializa\c{c}\~ao, conduzimos varredura
+experimentos sens\'iveis \`a inicializa\c{c}\~ao, conduz-se varredura
 expl\'icita sobre 10 \emph{seeds} independentes em \S\ref{sec:topo_sem_texto}
-e reportamos m\'edia e desvio-padr\~ao.
+e reportam-se m\'edia e desvio-padr\~ao.
 
 Terceiro, reconhecemos as limita\c{c}\~oes ao determinismo: operadores
 \texttt{scatter} e \texttt{gather} do PyTorch Geometric n\~ao possuem

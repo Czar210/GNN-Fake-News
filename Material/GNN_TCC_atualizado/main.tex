@@ -11,8 +11,11 @@
 \usepackage{amssymb}
 \usepackage{listings}
 \usepackage{booktabs}
+\usepackage{longtable}
 \usepackage{multirow}
+\PassOptionsToPackage{hyphens}{url}
 \usepackage{hyperref}
+\setlength{\emergencystretch}{3em}
 \usepackage{tikz}
 \usetikzlibrary{shapes.geometric, arrows, positioning, shapes.misc}
 \usepackage{float}
@@ -49,13 +52,13 @@ produzir texto gramaticalmente impec\'avel e a postagens em idiomas
 n\~ao cobertos por modelos pr\'e-treinados. Este trabalho investiga em
 que condi\c{c}\~oes a \textbf{topologia da propaga\c{c}\~ao}, o padr\~ao
 com que uma not\'icia se espalha pela rede, pode complementar ou
-substituir a an\'alise textual. Tr\^es perguntas de pesquisa orientam o
-trabalho: (RQ1) topologia carrega sinal discriminante acima do texto
-da raiz da \'arvore de propaga\c{c}\~ao? (RQ2) sob quais condi\c{c}\~oes
-estruturais? (RQ3) \'e vi\'avel detectar fake news \emph{apenas} pela
-topologia?
+substituir a an\'alise textual. Tr\^es quest\~oes de pesquisa orientam o
+trabalho: (RQ1) se a topologia carrega sinal discriminante acima do texto
+da raiz da \'arvore de propaga\c{c}\~ao; (RQ2) sob quais condi\c{c}\~oes
+estruturais isso ocorre; (RQ3) se \'e vi\'avel detectar fake news \emph{apenas} pela
+topologia.
 
-Realizamos ablation sistem\'atica em tr\^es \emph{datasets} (FakeNewsNet
+Foi realizada ablation sistem\'atica em tr\^es \emph{datasets} (FakeNewsNet
 PolitiFact, UPFD-PolitiFact, UPFD-GossipCop), comparando GCN, GAT e
 GraphSAGE com tr\^es variantes de \emph{features} estruturais. Os
 experimentos s\~ao validados com k-fold pareado, teste $t$ pareado
@@ -183,8 +186,8 @@ Bluesky. Cohen's d. Positional encodings.
 % Bibliografia
 % ============================================================
 
-\bibliography{Referencias}
 \bibliographystyle{abntex2-alf}
+\bibliography{Referencias}
 
 % ============================================================
 % Apendices
