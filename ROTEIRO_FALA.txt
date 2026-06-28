@@ -1,0 +1,290 @@
+==========================================================================
+ ROTEIRO DE FALA - DEFESA DO TCC
+ Deteccao de Fake News com Redes Neurais de Grafos:
+ Ablation Sistematica e Diagnostico de Aplicabilidade Topologica
+ Andre Messina Livingston - Cesar Augusto Sibila - Enzo Kikuji Takida
+ PUC-SP - Ciencia de Dados e Inteligencia Artificial - 2026
+==========================================================================
+
+COMO USAR ESTE ARQUIVO
+- E fala natural, para ENSAIAR. Nao leia palavra por palavra na defesa.
+- Numeros conferidos contra o FATOS_TCC.md.
+- Os numeros de pagina sao os IMPRESSOS no rodape (= os do sumario).
+- Apresentacao de 20 min. Andre ~7 min / Cesar ~8 min / Enzo ~5 min.
+
+TODOS OS TRES DEVEM SABER DE COR:
+- A frase da tese central (slide 12).
+- Os 3 numeros-ancora: F1=0,81 (GossipCop) / 0,33 (PolitiFact) / d=+1,53.
+- Ler o RESUMO (pagina 1) - tem o arco inteiro do trabalho em uma pagina.
+
+
+==========================================================================
+ ANDRE - slides 1 a 8 (~7 min)
+ Abre, conta a historia, ficha tecnica de dados e arquiteturas.
+ Sem estatistica - o porque-matematico ele passa para o Cesar.
+==========================================================================
+
+PAGINAS DO TCC PARA LER (para dominar este bloco):
+- Capitulo 1 inteiro - paginas 13 a 17
+  (Contextualizacao, Motivacao, Perguntas de pesquisa, Contribuicoes).
+  E a historia toda: COVID, escala, fragilidade do texto, as 3 RQs.
+- Secao 2.1 - pagina 18 (panorama da deteccao de fake news).
+- Secoes 2.4, 2.4.1-2.4.3 - paginas 22 a 25 (GCN, GAT, GraphSAGE).
+- Secao 2.5 - pagina 25 (por que o GCN degenera - "por que a SAGE vence";
+  pode passar a fundo para o Cesar, mas leia para nao travar).
+- Secoes 3.1, 3.2, 3.3 - paginas 33 a 34 (pipeline, datasets, construcao
+  dos grafos de propagacao) + Tabela 3.1 (pagina 34).
+- Secao 3.5 - paginas 35 a 36 (arquiteturas e hiperparametros).
+- Apendice D.1 - pagina 90 (o dataset Bluesky).
+- Figura 1.1 - pagina 15 (o fluxograma geral do trabalho).
+
+--------------------------------------------------------------------------
+SLIDE 1 - CAPA
+"Boa tarde a todos. Somos Andre, Cesar e Enzo, do curso de Ciencia de
+Dados e Inteligencia Artificial. Nosso trabalho investiga uma pergunta
+simples de enunciar e dificil de responder: da pra detectar fake news SEM
+LER O TEXTO - so olhando como a noticia se espalha pela rede? A resposta,
+como a gente vai mostrar, e DEPENDE - e a contribuicao do trabalho e
+justamente dizer DE QUE depende."
+
+--------------------------------------------------------------------------
+SLIDE 2 - DIVISOR ATO 1
+"Comeco pela historia: por que detectar fake news so pelo texto esta
+ficando fragil, e qual foi a nossa aposta."
+
+--------------------------------------------------------------------------
+SLIDE 3 - O PROBLEMA E REAL E DE ESCALA
+"A desinformacao nao e so ruido de internet - tem dano documentado. Na
+pandemia, narrativas falsas levaram gente a tomar risco real, tipo usar
+desinfetante como protecao. E o volume e de Big Data: criar uma mentira e
+instantaneo, desmenti-la e lento e caro. Nao da pra fazer na mao -
+deteccao automatica virou necessidade tecnica."
+
+--------------------------------------------------------------------------
+SLIDE 4 - POR QUE O TEXTO SOZINHO NAO BASTA
+"A forma classica de detectar e analisar o texto com PLN. Mas isso tem
+dois furos que so crescem. Primeiro: os LLMs hoje escrevem mentira com
+gramatica perfeita - a fronteira entre texto humano e sintetico some.
+Segundo: se a noticia esta num idioma sem bom modelo, o texto vira inutil.
+A virada de chave do trabalho e olhar pra outra coisa: NAO o que a noticia
+diz, mas COMO ela se espalha - quem compartilha, pra quem, em que ordem.
+Esse padrao e um grafo, e ele independe do idioma."
+
+--------------------------------------------------------------------------
+SLIDE 5 - AS TRES PERGUNTAS DE PESQUISA
+"O trabalho inteiro gira em torno de tres perguntas. RQ1: a estrutura
+ajuda alem do texto? RQ2, a mais importante: SOB QUAIS CONDICOES? - porque
+a gente ja desconfiava que nao fosse sempre. E RQ3: da pra ir ao extremo e
+usar SO estrutura, sem texto nenhum? E isso que fomos medir."
+
+--------------------------------------------------------------------------
+SLIDE 6 - DIVISOR ATO 2
+"Agora a parte do metodo: os dados, as arquiteturas, o rigor - e o achado
+central."
+
+--------------------------------------------------------------------------
+SLIDE 7 - OS DADOS
+"Usamos tres datasets de benchmark - dois do PolitiFact e o GossipCop, que
+e o maior, com 5.464 grafos. A ideia central: cada noticia vira um grafo
+de propagacao, onde a raiz e a noticia e os filhos sao quem repostou. Alem
+disso, montamos uma aplicacao sobre o Bluesky - 168 mil posts reais,
+multilingues - um dataset que a gente mesmo tratou e PUBLICOU no Hugging
+Face. Usamos benchmarks oficiais de proposito, pra poder comparar com a
+literatura e nao inventar a regua."
+
+--------------------------------------------------------------------------
+SLIDE 8 - TRES ARQUITETURAS  >>> passa pro Cesar
+"Comparamos tres arquiteturas de proposito. A GCN, classica, que faz media
+dos vizinhos. A GAT, que aprende com ATENCAO o peso de cada vizinho. E a
+GraphSAGE, indutiva, que separa a representacao do proprio no da dos
+vizinhos. Testamos as tres por um motivo metodologico: se o resultado
+dependesse de uma arquitetura especifica, seria um truque; quando as tres
+concordam, o sinal esta nos DADOS. E spoiler: a SAGE venceu. POR QUE ela
+vence - e o quanto isso importa - QUEM MOSTRA E O CESAR."
+
+
+==========================================================================
+ CESAR - slides 9 a 15 e 20 a 22 (~8 min)
+ Todo o nucleo matematico + o fecho + conduz a arguicao.
+ E a rede de seguranca dos tres.
+==========================================================================
+
+PAGINAS DO TCC PARA LER (precisa dominar o miolo todo):
+- Secao 2.5 - pagina 25 (degeneracao do GCN: por que a SAGE vence).
+- Secao 2.6 - pagina 26 (codificacoes posicionais: base do ablation).
+- Secao 2.8 - pagina 28 (validacao estatistica) + Tabela 2.1, pagina 29
+  (limiares do Cohen's d: 0,2 / 0,5 / 0,8).
+- Secoes 3.4 a 3.11 - paginas 35 a 40 (folds, hiperparametros, baselines,
+  protocolo, analise estratificada, regra dual, reprodutibilidade).
+- Capitulo 4 INTEIRO - paginas 41 a 65. Principais:
+   . 4.2 confound (pag. 43) - resposta ao "num_nodes nao e confound?"
+   . 4.4 topologia sem texto - ACHADO CENTRAL (pag. 45-46) + Tabela 4.5
+   . 4.6 por que GossipCop sim e PolitiFact nao (pag. 49-50) + Tabela 4.7
+   . 4.7 concordancia textual x topologico (pag. 51-53)
+   . 4.8 GNNExplainer (pag. 54-55) - o mecanismo
+   . 4.9.4 cascatas profundas / multi-hop (pag. 61-63) + Tabelas 4.10/Fig
+   . 4.10 painel mestre (pag. 64-65)
+- Capitulo 5 INTEIRO - paginas 66 a 70 (sintese por RQ, o negativo como
+  evidencia, limitacoes, trabalhos futuros, consideracoes finais).
+- Para o "cap de 100 nos": Secao 3.3 - pagina 34.
+
+--------------------------------------------------------------------------
+SLIDE 9 - RIGOR
+"Obrigado, Andre. Antes dos resultados, o que separa isto de um
+experimento de fim de semana: o rigor. Quatro coisas. Ablation: desligamos
+o texto e cada feature, uma a uma, pra saber de onde o sinal realmente
+vem. Estatistica de verdade: k-fold pareado com teste-t, e 10 seeds no
+resultado principal. Cohen's d, que mede o TAMANHO da diferenca entre fake
+e real. E bootstrap, 2.000 reamostragens, nos subgrupos. Tudo em CPU, com
+seed fixa - qualquer um repete."
+
+--------------------------------------------------------------------------
+SLIDE 10 - O ACHADO CENTRAL
+"E aqui esta o coracao do trabalho. A mesma GraphSAGE, com SO DUAS FEATURES
+estruturais por no e ZERO TEXTO, atinge F1 de 0,81 no GossipCop - perto do
+teto que o texto da. Mas a MESMA arquitetura, no PolitiFact, COLAPSA pra
+0,33 - abaixo da chance, que e 0,50. Mesmo pipeline, destino oposto. A
+pergunta obvia e: por que?"
+
+--------------------------------------------------------------------------
+SLIDE 11 - A DIFERENCA ESTRUTURAL (COHEN'S D)
+"A resposta esta nesta figura. A gente mede, com Cohen's d, o quao
+diferentes sao as estruturas de fake e de real em cada dataset. No
+GossipCop, sao MUITO diferentes - d de 1,53, efeito grande. No PolitiFact,
+sao quase identicas - d abaixo de 0,5 em toda metrica, no maximo 0,25.
+Onde ha separacao estrutural, a topologia funciona; onde nao ha, colapsa."
+
+--------------------------------------------------------------------------
+SLIDE 12 - TESE CENTRAL
+"Disso vem a tese do trabalho, e a gente formulou ela pra ser
+FALSIFICAVEL de proposito: modelos topologicos exigem d maior ou igual a
+0,5 em ao menos uma metrica de cascata pra serem efetivos; abaixo disso,
+colapsam, independentemente da arquitetura. Isso e raro em machine
+learning - e uma regra que PODE SER REFUTADA por um unico contraexemplo. E
+ela nao para no numero agregado."
+
+--------------------------------------------------------------------------
+SLIDE 13 - DIVISOR ATO 3
+"Vamos aprofundar: o mecanismo por tras do numero, a aplicacao, e o
+fechamento honesto."
+
+--------------------------------------------------------------------------
+SLIDE 14 - O GANHO E MULTI-HOP
+"Uma critica natural seria: 'a SAGE so esta medindo se o grafo e grande'. A
+gente testou isso. Comparando a SAGE com um Random Forest que so ve
+tamanho e grau, o ganho da SAGE CRESCE COM A PROFUNDIDADE da cascata - de
+6 pontos no geral pra 21 pontos nas cascatas mais profundas, com intervalo
+de confianca que nao toca o zero. Ela usa propagacao multi-hop, nao so
+tamanho. Esse e o mecanismo."
+
+--------------------------------------------------------------------------
+SLIDE 15 - TEXTO x TOPOLOGIA  >>> passa pro Enzo
+"E quando a gente cruza o sinal de texto com o de estrutura, eles nem
+sempre concordam. Quando concordam, a confianca e altissima - F1 de 0,97.
+Quando discordam, e onde mora o perigo: o topologico desaba pra 0,08, e o
+textual segura 0,91. Disso derivamos uma regra de combinacao que favorece
+o texto quando os dois brigam - e deixamos claro que ela e conjectura,
+derivada depois de ver os dados. A PARTIR DAQUI, O ENZO MOSTRA como isso
+vira aplicacao no mundo real."
+
+      (... Enzo apresenta os slides 16 a 19 ...)
+
+--------------------------------------------------------------------------
+SLIDE 20 - LIMITACOES
+"Obrigado, Enzo. E as limitacoes, que a gente assume de frente. O
+FakeNewsNet que construimos vira estrela rasa, porque o CSV bruto nao traz
+o parentesco entre reposts - mas isso vale so pro NOSSO FNN; o UPFD oficial
+nao e estrela, tem 30% de grafos profundos. A regra dual saiu de um
+experimento so, entao e conjectura. O Bluesky nao tem rotulos, entao ali e
+demonstracao. E rodamos em CPU, sem comparar numero a numero com BiGCN.
+Nada disso derruba o achado central - e a gente prefere dizer do que
+esconder."
+
+--------------------------------------------------------------------------
+SLIDE 21 - AS TRES RESPOSTAS
+"Fechando, as tres respostas. RQ1: depende - e a gente sabe de que
+depende. RQ2: a condicao e MEDIVEL ANTES DE TREINAR - Cohen's d maior que
+0,5. RQ3: sim, condicionalmente, e o sinal nao depende do idioma. A
+contribuicao nao e 'mais uma rede que detecta fake news' - e um CRITERIO
+DE APLICABILIDADE: saber de antemao quando vale usar topologia e quando e
+melhor confiar no texto."
+
+--------------------------------------------------------------------------
+SLIDE 22 - ENCERRAMENTO
+"E isso. O codigo, o dataset Bluesky tratado e os pesos estao publicos no
+Hugging Face. Obrigado pela atencao - estamos a disposicao da banca para
+as perguntas."
+
+
+==========================================================================
+ ENZO - slides 16 a 19 (~5 min)
+ Bloco mais seguro: aplicacao e sintese. 100% roteirizado, baixo risco.
+==========================================================================
+
+PAGINAS DO TCC PARA LER (foco no que voce apresenta):
+- RESUMO - pagina 1 (o arco inteiro; sustenta o slide 19 "virtudes").
+- Figura 1.1 - pagina 15 (o fluxograma; sustenta o slide 17 ferramenta).
+- Secao 3.10 - pagina 39 (a regra dual: como texto e topologia se combinam).
+- Secao 4.5 - paginas 47 a 48 (consistencia entre idiomas, RQ3) + Tabela 4.6.
+- Secao 4.10 - paginas 64 a 65 (o painel mestre, Figura 4.15).
+- Secoes 5.1 e 5.2 - paginas 66 a 67 (sintese por RQ; o resultado negativo
+  como evidencia - e o coracao do slide 19).
+- Apendice D INTEIRO - paginas 90 a 92 (Bluesky, inferencia cross-domain,
+  concordancia, e a ferramenta web - sustenta os slides 16 e 17).
+
+--------------------------------------------------------------------------
+SLIDE 16 - A ESTRUTURA E AGNOSTICA A IDIOMA (RQ3)
+"Obrigado, Cesar. Aqui a gente fecha a RQ3, a promessa la do comeco.
+Pegamos o classificador puramente estrutural - o que nao le texto - e
+aplicamos em posts do Bluesky em idiomas diferentes. Entre portugues e
+ingles, a diferenca das distribuicoes e de menos 0,057, praticamente zero.
+E faz sentido: se o modelo nao le o texto, o idioma nao afeta ele. E a
+vantagem estrutural do paradigma, demonstrada num dado real e multilingue."
+
+  SE PERGUNTAREM DO BLUESKY: "O Bluesky nao tem rotulos fake/real - entao
+  aqui a gente mede CONSISTENCIA entre idiomas, nao acuracia. E
+  demonstracao de aplicabilidade, e esta dito nas limitacoes."
+  (Pergunta mais funda volta pro Cesar - o dataset e dele.)
+
+--------------------------------------------------------------------------
+SLIDE 17 - DA PESQUISA PARA UMA FERRAMENTA WEB
+"E o trabalho nao parou no PDF. A gente empacotou os tres modelos numa
+ferramenta web - Next.js e FastAPI - que recebe um post e devolve um score
+combinado pela regra dual, com uma flag dizendo se texto e estrutura
+concordam. Carrega em cerca de um segundo e meio, infere em milissegundos,
+e roda em CPU. O dataset tratado e os pesos estao publicados no Hugging
+Face - qualquer um reproduz."
+
+--------------------------------------------------------------------------
+SLIDE 18 - O PAINEL MESTRE
+"Esta figura resume o trabalho inteiro. Lendo na horizontal - mesmo
+modelo, datasets diferentes: o topologico puro, em verde, encosta no
+textual no GossipCop e desmorona no PolitiFact. Lendo na vertical - mesmo
+dataset: no PolitiFact, somar estrutura ao texto nao acrescenta nada. E os
+dois efeitos sao previstos pela mesma regua, o Cohen's d. Uma figura, a
+tese inteira."
+
+--------------------------------------------------------------------------
+SLIDE 19 - AS VIRTUDES DO TRABALHO  >>> passa pro Cesar
+"E por que esse trabalho importa? Tres virtudes. Primeira: e um
+DIAGNOSTICO, nao uma demonstracao - a area costuma publicar so os casos em
+que a topologia funciona; a gente apresenta o caso em que ela falha, com o
+mesmo rigor. Segunda: a tese e FALSIFICAVEL - a gente se expos a refutacao
+de proposito. Terceira: rigor estatistico e reprodutibilidade total, em
+CPU. O resultado negativo do PolitiFact nao e um problema do trabalho; e
+parte da contribuicao. PRA FECHAR, O CESAR ASSUME as limitacoes e a
+conclusao."
+
+
+==========================================================================
+ ROTEAMENTO DA ARGUICAO (quem responde o que)
+==========================================================================
+- Estatistica / Cohen's d / colapso do PolitiFact / cap de 100 nos /
+  curadoria do Bluesky ............................. CESAR (rede de seguranca)
+- Arquiteturas / ferramenta / stack ................ ANDRE
+- Enquadramento / motivacao / "qual a contribuicao" . ENZO (Cesar completa)
+- Regra geral: quem domina o tema responde, NAO IMPORTA quem apresentou.
+
+==========================================================================
+ FIM DO ROTEIRO
+==========================================================================
